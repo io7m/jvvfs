@@ -43,6 +43,7 @@ public class FilesystemTest
       if (f.exists() == false) {
         f.mkdirs();
       }
+      f.setLastModified(0);
     }
   }
 
