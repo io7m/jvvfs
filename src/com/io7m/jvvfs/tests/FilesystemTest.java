@@ -9,6 +9,7 @@ import java.util.TreeSet;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.io7m.jaux.Constraints.ConstraintError;
@@ -24,6 +25,26 @@ import com.io7m.jvvfs.PathVirtual;
 public class FilesystemTest
 {
   private static final String archive_dir = "test-archives";
+
+  @Before public void setUp()
+    throws Exception
+  {
+    {
+      final File f =
+        new File(FilesystemTest.archive_dir + "/archive1/subdir");
+      if (f.exists() == false) {
+        f.mkdirs();
+      }
+    }
+
+    {
+      final File f =
+        new File(FilesystemTest.archive_dir + "/archive-mtime/subdir");
+      if (f.exists() == false) {
+        f.mkdirs();
+      }
+    }
+  }
 
   private static FilesystemAPI makeFS()
     throws IOException,
