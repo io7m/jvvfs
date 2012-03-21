@@ -3,6 +3,16 @@
   <c:project>io7m-jvvfs</c:project>
 
   <c:release ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2012-03-21</c:date>
+    <c:version>1.0.1</c:version>
+    <c:item>
+      <c:date>2012-03-21</c:date>
+      <c:type-platform-new/>
+      <c:summary>Add FreeBSD 8.2 as supported</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2012-03-15</c:date>
     <c:version>1.0.0</c:version>
     <c:item>
