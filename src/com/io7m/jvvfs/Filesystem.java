@@ -18,6 +18,10 @@ import com.io7m.jlog.Log;
 import com.io7m.jvvfs.FileReference.Type;
 import com.io7m.jvvfs.FilesystemError.Code;
 
+/**
+ * The default implementation of the filesystem.
+ */
+
 public final class Filesystem implements FilesystemAPI
 {
   private static boolean archiveExists(
@@ -36,9 +40,7 @@ public final class Filesystem implements FilesystemAPI
   private final @Nonnull Log                                  log;
   private final @Nonnull PathReal                             archive_path;
   private final @Nonnull ArrayList<ArchiveHandler>            handlers;
-
   private final @Nonnull HashMap<PathVirtual, Stack<Archive>> mounts;
-
   private final @Nonnull TreeSet<PathVirtual>                 directories;
 
   public Filesystem(
@@ -89,7 +91,9 @@ public final class Filesystem implements FilesystemAPI
     final @Nonnull String archive_name)
     throws ConstraintError
   {
-    return new PathReal(this.archive_path.value + File.separatorChar + archive_name);
+    return new PathReal(this.archive_path.value
+      + File.separatorChar
+      + archive_name);
   }
 
   /*

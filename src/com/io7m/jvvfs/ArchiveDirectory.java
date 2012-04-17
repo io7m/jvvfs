@@ -14,6 +14,10 @@ import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jlog.Log;
 import com.io7m.jvvfs.FileReference.Type;
 
+/**
+ * Archiver based on standard filesystem/directory operations.
+ */
+
 public final class ArchiveDirectory implements Archive
 {
   private final @Nonnull PathVirtual  path_mount;

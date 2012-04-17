@@ -6,6 +6,10 @@ import javax.annotation.Nonnull;
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
 
+/**
+ * A reference to a file inside an archive.
+ */
+
 public final class FileReference
 {
   public static enum Type

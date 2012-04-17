@@ -8,6 +8,10 @@ import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jlog.Log;
 
+/**
+ * Handler for loading archives of type {@link ArchiveZip}.
+ */
+
 public final class ArchiveHandlerZip implements ArchiveHandler
 {
   private final @Nonnull Log log;

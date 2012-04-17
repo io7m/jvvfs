@@ -4,6 +4,10 @@ import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints.ConstraintError;
 
+/**
+ * The interface exposed by the "handler" for each archive type.
+ */
+
 public interface ArchiveHandler
 {
   boolean canHandle(

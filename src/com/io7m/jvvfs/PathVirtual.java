@@ -11,6 +11,13 @@ import javax.annotation.Nonnull;
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
 
+/**
+ * Type representing virtual paths. That is, paths inside the virtual
+ * filesystem created by mounting archives.
+ * 
+ * @see PathReal
+ */
+
 public final class PathVirtual implements Comparable<PathVirtual>
 {
   public static boolean isSafe(

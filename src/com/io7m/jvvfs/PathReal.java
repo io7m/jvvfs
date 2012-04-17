@@ -7,6 +7,13 @@ import javax.annotation.Nonnull;
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
 
+/**
+ * Type representing "real" paths. That is, paths to files in the real OS
+ * filesystem.
+ * 
+ * @see PathVirtual
+ */
+
 public final class PathReal
 {
   public final @Nonnull String value;

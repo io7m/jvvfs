@@ -8,6 +8,10 @@ import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints.ConstraintError;
 
+/**
+ * Type representing a mounted archive.
+ */
+
 public interface Archive
 {
   /**

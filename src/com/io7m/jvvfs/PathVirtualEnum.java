@@ -7,6 +7,10 @@ import javax.annotation.Nonnull;
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
 
+/**
+ * Trivial class for iterating over elements of a {@link PathVirtual}.
+ */
+
 public final class PathVirtualEnum implements Enumeration<PathVirtual>
 {
   private final @Nonnull PathVirtual path;

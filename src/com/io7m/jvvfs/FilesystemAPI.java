@@ -7,6 +7,10 @@ import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints.ConstraintError;
 
+/**
+ * The API exposed by filesystem implementations.
+ */
+
 public interface FilesystemAPI
 {
   /**

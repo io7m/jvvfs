@@ -2,6 +2,10 @@ package com.io7m.jvvfs;
 
 import javax.annotation.Nonnull;
 
+/**
+ * Exception type raised during filesystem operations.
+ */
+
 public final class FilesystemError extends Exception
 {
   public static enum Code

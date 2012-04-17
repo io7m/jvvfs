@@ -16,24 +16,34 @@ import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jlog.Log;
 import com.io7m.jvvfs.FileReference.Type;
 
+/**
+ * Archiver based on zip files.
+ */
+
 public final class ArchiveZip implements Archive
 {
-  private static long convertZipTime(final long t)
+  private static long convertZipTime(
+    final long t)
   {
     final String os = System.getProperty("os.name");
-    if (os.indexOf("win") >= 0 || os.indexOf("Win") >= 0) {
-      return convertZipTimeWin32(t);
+    if ((os.indexOf("win") >= 0) || (os.indexOf("Win") >= 0)) {
+      return ArchiveZip.convertZipTimeWin32(t);
     }
-    return convertZipTimeUnix(t);
+    return ArchiveZip.convertZipTimeUnix(t);
   }
-  private static long convertZipTimeUnix(final long t)
+
+  private static long convertZipTimeUnix(
+    final long t)
   {
     return t - 315532800000L;
   }
-  private static long convertZipTimeWin32(final long t)
+
+  private static long convertZipTimeWin32(
+    final long t)
   {
     return t - 315561600000L;
   }
+
   private final @Nonnull PathVirtual  path_mount;
   private final @Nonnull PathReal     path_real;
 
@@ -205,7 +215,7 @@ public final class ArchiveZip implements Archive
     this.log.info("lookup " + path);
     return this.lookupInternal(path);
   }
-  
+
   private @Nonnull FileReference lookupInternal(
     final @Nonnull PathVirtual path)
     throws ConstraintError,
@@ -243,10 +253,10 @@ public final class ArchiveZip implements Archive
   }
 
   /*
-   * XXX: Portability: There are probably systems that aren't UNIX
-   * and aren't Windows.
+   * XXX: Portability: There are probably systems that aren't UNIX and aren't
+   * Windows.
    */
-  
+
   @Override public long modificationTime(
     final PathVirtual path)
     throws ConstraintError,
@@ -256,7 +266,7 @@ public final class ArchiveZip implements Archive
       path,
       "path"));
   }
-  
+
   private long modificationTimeInternal(
     final @Nonnull PathVirtual path)
     throws FilesystemError
@@ -284,7 +294,7 @@ public final class ArchiveZip implements Archive
        * time.
        */
       if ((entry_slash == null) && (entry_name != null)) {
-        return convertZipTime(entry_name.getTime());
+        return ArchiveZip.convertZipTime(entry_name.getTime());
       }
     }
 
