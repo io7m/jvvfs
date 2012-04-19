@@ -734,6 +734,50 @@ public class FilesystemTest
     f.unmount(new PathVirtual("/"));
   }
 
+  @Test public void testFilesystemListMkdir()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/a");
+      f.createDirectory("/b");
+      f.createDirectory("/c");
+      f.createDirectory("/a/x");
+      f.createDirectory("/b/y");
+      f.createDirectory("/c/z");
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    } catch (final ConstraintError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    items.clear();
+    f.listDirectory(new PathVirtual("/"), items);
+    Assert.assertEquals(3, items.size());
+    Assert.assertTrue(items.contains("a"));
+    Assert.assertTrue(items.contains("b"));
+    Assert.assertTrue(items.contains("c"));
+
+    items.clear();
+    f.listDirectory(new PathVirtual("/a"), items);
+    Assert.assertEquals(1, items.size());
+    Assert.assertTrue(items.contains("x"));
+
+    items.clear();
+    f.listDirectory(new PathVirtual("/b"), items);
+    Assert.assertEquals(1, items.size());
+    Assert.assertTrue(items.contains("y"));
+
+    items.clear();
+    f.listDirectory(new PathVirtual("/c"), items);
+    Assert.assertEquals(1, items.size());
+    Assert.assertTrue(items.contains("z"));
+  }
+
   @Test(expected = FilesystemError.class) public
     void
     testFilesystemMountBadArchive()

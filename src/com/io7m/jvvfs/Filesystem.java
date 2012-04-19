@@ -362,6 +362,14 @@ public final class Filesystem implements FilesystemAPI
         }
       }
     }
+
+    for (final PathVirtual dir : this.directories) {
+      if (dir.isRoot() == false) {
+        if (dir.parent().equals(path)) {
+          items.add(dir.baseName());
+        }
+      }
+    }
   }
 
   private Archive loadArchive(

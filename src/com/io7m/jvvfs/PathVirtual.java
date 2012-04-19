@@ -74,6 +74,14 @@ public final class PathVirtual implements Comparable<PathVirtual>
     this.image = builder.toString();
   }
 
+  public @Nonnull String baseName()
+  {
+    if (this.isRoot()) {
+      return "/";
+    }
+    return this.components.get(this.components.size() - 1);
+  }
+
   @Override public int compareTo(
     final PathVirtual other)
   {
