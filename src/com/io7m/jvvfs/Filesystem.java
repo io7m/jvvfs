@@ -346,14 +346,23 @@ public final class Filesystem implements FilesystemAPI
     for (final Entry<PathVirtual, Stack<Archive>> ent : this.mounts
       .entrySet()) {
       final PathVirtual mount = ent.getKey();
-      if (mount.isParentOf(path)) {
+      if (mount.isParentOf(path) || mount.equals(path)) {
         final Stack<Archive> stack = ent.getValue();
         final int size = stack.size();
         assert size > 0;
         for (int index = size - 1; index >= 0; --index) {
           final Archive a = stack.get(index);
           try {
-            a.listDirectory(path.subtract(mount), items);
+            PathVirtual list_dir = null;
+
+            if (mount.equals(path)) {
+              list_dir = PathVirtual.root;
+            } else {
+              list_dir = path.subtract(mount);
+            }
+
+            assert list_dir != null;
+            a.listDirectory(list_dir, items);
           } catch (final FilesystemError e) {
             if (e.code != Code.FS_ERROR_NONEXISTENT) {
               throw e;

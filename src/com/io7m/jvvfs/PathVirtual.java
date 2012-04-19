@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
@@ -18,7 +19,7 @@ import com.io7m.jaux.Constraints.ConstraintError;
  * @see PathReal
  */
 
-public final class PathVirtual implements Comparable<PathVirtual>
+@Immutable public final class PathVirtual implements Comparable<PathVirtual>
 {
   public static boolean isSafe(
     final @Nonnull String path)
@@ -43,8 +44,14 @@ public final class PathVirtual implements Comparable<PathVirtual>
   }
 
   private final @Nonnull ArrayList<String> components;
-
   private final @Nonnull String            image;
+  public static final @Nonnull PathVirtual root = new PathVirtual();
+
+  private PathVirtual()
+  {
+    this.components = new ArrayList<String>();
+    this.image = "/";
+  }
 
   public PathVirtual(
     final @Nonnull String path)

@@ -7,6 +7,11 @@
     <c:version>1.1.0</c:version>
     <c:item>
       <c:date>2012-04-19</c:date>
+      <c:type-code-fix/>
+      <c:summary>Directories were not being listed when specifying a mount point directly</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2012-04-19</c:date>
       <c:type-code-new/>
       <c:summary>Add mountUnsafeClasspathItem for mounting classpath archives</c:summary>
     </c:item>

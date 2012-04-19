@@ -404,6 +404,27 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("file33.txt"));
   }
 
+  @Test public void testFilesystemDirectoryListMountDirect()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive1", new PathVirtual("/xyz"));
+      f.listDirectory(new PathVirtual("/xyz"), items);
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    Assert.assertEquals(2, items.size());
+    Assert.assertTrue(items.contains("file.txt"));
+    Assert.assertTrue(items.contains("subdir"));
+  }
+
   @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryListNonexistent()
