@@ -2,6 +2,7 @@ package com.io7m.jvvfs;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -24,6 +25,12 @@ import com.io7m.jvvfs.FilesystemError.Code;
 
 public final class Filesystem implements FilesystemAPI
 {
+  private static enum MountCheck
+  {
+    MOUNT_ARCHIVE_DANGEROUSLY_AND_DIRECTLY,
+    MOUNT_ARCHIVE_FILE_SAFELY_FROM_DIRECTORY
+  }
+
   private static boolean archiveExists(
     final @Nonnull PathReal archive_real)
   {
@@ -41,6 +48,7 @@ public final class Filesystem implements FilesystemAPI
   private final @Nonnull PathReal                             archive_path;
   private final @Nonnull ArrayList<ArchiveHandler>            handlers;
   private final @Nonnull HashMap<PathVirtual, Stack<Archive>> mounts;
+
   private final @Nonnull TreeSet<PathVirtual>                 directories;
 
   public Filesystem(
@@ -87,6 +95,13 @@ public final class Filesystem implements FilesystemAPI
     return null;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * com.io7m.jvvfs.FilesystemAPI#createDirectory(com.io7m.jvvfs.PathVirtual)
+   */
+
   private PathReal archiveReal(
     final @Nonnull String archive_name)
     throws ConstraintError
@@ -95,13 +110,6 @@ public final class Filesystem implements FilesystemAPI
       + File.separatorChar
       + archive_name);
   }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * com.io7m.jvvfs.FilesystemAPI#createDirectory(com.io7m.jvvfs.PathVirtual)
-   */
 
   @Override public void createDirectory(
     final @Nonnull PathVirtual path)
@@ -119,6 +127,12 @@ public final class Filesystem implements FilesystemAPI
   {
     this.createDirectory(new PathVirtual(path));
   }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.io7m.jvvfs.FilesystemAPI#isDirectory(com.io7m.jvvfs.PathVirtual)
+   */
 
   private void createDirectoryInternal(
     final @Nonnull PathVirtual path)
@@ -147,12 +161,6 @@ public final class Filesystem implements FilesystemAPI
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.io7m.jvvfs.FilesystemAPI#isDirectory(com.io7m.jvvfs.PathVirtual)
-   */
-
   @Override public long fileSize(
     final @Nonnull PathVirtual path)
     throws ConstraintError,
@@ -161,6 +169,12 @@ public final class Filesystem implements FilesystemAPI
     return this.fileSizeInternal(Constraints.constrainNotNull(path, "path"));
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.io7m.jvvfs.FilesystemAPI#isFile(com.io7m.jvvfs.PathVirtual)
+   */
+
   @Override public long fileSize(
     final @Nonnull String path)
     throws ConstraintError,
@@ -168,12 +182,6 @@ public final class Filesystem implements FilesystemAPI
   {
     return this.fileSize(new PathVirtual(path));
   }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.io7m.jvvfs.FilesystemAPI#isFile(com.io7m.jvvfs.PathVirtual)
-   */
 
   private long fileSizeInternal(
     final @Nonnull PathVirtual path)
@@ -243,6 +251,13 @@ public final class Filesystem implements FilesystemAPI
     return this.isFileInternal(Constraints.constrainNotNull(path, "path"));
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.io7m.jvvfs.FilesystemAPI#mount(java.lang.String,
+   * com.io7m.jvvfs.PathVirtual)
+   */
+
   @Override public boolean isFile(
     final @Nonnull String path)
     throws ConstraintError,
@@ -250,13 +265,6 @@ public final class Filesystem implements FilesystemAPI
   {
     return this.isFile(new PathVirtual(path));
   }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.io7m.jvvfs.FilesystemAPI#mount(java.lang.String,
-   * com.io7m.jvvfs.PathVirtual)
-   */
 
   private boolean isFileInternal(
     final @Nonnull PathVirtual path)
@@ -318,6 +326,12 @@ public final class Filesystem implements FilesystemAPI
     this.listDirectory(new PathVirtual(path), items);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.io7m.jvvfs.FilesystemAPI#unmount(com.io7m.jvvfs.PathVirtual)
+   */
+
   private void listDirectoryInternal(
     final @Nonnull PathVirtual path,
     final @Nonnull TreeSet<String> items)
@@ -349,12 +363,6 @@ public final class Filesystem implements FilesystemAPI
       }
     }
   }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.io7m.jvvfs.FilesystemAPI#unmount(com.io7m.jvvfs.PathVirtual)
-   */
 
   private Archive loadArchive(
     final @Nonnull PathReal archive_real,
@@ -467,6 +475,7 @@ public final class Filesystem implements FilesystemAPI
     this.log.info("mount " + archive + " " + mount.toString());
     this.mountInternal(
       Constraints.constrainNotNull(archive, "archive"),
+      MountCheck.MOUNT_ARCHIVE_FILE_SAFELY_FROM_DIRECTORY,
       Constraints.constrainNotNull(mount, "mount point"));
   }
 
@@ -495,17 +504,26 @@ public final class Filesystem implements FilesystemAPI
 
   private void mountInternal(
     final @Nonnull String archive_name,
+    final @Nonnull MountCheck check,
     final @Nonnull PathVirtual mount)
     throws FilesystemError,
       ConstraintError
   {
-    if (Filesystem.archiveNameUnsafe(archive_name)) {
-      throw FilesystemError.fileNotFound(archive_name);
+    PathReal archive_real = null;
+
+    if (check == MountCheck.MOUNT_ARCHIVE_FILE_SAFELY_FROM_DIRECTORY) {
+      if (Filesystem.archiveNameUnsafe(archive_name)) {
+        throw FilesystemError.fileNotFound(archive_name);
+      }
+      archive_real = this.archiveReal(archive_name);
+    } else if (check == MountCheck.MOUNT_ARCHIVE_DANGEROUSLY_AND_DIRECTLY) {
+      archive_real = new PathReal(archive_name);
     }
 
-    final PathReal archive_real = this.archiveReal(archive_name);
+    assert archive_real != null;
+
     if (Filesystem.archiveExists(archive_real) == false) {
-      throw FilesystemError.fileNotFound(archive_name);
+      throw FilesystemError.fileNotFound(archive_real.toString());
     }
     if (this.isMountedArchive(mount, archive_real)) {
       throw FilesystemError.duplicateMount(archive_name, mount.toString());
@@ -552,6 +570,79 @@ public final class Filesystem implements FilesystemAPI
     final @Nonnull PathVirtual mount)
   {
     return this.directories.contains(mount) == false;
+  }
+
+  /**
+   * Mount the archive file that contains class <code>c</code>. This is a
+   * slightly dangerous function that should be used with extreme caution: it
+   * may result in surprises when a class is not where the developer expects
+   * it to be.
+   * 
+   * @param c
+   *          The class.
+   * @param mount
+   *          The path at which to mount the resulting archive.
+   * @throws ConstraintError
+   *           Iff any of the following conditions hold:
+   *           <ul>
+   *           <li><code>c == null</code></li>
+   *           <li><code>mount == null</code></li>
+   *           </ul>
+   * @throws FilesystemError
+   *           Iff a filesystem error occurs. This error may occur if the
+   *           given class is within a container that <code>jvvfs</code> does
+   *           not know how to load.
+   */
+
+  public void mountUnsafeClasspathItem(
+    final @Nonnull Class<?> c,
+    final @Nonnull PathVirtual mount)
+    throws ConstraintError,
+      FilesystemError
+  {
+    Constraints.constrainNotNull(c, "Class");
+    final String cname = c.getCanonicalName();
+    Constraints.constrainNotNull(cname, "Class canonical name");
+
+    final String cname_s = cname.replace('.', '/');
+    final String cname_k = cname_s + ".class";
+
+    final ClassLoader loader = c.getClassLoader();
+    final URL url = loader.getResource(cname_k);
+
+    if (url.getProtocol().equals("file")) {
+      final String real_path = url.getPath();
+      final String mount_path =
+        real_path.substring(0, real_path.length() - cname_k.length());
+
+      this.log.info("mount-classpath-file : " + mount_path);
+
+      this.mountInternal(
+        mount_path,
+        MountCheck.MOUNT_ARCHIVE_DANGEROUSLY_AND_DIRECTLY,
+        mount);
+    } else if (url.getProtocol().equals("jar")) {
+      final String real_path = url.getPath();
+
+      /*
+       * Path is of the form "file:/x/y/z.jar!/path/to/file.class"
+       */
+
+      final String file_path =
+        real_path.substring(0, real_path.length() - (cname_k.length() + 2));
+      final String mount_path = file_path.replaceFirst("^file:", "");
+
+      this.log.info("mount-classpath-jar : " + mount_path);
+
+      this.mountInternal(
+        mount_path,
+        MountCheck.MOUNT_ARCHIVE_DANGEROUSLY_AND_DIRECTLY,
+        mount);
+    } else {
+      throw new FilesystemError(
+        Code.FS_ERROR_UNHANDLED_TYPE,
+        "Cannot mount whatever is holding this classpath item");
+    }
   }
 
   @Override public @Nonnull InputStream openFile(

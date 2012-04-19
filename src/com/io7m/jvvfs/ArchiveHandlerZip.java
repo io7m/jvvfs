@@ -26,7 +26,13 @@ public final class ArchiveHandlerZip implements ArchiveHandler
   @Override public boolean canHandle(
     final @Nonnull PathReal name)
   {
-    return name.value.endsWith(".zip") && (new File(name.value).isFile());
+    boolean ok = true;
+
+    ok = ok && name.value.endsWith(".zip");
+    ok = ok || name.value.endsWith(".jar");
+    ok = ok && new File(name.value).isFile();
+
+    return ok;
   }
 
   @Override public Archive load(

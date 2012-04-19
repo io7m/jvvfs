@@ -26,6 +26,19 @@ public class FilesystemTest
 {
   private static final String archive_dir = "test-archives";
 
+  private static FilesystemAPI makeFS()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Log log =
+      new Log(
+        PropertyUtils.loadFromFile("io7m-jvvfs.properties"),
+        "com.io7m.jvvfs",
+        "main");
+    return new Filesystem(log, new PathReal(FilesystemTest.archive_dir));
+  }
+
   @Before public void setUp()
     throws Exception
   {
@@ -45,19 +58,6 @@ public class FilesystemTest
       }
       f.setLastModified(0);
     }
-  }
-
-  private static FilesystemAPI makeFS()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
-  {
-    final Log log =
-      new Log(
-        PropertyUtils.loadFromFile("io7m-jvvfs.properties"),
-        "com.io7m.jvvfs",
-        "main");
-    return new Filesystem(log, new PathReal(FilesystemTest.archive_dir));
   }
 
   @SuppressWarnings("unused") @Test(expected = FilesystemError.class) public
