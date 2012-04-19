@@ -3,6 +3,21 @@
   <c:project>io7m-jvvfs</c:project>
 
   <c:release ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2012-04-19</c:date>
+    <c:version>1.1.0</c:version>
+    <c:item>
+      <c:date>2012-04-19</c:date>
+      <c:type-code-new/>
+      <c:summary>Add mountUnsafeClasspathItem for mounting classpath archives</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2012-04-19</c:date>
+      <c:type-code-fix/>
+      <c:summary>Add missing directory entries in file listings</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2012-03-21</c:date>
     <c:version>1.0.1</c:version>
     <c:item>
