@@ -91,8 +91,7 @@ public final class Filesystem implements FilesystemAPI
     }
 
     /* UNREACHABLE */
-    assert false;
-    return null;
+    throw new AssertionError("bug: unreachable code");
   }
 
   /*
