@@ -41,8 +41,8 @@ public final class PathVirtualEnum implements Enumeration<PathVirtual>
       ++this.index;
       return new PathVirtual(this.builder.toString());
     } catch (final ConstraintError e) {
-      assert false;
-      return null;
+      /* UNREACHABLE */
+      throw new AssertionError("bug: unreachable code");
     }
   }
 }
