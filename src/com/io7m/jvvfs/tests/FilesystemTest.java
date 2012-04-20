@@ -103,6 +103,12 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(new PathVirtual("/usr")));
     Assert.assertTrue(fs.isDirectory(new PathVirtual("/usr/local")));
     Assert.assertTrue(fs.isDirectory(new PathVirtual("/usr/local/lib")));
+
+    fs.createDirectory("/opt/local/lib");
+    Assert.assertTrue(fs.isDirectory(new PathVirtual("/")));
+    Assert.assertTrue(fs.isDirectory(new PathVirtual("/opt")));
+    Assert.assertTrue(fs.isDirectory(new PathVirtual("/opt/local")));
+    Assert.assertTrue(fs.isDirectory(new PathVirtual("/opt/local/lib")));
   }
 
   @Test public void testFilesystemDirectoryIsDirectoryCorrect()
@@ -139,6 +145,25 @@ public class FilesystemTest
     Assert.assertFalse(fs.isDirectory(new PathVirtual("/file.txt")));
   }
 
+  @Test public void testFilesystemDirectoryIsFileCorrectNonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI fs = FilesystemTest.makeFS();
+
+    try {
+      fs.createDirectory("/xyz");
+      fs.mount("archive0", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    Assert.assertFalse(fs.isFile(new PathVirtual("/xyz")));
+    Assert.assertTrue(fs.isFile(new PathVirtual("/xyz/file.txt")));
+    Assert.assertFalse(fs.isDirectory(new PathVirtual("/xyz/file.txt")));
+  }
+
   @Test public void testFilesystemDirectoryListComplex0()
     throws IOException,
       FilesystemError,
@@ -161,6 +186,29 @@ public class FilesystemTest
     }
   }
 
+  @Test public void testFilesystemDirectoryListComplex0NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-nest", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz"), items);
+      Assert.assertEquals(2, items.size());
+      Assert.assertTrue(items.contains("a"));
+      Assert.assertTrue(items.contains("b"));
+    }
+  }
+
   @Test public void testFilesystemDirectoryListComplex1()
     throws IOException,
       FilesystemError,
@@ -177,6 +225,33 @@ public class FilesystemTest
     {
       final TreeSet<String> items = new TreeSet<String>();
       f.listDirectory(new PathVirtual("/a"), items);
+      Assert.assertEquals(6, items.size());
+      Assert.assertTrue(items.contains("a"));
+      Assert.assertTrue(items.contains("a1.txt"));
+      Assert.assertTrue(items.contains("a2.txt"));
+      Assert.assertTrue(items.contains("a3.txt"));
+      Assert.assertTrue(items.contains("b"));
+      Assert.assertTrue(items.contains("c"));
+    }
+  }
+
+  @Test public void testFilesystemDirectoryListComplex1NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-nest", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/a"), items);
       Assert.assertEquals(6, items.size());
       Assert.assertTrue(items.contains("a"));
       Assert.assertTrue(items.contains("a1.txt"));
@@ -213,6 +288,33 @@ public class FilesystemTest
     }
   }
 
+  @Test public void testFilesystemDirectoryListComplex2NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-nest", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/b"), items);
+      Assert.assertEquals(6, items.size());
+      Assert.assertTrue(items.contains("a"));
+      Assert.assertTrue(items.contains("b1.txt"));
+      Assert.assertTrue(items.contains("b2.txt"));
+      Assert.assertTrue(items.contains("b3.txt"));
+      Assert.assertTrue(items.contains("b"));
+      Assert.assertTrue(items.contains("c"));
+    }
+  }
+
   @Test public void testFilesystemDirectoryListComplex3()
     throws IOException,
       FilesystemError,
@@ -229,6 +331,30 @@ public class FilesystemTest
     {
       final TreeSet<String> items = new TreeSet<String>();
       f.listDirectory(new PathVirtual("/a/a"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("aa1.txt"));
+      Assert.assertTrue(items.contains("aa2.txt"));
+      Assert.assertTrue(items.contains("aa3.txt"));
+    }
+  }
+
+  @Test public void testFilesystemDirectoryListComplex3NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-nest", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/a/a"), items);
       Assert.assertEquals(3, items.size());
       Assert.assertTrue(items.contains("aa1.txt"));
       Assert.assertTrue(items.contains("aa2.txt"));
@@ -264,6 +390,30 @@ public class FilesystemTest
     }
   }
 
+  @Test public void testFilesystemDirectoryListComplex4NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-nest", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/a/b"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("ab1.txt"));
+      Assert.assertTrue(items.contains("ab2.txt"));
+      Assert.assertTrue(items.contains("ab3.txt"));
+    }
+  }
+
   @Test public void testFilesystemDirectoryListComplex5()
     throws IOException,
       FilesystemError,
@@ -280,6 +430,30 @@ public class FilesystemTest
     {
       final TreeSet<String> items = new TreeSet<String>();
       f.listDirectory(new PathVirtual("/a/c"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("ac1.txt"));
+      Assert.assertTrue(items.contains("ac2.txt"));
+      Assert.assertTrue(items.contains("ac3.txt"));
+    }
+  }
+
+  @Test public void testFilesystemDirectoryListComplex5NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-nest", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/a/c"), items);
       Assert.assertEquals(3, items.size());
       Assert.assertTrue(items.contains("ac1.txt"));
       Assert.assertTrue(items.contains("ac2.txt"));
@@ -315,6 +489,30 @@ public class FilesystemTest
     }
   }
 
+  @Test public void testFilesystemDirectoryListComplex6NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-nest", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/b/a"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("ba1.txt"));
+      Assert.assertTrue(items.contains("ba2.txt"));
+      Assert.assertTrue(items.contains("ba3.txt"));
+    }
+  }
+
   @Test public void testFilesystemDirectoryListComplex7()
     throws IOException,
       FilesystemError,
@@ -331,6 +529,30 @@ public class FilesystemTest
     {
       final TreeSet<String> items = new TreeSet<String>();
       f.listDirectory(new PathVirtual("/b/b"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("bb1.txt"));
+      Assert.assertTrue(items.contains("bb2.txt"));
+      Assert.assertTrue(items.contains("bb3.txt"));
+    }
+  }
+
+  @Test public void testFilesystemDirectoryListComplex7NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-nest", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/b/b"), items);
       Assert.assertEquals(3, items.size());
       Assert.assertTrue(items.contains("bb1.txt"));
       Assert.assertTrue(items.contains("bb2.txt"));
@@ -361,6 +583,30 @@ public class FilesystemTest
     }
   }
 
+  @Test public void testFilesystemDirectoryListComplex8NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-nest", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/b/c"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("bc1.txt"));
+      Assert.assertTrue(items.contains("bc2.txt"));
+      Assert.assertTrue(items.contains("bc3.txt"));
+    }
+  }
+
   @Test public void testFilesystemDirectoryListCorrectOne()
     throws IOException,
       FilesystemError,
@@ -376,6 +622,26 @@ public class FilesystemTest
     }
 
     f.listDirectory(new PathVirtual("/"), items);
+    Assert.assertTrue(items.contains("subdir"));
+    Assert.assertTrue(items.contains("file.txt"));
+  }
+
+  @Test public void testFilesystemDirectoryListCorrectOneNonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive1", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    f.listDirectory(new PathVirtual("/xyz"), items);
     Assert.assertTrue(items.contains("subdir"));
     Assert.assertTrue(items.contains("file.txt"));
   }
@@ -404,7 +670,53 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("file33.txt"));
   }
 
+  @Test public void testFilesystemDirectoryListCorrectUnionNonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive2", new PathVirtual("/xyz"));
+      f.mount("archive3", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    f.listDirectory(new PathVirtual("/xyz"), items);
+    Assert.assertTrue(items.contains("file21.txt"));
+    Assert.assertTrue(items.contains("file22.txt"));
+    Assert.assertTrue(items.contains("file23.txt"));
+    Assert.assertTrue(items.contains("file31.txt"));
+    Assert.assertTrue(items.contains("file32.txt"));
+    Assert.assertTrue(items.contains("file33.txt"));
+  }
+
   @Test public void testFilesystemDirectoryListMountDirect()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/");
+      f.mount("archive1", new PathVirtual("/"));
+      f.listDirectory(new PathVirtual("/"), items);
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    Assert.assertEquals(2, items.size());
+    Assert.assertTrue(items.contains("file.txt"));
+    Assert.assertTrue(items.contains("subdir"));
+  }
+
+  @Test public void testFilesystemDirectoryListMountDirectNonRootMount()
     throws IOException,
       FilesystemError,
       ConstraintError
@@ -451,6 +763,31 @@ public class FilesystemTest
 
   @Test(expected = FilesystemError.class) public
     void
+    testFilesystemDirectoryListNonexistentNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive1", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      f.listDirectory(new PathVirtual("/xyz/nonexistent"), items);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
     testFilesystemDirectoryListNotDirectory()
       throws IOException,
         FilesystemError,
@@ -467,6 +804,31 @@ public class FilesystemTest
 
     try {
       f.listDirectory(new PathVirtual("/file.txt/"), items);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemDirectoryListNotDirectoryNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive1", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      f.listDirectory(new PathVirtual("/xyz/file.txt/"), items);
     } catch (final FilesystemError e) {
       Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
       throw e;
@@ -498,6 +860,32 @@ public class FilesystemTest
     }
   }
 
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemDirectoryListShadowedNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive1", new PathVirtual("/xyz"));
+      f.mount("archive-shadow-file", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      f.listDirectory(new PathVirtual("/xyz/subdir"), items);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
   @Test public void testFilesystemDirectoryModificationTimeCorrect()
     throws IOException,
       FilesystemError,
@@ -519,6 +907,30 @@ public class FilesystemTest
     Assert.assertEquals(0, t);
   }
 
+  @Test public
+    void
+    testFilesystemDirectoryModificationTimeCorrectNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-mtime", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    final File file =
+      new File(FilesystemTest.archive_dir + "/archive-mtime/file.txt");
+    file.setLastModified(0);
+
+    final long t = f.modificationTime(new PathVirtual("/xyz/file.txt"));
+    Assert.assertEquals(0, t);
+  }
+
   @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryModificationTimeDirectory()
@@ -536,6 +948,30 @@ public class FilesystemTest
 
     try {
       f.modificationTime(new PathVirtual("/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemDirectoryModificationTimeDirectoryNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-mtime", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      f.modificationTime(new PathVirtual("/xyz/subdir"));
     } catch (final FilesystemError e) {
       Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
       throw e;
@@ -565,6 +1001,30 @@ public class FilesystemTest
     }
   }
 
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemDirectoryModificationTimeNonexistentNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive-mtime", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      f.modificationTime(new PathVirtual("/xyz/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    }
+  }
+
   @Test public void testFilesystemDirectoryOpenFileCorrect()
     throws IOException,
       ConstraintError,
@@ -581,6 +1041,28 @@ public class FilesystemTest
 
     assert fs != null;
     final InputStream i = fs.openFile(new PathVirtual("/file.txt"));
+    final BufferedReader r = new BufferedReader(new InputStreamReader(i));
+    final String line = r.readLine();
+    Assert.assertEquals("Hello archive0.", line);
+  }
+
+  @Test public void testFilesystemDirectoryOpenFileCorrectNonRootMount()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = FilesystemTest.makeFS();
+      fs.createDirectory("/xyz");
+      fs.mount("archive0", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    assert fs != null;
+    final InputStream i = fs.openFile(new PathVirtual("/xyz/file.txt"));
     final BufferedReader r = new BufferedReader(new InputStreamReader(i));
     final String line = r.readLine();
     Assert.assertEquals("Hello archive0.", line);
@@ -613,6 +1095,32 @@ public class FilesystemTest
 
   @Test(expected = FilesystemError.class) public
     void
+    testFilesystemDirectoryOpenFileDirectoryNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = FilesystemTest.makeFS();
+      fs.createDirectory("/xyz");
+      fs.mount("archive1", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      assert fs != null;
+      fs.openFile(new PathVirtual("/xyz/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
     testFilesystemDirectoryOpenFileNonexistent()
       throws IOException,
         ConstraintError,
@@ -636,6 +1144,54 @@ public class FilesystemTest
     }
   }
 
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemDirectoryOpenFileNonexistentNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = FilesystemTest.makeFS();
+      fs.createDirectory("/xyz");
+      fs.mount("archive1", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      assert fs != null;
+      fs.openFile(new PathVirtual("/xyz/subdir/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    }
+  }
+
+  @Test public void testFilesystemDirectoryOpenFileNonRootMount()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = FilesystemTest.makeFS();
+      fs.createDirectory("/xyz");
+      fs.mount("archive0", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    assert fs != null;
+    final InputStream i = fs.openFile(new PathVirtual("/xyz/file.txt"));
+    final BufferedReader r = new BufferedReader(new InputStreamReader(i));
+    final String line = r.readLine();
+    Assert.assertEquals("Hello archive0.", line);
+  }
+
   @Test public void testFilesystemDirectoryOpenFileOverlayCorrect()
     throws IOException,
       ConstraintError,
@@ -653,6 +1209,31 @@ public class FilesystemTest
 
     assert fs != null;
     final InputStream i = fs.openFile(new PathVirtual("/file.txt"));
+    final BufferedReader r = new BufferedReader(new InputStreamReader(i));
+    final String line = r.readLine();
+    Assert.assertEquals("Hello archive1.", line);
+  }
+
+  @Test public
+    void
+    testFilesystemDirectoryOpenFileOverlayCorrectNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = FilesystemTest.makeFS();
+      fs.createDirectory("/xyz");
+      fs.mount("archive0", new PathVirtual("/xyz"));
+      fs.mount("archive1", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    assert fs != null;
+    final InputStream i = fs.openFile(new PathVirtual("/xyz/file.txt"));
     final BufferedReader r = new BufferedReader(new InputStreamReader(i));
     final String line = r.readLine();
     Assert.assertEquals("Hello archive1.", line);
@@ -698,6 +1279,24 @@ public class FilesystemTest
     Assert.assertEquals(16, size);
   }
 
+  @Test public void testFilesystemDirectorySizeCorrectNonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive1", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    final long size = f.fileSize(new PathVirtual("/xyz/file.txt"));
+    Assert.assertEquals(16, size);
+  }
+
   @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectorySizeDirectory()
@@ -723,6 +1322,30 @@ public class FilesystemTest
 
   @Test(expected = FilesystemError.class) public
     void
+    testFilesystemDirectorySizeDirectoryNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive1", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      f.fileSize(new PathVirtual("/xyz/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
     testFilesystemDirectorySizeNonexistent()
       throws IOException,
         FilesystemError,
@@ -738,6 +1361,30 @@ public class FilesystemTest
 
     try {
       f.fileSize(new PathVirtual("/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemDirectorySizeNonexistentNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive1", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      f.fileSize(new PathVirtual("/xyz/nonexistent"));
     } catch (final FilesystemError e) {
       Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
       throw e;
@@ -1093,6 +1740,25 @@ public class FilesystemTest
     Assert.assertFalse(fs.isDirectory(new PathVirtual("/file.txt")));
   }
 
+  @Test public void testFilesystemZipIsFileCorrectNonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI fs = FilesystemTest.makeFS();
+
+    try {
+      fs.createDirectory("/xyz");
+      fs.mount("one.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    Assert.assertFalse(fs.isFile(new PathVirtual("/xyz")));
+    Assert.assertTrue(fs.isFile(new PathVirtual("/xyz/file.txt")));
+    Assert.assertFalse(fs.isDirectory(new PathVirtual("/xyz/file.txt")));
+  }
+
   @Test public void testFilesystemZipListComplex0()
     throws IOException,
       FilesystemError,
@@ -1115,6 +1781,29 @@ public class FilesystemTest
     }
   }
 
+  @Test public void testFilesystemZipListComplex0NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("zip-nest.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz"), items);
+      Assert.assertEquals(2, items.size());
+      Assert.assertTrue(items.contains("a"));
+      Assert.assertTrue(items.contains("b"));
+    }
+  }
+
   @Test public void testFilesystemZipListComplex1()
     throws IOException,
       FilesystemError,
@@ -1131,6 +1820,33 @@ public class FilesystemTest
     {
       final TreeSet<String> items = new TreeSet<String>();
       f.listDirectory(new PathVirtual("/a"), items);
+      Assert.assertEquals(6, items.size());
+      Assert.assertTrue(items.contains("a"));
+      Assert.assertTrue(items.contains("a1.txt"));
+      Assert.assertTrue(items.contains("a2.txt"));
+      Assert.assertTrue(items.contains("a3.txt"));
+      Assert.assertTrue(items.contains("b"));
+      Assert.assertTrue(items.contains("c"));
+    }
+  }
+
+  @Test public void testFilesystemZipListComplex1NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("zip-nest.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/a"), items);
       Assert.assertEquals(6, items.size());
       Assert.assertTrue(items.contains("a"));
       Assert.assertTrue(items.contains("a1.txt"));
@@ -1167,6 +1883,33 @@ public class FilesystemTest
     }
   }
 
+  @Test public void testFilesystemZipListComplex2NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("zip-nest.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/b"), items);
+      Assert.assertEquals(6, items.size());
+      Assert.assertTrue(items.contains("a"));
+      Assert.assertTrue(items.contains("b1.txt"));
+      Assert.assertTrue(items.contains("b2.txt"));
+      Assert.assertTrue(items.contains("b3.txt"));
+      Assert.assertTrue(items.contains("b"));
+      Assert.assertTrue(items.contains("c"));
+    }
+  }
+
   @Test public void testFilesystemZipListComplex3()
     throws IOException,
       FilesystemError,
@@ -1183,6 +1926,30 @@ public class FilesystemTest
     {
       final TreeSet<String> items = new TreeSet<String>();
       f.listDirectory(new PathVirtual("/a/a"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("aa1.txt"));
+      Assert.assertTrue(items.contains("aa2.txt"));
+      Assert.assertTrue(items.contains("aa3.txt"));
+    }
+  }
+
+  @Test public void testFilesystemZipListComplex3NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("zip-nest.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/a/a"), items);
       Assert.assertEquals(3, items.size());
       Assert.assertTrue(items.contains("aa1.txt"));
       Assert.assertTrue(items.contains("aa2.txt"));
@@ -1213,6 +1980,30 @@ public class FilesystemTest
     }
   }
 
+  @Test public void testFilesystemZipListComplex4NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("zip-nest.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/a/b"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("ab1.txt"));
+      Assert.assertTrue(items.contains("ab2.txt"));
+      Assert.assertTrue(items.contains("ab3.txt"));
+    }
+  }
+
   @Test public void testFilesystemZipListComplex5()
     throws IOException,
       FilesystemError,
@@ -1229,6 +2020,30 @@ public class FilesystemTest
     {
       final TreeSet<String> items = new TreeSet<String>();
       f.listDirectory(new PathVirtual("/a/c"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("ac1.txt"));
+      Assert.assertTrue(items.contains("ac2.txt"));
+      Assert.assertTrue(items.contains("ac3.txt"));
+    }
+  }
+
+  @Test public void testFilesystemZipListComplex5NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("zip-nest.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/a/c"), items);
       Assert.assertEquals(3, items.size());
       Assert.assertTrue(items.contains("ac1.txt"));
       Assert.assertTrue(items.contains("ac2.txt"));
@@ -1259,6 +2074,30 @@ public class FilesystemTest
     }
   }
 
+  @Test public void testFilesystemZipListComplex6NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("zip-nest.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/b/a"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("ba1.txt"));
+      Assert.assertTrue(items.contains("ba2.txt"));
+      Assert.assertTrue(items.contains("ba3.txt"));
+    }
+  }
+
   @Test public void testFilesystemZipListComplex7()
     throws IOException,
       FilesystemError,
@@ -1275,6 +2114,30 @@ public class FilesystemTest
     {
       final TreeSet<String> items = new TreeSet<String>();
       f.listDirectory(new PathVirtual("/b/b"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("bb1.txt"));
+      Assert.assertTrue(items.contains("bb2.txt"));
+      Assert.assertTrue(items.contains("bb3.txt"));
+    }
+  }
+
+  @Test public void testFilesystemZipListComplex7NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("zip-nest.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/b/b"), items);
       Assert.assertEquals(3, items.size());
       Assert.assertTrue(items.contains("bb1.txt"));
       Assert.assertTrue(items.contains("bb2.txt"));
@@ -1305,6 +2168,30 @@ public class FilesystemTest
     }
   }
 
+  @Test public void testFilesystemZipListComplex8NonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("zip-nest.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      f.listDirectory(new PathVirtual("/xyz/b/c"), items);
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("bc1.txt"));
+      Assert.assertTrue(items.contains("bc2.txt"));
+      Assert.assertTrue(items.contains("bc3.txt"));
+    }
+  }
+
   @Test public void testFilesystemZipListCorrectOne()
     throws IOException,
       FilesystemError,
@@ -1320,6 +2207,26 @@ public class FilesystemTest
     }
 
     f.listDirectory(new PathVirtual("/"), items);
+    Assert.assertTrue(items.contains("subdir"));
+    Assert.assertTrue(items.contains("file.txt"));
+  }
+
+  @Test public void testFilesystemZipListCorrectOneNonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("three.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    f.listDirectory(new PathVirtual("/xyz"), items);
     Assert.assertTrue(items.contains("subdir"));
     Assert.assertTrue(items.contains("file.txt"));
   }
@@ -1340,6 +2247,31 @@ public class FilesystemTest
     }
 
     f.listDirectory(new PathVirtual("/"), items);
+    Assert.assertTrue(items.contains("file21.txt"));
+    Assert.assertTrue(items.contains("file22.txt"));
+    Assert.assertTrue(items.contains("file23.txt"));
+    Assert.assertTrue(items.contains("file31.txt"));
+    Assert.assertTrue(items.contains("file32.txt"));
+    Assert.assertTrue(items.contains("file33.txt"));
+  }
+
+  @Test public void testFilesystemZipListCorrectUnionNonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("zip2.zip", new PathVirtual("/xyz"));
+      f.mount("zip3.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    f.listDirectory(new PathVirtual("/xyz"), items);
     Assert.assertTrue(items.contains("file21.txt"));
     Assert.assertTrue(items.contains("file22.txt"));
     Assert.assertTrue(items.contains("file23.txt"));
@@ -1374,6 +2306,31 @@ public class FilesystemTest
 
   @Test(expected = FilesystemError.class) public
     void
+    testFilesystemZipListNonexistentNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("three.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      f.listDirectory(new PathVirtual("/xyz/nonexistent"), items);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
     testFilesystemZipListNotDirectory()
       throws IOException,
         FilesystemError,
@@ -1390,6 +2347,31 @@ public class FilesystemTest
 
     try {
       f.listDirectory(new PathVirtual("/file.txt/"), items);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemZipListNotDirectoryNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("one.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      f.listDirectory(new PathVirtual("/xyz/file.txt/"), items);
     } catch (final FilesystemError e) {
       Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
       throw e;
@@ -1421,6 +2403,32 @@ public class FilesystemTest
     }
   }
 
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemZipListShadowedNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("archive1", new PathVirtual("/xyz"));
+      f.mount("shadow.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      f.listDirectory(new PathVirtual("/xyz/subdir"), items);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
   @Test public void testFilesystemZipModificationTimeCorrect()
     throws IOException,
       FilesystemError,
@@ -1435,6 +2443,24 @@ public class FilesystemTest
     }
 
     final long t = f.modificationTime(new PathVirtual("/file.txt"));
+    Assert.assertEquals(0, t);
+  }
+
+  @Test public void testFilesystemZipModificationTimeCorrectNonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("mtime.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    final long t = f.modificationTime(new PathVirtual("/xyz/file.txt"));
     Assert.assertEquals(0, t);
   }
 
@@ -1463,6 +2489,30 @@ public class FilesystemTest
 
   @Test(expected = FilesystemError.class) public
     void
+    testFilesystemZipModificationTimeDirectoryNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("mtime.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      f.modificationTime(new PathVirtual("/xyz/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
     testFilesystemZipModificationTimeNonexistent()
       throws IOException,
         FilesystemError,
@@ -1478,6 +2528,30 @@ public class FilesystemTest
 
     try {
       f.modificationTime(new PathVirtual("/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemZipModificationTimeNonexistentNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("mtime.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      f.modificationTime(new PathVirtual("/xyz/nonexistent"));
     } catch (final FilesystemError e) {
       Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
       throw e;
@@ -1583,6 +2657,25 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(new PathVirtual("/subdir")));
   }
 
+  @Test public void testFilesystemZipNoExplicitSubdirCorrectNonRootMount()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = FilesystemTest.makeFS();
+      fs.createDirectory("/xyz");
+      fs.mount("no-explicit-subdir.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    assert fs != null;
+    Assert.assertTrue(fs.isDirectory(new PathVirtual("/xyz/subdir")));
+  }
+
   @Test public void testFilesystemZipOpenFileCorrect()
     throws IOException,
       ConstraintError,
@@ -1599,6 +2692,28 @@ public class FilesystemTest
 
     assert fs != null;
     final InputStream i = fs.openFile(new PathVirtual("/file.txt"));
+    final BufferedReader r = new BufferedReader(new InputStreamReader(i));
+    final String line = r.readLine();
+    Assert.assertEquals("Hello zip.", line);
+  }
+
+  @Test public void testFilesystemZipOpenFileCorrectNonRootMount()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = FilesystemTest.makeFS();
+      fs.createDirectory("/xyz");
+      fs.mount("one.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    assert fs != null;
+    final InputStream i = fs.openFile(new PathVirtual("/xyz/file.txt"));
     final BufferedReader r = new BufferedReader(new InputStreamReader(i));
     final String line = r.readLine();
     Assert.assertEquals("Hello zip.", line);
@@ -1623,6 +2738,32 @@ public class FilesystemTest
     try {
       assert fs != null;
       fs.openFile(new PathVirtual("/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemZipOpenFileDirectoryNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = FilesystemTest.makeFS();
+      fs.createDirectory("/xyz");
+      fs.mount("two.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      assert fs != null;
+      fs.openFile(new PathVirtual("/xyz/subdir"));
     } catch (final FilesystemError e) {
       Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
       throw e;
@@ -1656,6 +2797,32 @@ public class FilesystemTest
 
   @Test(expected = FilesystemError.class) public
     void
+    testFilesystemZipOpenFileNoExplicitSubdirCorrectNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = FilesystemTest.makeFS();
+      fs.createDirectory("/xyz");
+      fs.mount("no-explicit-subdir.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      assert fs != null;
+      fs.openFile(new PathVirtual("/xyz/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
     testFilesystemZipOpenFileNonexistent()
       throws IOException,
         ConstraintError,
@@ -1679,6 +2846,32 @@ public class FilesystemTest
     }
   }
 
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemZipOpenFileNonexistentNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = FilesystemTest.makeFS();
+      fs.createDirectory("/xyz");
+      fs.mount("two.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      assert fs != null;
+      fs.openFile(new PathVirtual("/xyz/subdir/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    }
+  }
+
   @Test public void testFilesystemZipOpenFileOverlayCorrect()
     throws IOException,
       ConstraintError,
@@ -1696,6 +2889,29 @@ public class FilesystemTest
 
     assert fs != null;
     final InputStream i = fs.openFile(new PathVirtual("/file.txt"));
+    final BufferedReader r = new BufferedReader(new InputStreamReader(i));
+    final String line = r.readLine();
+    Assert.assertEquals("Hello three.zip.", line);
+  }
+
+  @Test public void testFilesystemZipOpenFileOverlayCorrectNonRootMount()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = FilesystemTest.makeFS();
+      fs.createDirectory("/xyz");
+      fs.mount("two.zip", new PathVirtual("/xyz"));
+      fs.mount("three.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    assert fs != null;
+    final InputStream i = fs.openFile(new PathVirtual("/xyz/file.txt"));
     final BufferedReader r = new BufferedReader(new InputStreamReader(i));
     final String line = r.readLine();
     Assert.assertEquals("Hello three.zip.", line);
@@ -1741,6 +2957,24 @@ public class FilesystemTest
     Assert.assertEquals(17, size);
   }
 
+  @Test public void testFilesystemZipSizeCorrectNonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("three.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    final long size = f.fileSize(new PathVirtual("/xyz/file.txt"));
+    Assert.assertEquals(17, size);
+  }
+
   @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipSizeDirectory()
@@ -1766,6 +3000,30 @@ public class FilesystemTest
 
   @Test(expected = FilesystemError.class) public
     void
+    testFilesystemZipSizeDirectoryNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("three.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      f.fileSize(new PathVirtual("/xyz/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
     testFilesystemZipSizeNonexistent()
       throws IOException,
         FilesystemError,
@@ -1781,6 +3039,30 @@ public class FilesystemTest
 
     try {
       f.fileSize(new PathVirtual("/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemZipSizeNonexistentNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("three.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      f.fileSize(new PathVirtual("/xyz/nonexistent"));
     } catch (final FilesystemError e) {
       Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
       throw e;

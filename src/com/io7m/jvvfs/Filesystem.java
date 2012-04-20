@@ -193,7 +193,8 @@ public final class Filesystem implements FilesystemAPI
       throw FilesystemError.isDirectory(path.toString());
     }
 
-    return file.archive.fileSize(path);
+    final PathVirtual path_sub = path.subtract(file.archive.getMountPath());
+    return file.archive.fileSize(path_sub);
   }
 
   private ArchiveHandler handlerFor(
@@ -478,7 +479,8 @@ public final class Filesystem implements FilesystemAPI
   {
     final FileReference ref = this.lookup(path);
     if (ref.type == Type.TYPE_FILE) {
-      return ref.archive.modificationTime(path);
+      final PathVirtual path_sub = path.subtract(ref.archive.getMountPath());
+      return ref.archive.modificationTime(path_sub);
     }
     throw FilesystemError.isDirectory(path.toString());
   }
@@ -686,7 +688,8 @@ public final class Filesystem implements FilesystemAPI
   {
     final FileReference ref = this.lookup(path);
     if (ref.type == Type.TYPE_FILE) {
-      return ref.archive.openFile(path);
+      final PathVirtual path_sub = path.subtract(ref.archive.getMountPath());
+      return ref.archive.openFile(path_sub);
     }
     throw FilesystemError.isDirectory(path.toString());
   }

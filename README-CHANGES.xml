@@ -3,8 +3,13 @@
   <c:project>io7m-jvvfs</c:project>
 
   <c:release ticket-system="com.io7m.fossil.jvvfs">
-    <c:date>2012-04-19</c:date>
+    <c:date>2012-04-20</c:date>
     <c:version>1.1.0</c:version>
+    <c:item>
+      <c:date>2012-04-20</c:date>
+      <c:type-code-fix/>
+      <c:summary>Non-root mount points for archives were not working correctly</c:summary>
+    </c:item>
     <c:item>
       <c:date>2012-04-19</c:date>
       <c:type-code-fix/>
