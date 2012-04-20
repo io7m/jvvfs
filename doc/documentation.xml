@@ -19,7 +19,7 @@
 <s:document
   xmlns:s="http://www.io7m.com/schemas/structural/0.1.0"
   xmlns:xi="http://www.w3.org/2001/XInclude">
-  <s:document-title>io7m-jvvfs 1.0.0 Documentation</s:document-title>
+  <s:document-title>io7m-jvvfs 1.1.0 Documentation</s:document-title>
   <s:document-style>documentation.css</s:document-style>
   <s:document-contents/>
 
@@ -119,9 +119,9 @@
       <s:subsection>
         <s:subsection-title>Installation</s:subsection-title>
         <s:paragraph>
-          Include <s:term type="file">io7m-jvvfs-1.0.0.jar</s:term>
+          Include <s:term type="file">io7m-jvvfs-1.1.0.jar</s:term>
           in your projects. The build process also produces a "source" jar
-          file, <s:term type="file">io7m-jvvfs-source-1.0.0.jar</s:term>,
+          file, <s:term type="file">io7m-jvvfs-source-1.1.0.jar</s:term>,
           that can be used for debugging in any IDE. The jar files do not
           contain any of the dependencies of the project, so these should
           be included separately.
@@ -169,6 +169,15 @@
               <s:table-row>
                 <s:table-cell>Linux</s:table-cell>
                 <s:table-cell>3.2.9-1-ARCH</s:table-cell>
+                <s:table-cell>x86_64</s:table-cell>
+                <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+                <s:table-cell>1.6.0_24</s:table-cell>
+                <s:table-cell>OpenJDK 64-Bit Server VM</s:table-cell>
+                <s:table-cell>20.0-b12</s:table-cell>
+              </s:table-row>
+              <s:table-row>
+                <s:table-cell>Linux</s:table-cell>
+                <s:table-cell>3.3.1-1-ARCH</s:table-cell>
                 <s:table-cell>x86_64</s:table-cell>
                 <s:table-cell>Sun Microsystems Inc.</s:table-cell>
                 <s:table-cell>1.6.0_24</s:table-cell>
