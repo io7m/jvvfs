@@ -7,10 +7,12 @@
   <description>Hierarchical logging package</description>
   <url>http://io7m.com/software/jvvfs/</url>
 
-  <issueManagement>
-    <url>http://fossil.io7m.com/repo.cgi/io7m-jvvfs</url>
-    <system>Fossil</system>
-  </issueManagement>
+  <licenses>
+    <license>
+      <name>ISC License</name>
+      <url>http://www.opensource.org/licenses/isc-license.txt</url>
+    </license>
+  </licenses>
 
   <scm>
     <url>http://fossil.io7m.com/repo.cgi/io7m-jvvfs</url>
@@ -18,12 +20,19 @@
     <developerConnection>scm:http://fossil.io7m.com/repo.cgi/io7m-jvvfs</developerConnection>
   </scm>
 
-  <licenses>
-    <license>
-      <name>ISC License</name>
-      <url>http://www.opensource.org/licenses/isc-license.txt</url>
-    </license>
-  </licenses>
+  <developers>
+    <developer>
+      <id>io7m</id>
+      <name>io7m</name>
+      <email>code@io7m.com</email>
+      <url>http://io7m.com</url>
+    </developer>
+  </developers>
+
+  <issueManagement>
+    <url>http://fossil.io7m.com/repo.cgi/io7m-jvvfs</url>
+    <system>Fossil</system>
+  </issueManagement>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
