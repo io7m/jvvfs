@@ -106,6 +106,15 @@
               <s:table-cell>OpenJDK 64-Bit Server VM</s:table-cell>
               <s:table-cell>20.0-b12</s:table-cell>
             </s:table-row>
+            <s:table-row>
+              <s:table-cell>Windows XP</s:table-cell>
+              <s:table-cell>5.1</s:table-cell>
+              <s:table-cell>x86</s:table-cell>
+              <s:table-cell>Oracle Corporation</s:table-cell>
+              <s:table-cell>1.7.0_02</s:table-cell>
+              <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
+              <s:table-cell>22.0-b10</s:table-cell>
+            </s:table-row>
           </s:table-body>
         </s:table>
       </s:formal-item>
