@@ -115,6 +115,15 @@
               <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
               <s:table-cell>22.0-b10</s:table-cell>
             </s:table-row>
+            <s:table-row>
+              <s:table-cell>SunOS</s:table-cell>
+              <s:table-cell>5.11</s:table-cell>
+              <s:table-cell>x86</s:table-cell>
+              <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+              <s:table-cell>1.6.0_21</s:table-cell>
+              <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
+              <s:table-cell>17.0-b16</s:table-cell>
+            </s:table-row>
           </s:table-body>
         </s:table>
       </s:formal-item>
