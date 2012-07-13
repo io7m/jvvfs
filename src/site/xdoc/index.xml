@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document
+  xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+  <properties>
+    <title>io7m-jvvfs</title>
+  </properties>
+
+  <body>
+    <subsection name="jvvfs">
+      The <var>jvvfs</var>
+      package implements a pseudo virtual filesystem abstraction. The
+      package essentially constructs a unified namespace from sets of
+      mounted archives (such as directories, zip files, etc). It is
+      inspired by <a href="http://icculus.org/physfs">PhysicsFS</a>
+      but does not contain support for old proprietary/obscure archive
+      formats.
+    </subsection>
+    <subsection name="features">
+      <ul>
+        <li>Transparent mounting of archives/directories into a unified namespace.</li>
+        <li>Supports the zip file format (using the Java standard library implementation, for better or worse).</li>
+        <li>90% automated unit test coverage of executable code.</li>
+        <li>ISC license.</li>
+        <li>Platform independent (tested on FreeBSD, Linux, Mac OS X, Solaris, Windows XP).</li>
+      </ul>
+    </subsection>
+  </body>
+
+</document>
