@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright © 2012 http://io7m.com
+
+  Permission to use, copy, modify, and/or distribute this software for any
+  purpose with or without fee is hereby granted, provided that the above
+  copyright notice and this permission notice appear in all copies.
+
+  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+  -->
+
+<s:document
+  xmlns:s="http://www.io7m.com/schemas/structural/1.0.0"
+  xmlns:xi="http://www.w3.org/2001/XInclude">
+  <s:document-title>io7m-jvvfs 2.1.0 Documentation</s:document-title>
+  <s:document-style>documentation.css</s:document-style>
+  <s:document-contents/>
+
+  <s:part>
+    <s:part-title>Package Information</s:part-title>
+    <s:part-contents />
+    <s:section>
+      <s:section-title>Orientation</s:section-title>
+      <s:subsection>
+        <s:subsection-title>Overview</s:subsection-title>
+        <s:paragraph>
+          The <s:term type="package">jvvfs</s:term>
+          package implements a pseudo virtual filesystem abstraction. The
+          package essentially constructs a unified namespace from sets of
+          mounted archives (such as directories, zip files, etc). It is
+          inspired by
+          <s:link-external target="http://icculus.org/physfs">PhysicsFS</s:link-external>
+          but does not contain support for old proprietary/obscure archive
+          formats.
+        </s:paragraph>
+        <s:paragraph>
+          When using a filesystem abstraction such as
+          <s:term type="package">jvvfs</s:term>, it becomes very easy
+          for application developers to distribute updates. The developer
+          initially distributes the program resources (images, audio, etc)
+          as one or more zip archives. Updates to the program data then consist
+          of zip archives containing only files that have been changed: these
+          new archives are simply mounted over the top of the old ones
+          in the virtual filesystem.
+        </s:paragraph>
+      </s:subsection>
+      <s:subsection>
+        <s:subsection-title>Portability</s:subsection-title>
+        <s:paragraph>
+          The package is written in pure Java and uses no system-specific
+          features. It is expected to work in any environment supporting
+          Java 6.
+        </s:paragraph>
+        <s:paragraph>
+          The filesystem abstraction allows developers to access program
+          resources using platform-independent notation. The package is
+          carefully written to ensure that applications access resources
+          consistently across all platforms (including consistency under
+          erroneous conditions).
+        </s:paragraph>
+      </s:subsection>
+    </s:section>
+    <s:section>
+      <s:section-title>Installation</s:section-title>
+      <s:paragraph>
+        The project can be compiled and installed with
+        <s:link-external target="http://maven.apache.org">Maven</s:link-external>:
+      </s:paragraph>
+      <s:paragraph>
+        <s:verbatim type="example"><![CDATA[$ mvn clean install]]></s:verbatim>     
+      </s:paragraph>
+    </s:section>
+    <s:section>
+      <s:section-title>Supported Systems</s:section-title>
+      <s:paragraph>
+        This release of the software passed 100% of the included unit tests on
+        the following platforms:
+      </s:paragraph>
+      <s:formal-item kind="platform_table" type="platforms">
+        <s:formal-item-title>Supported systems</s:formal-item-title>
+        <s:table>
+          <s:table-summary>Supported systems</s:table-summary>
+          <s:table-head>
+            <s:table-column-name>OS</s:table-column-name>
+            <s:table-column-name>OS-Version</s:table-column-name>
+            <s:table-column-name>OS-Arch</s:table-column-name>
+            <s:table-column-name>JDK-Vendor</s:table-column-name>
+            <s:table-column-name>JDK-Version</s:table-column-name>
+            <s:table-column-name>VM</s:table-column-name>
+            <s:table-column-name>VM-Version</s:table-column-name>
+          </s:table-head>
+          <s:table-body>
+            <s:table-row>
+              <s:table-cell>FreeBSD</s:table-cell>
+              <s:table-cell>8.2-RELEASE-p9</s:table-cell>
+              <s:table-cell>x86_64</s:table-cell>
+              <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+              <s:table-cell>1.6.0_32</s:table-cell>
+              <s:table-cell>OpenJDK 64-Bit Server VM</s:table-cell>
+              <s:table-cell>20.0-b12</s:table-cell>
+            </s:table-row>
+            <s:table-row>
+              <s:table-cell>Linux</s:table-cell>
+              <s:table-cell>3.4.2-2-ARCH</s:table-cell>
+              <s:table-cell>x86_64</s:table-cell>
+              <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+              <s:table-cell>1.6.0_24</s:table-cell>
+              <s:table-cell>OpenJDK 64-Bit Server VM</s:table-cell>
+              <s:table-cell>20.0-b12</s:table-cell>
+            </s:table-row>
+            <s:table-row>
+              <s:table-cell>Mac OS X</s:table-cell>
+              <s:table-cell>10.6.8</s:table-cell>
+              <s:table-cell>x86_64</s:table-cell>
+              <s:table-cell>Apple Inc.</s:table-cell>
+              <s:table-cell>1.6.0_33</s:table-cell>
+              <s:table-cell>Java HotSpot(TM) 64-Bit Server VM</s:table-cell>
+              <s:table-cell>20.8-b03-424</s:table-cell>
+            </s:table-row>
+            <s:table-row>
+              <s:table-cell>SunOS</s:table-cell>
+              <s:table-cell>5.11</s:table-cell>
+              <s:table-cell>x86</s:table-cell>
+              <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+              <s:table-cell>1.6.0_21</s:table-cell>
+              <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
+              <s:table-cell>17.0-b16</s:table-cell>
+            </s:table-row>
+            <s:table-row>
+              <s:table-cell>Windows XP</s:table-cell>
+              <s:table-cell>5.1</s:table-cell>
+              <s:table-cell>x86</s:table-cell>
+              <s:table-cell>Oracle Corporation</s:table-cell>
+              <s:table-cell>1.7.0_02</s:table-cell>
+              <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
+              <s:table-cell>22.0-b10</s:table-cell>
+            </s:table-row>
+          </s:table-body>
+        </s:table>
+      </s:formal-item>
+    </s:section>
+    <s:section>
+      <s:section-title>Platform Specific Issues</s:section-title>
+      <s:paragraph>
+        There are currently no known platform-specific issues.
+      </s:paragraph>
+    </s:section>
+    <s:section>
+      <s:section-title>License</s:section-title>
+      <s:paragraph>
+        All files distributed with the <s:term type="package">jvvfs</s:term>
+        package are placed under the following license:
+        <s:verbatim type="license"><![CDATA[Copyright © 2012 http://io7m.com
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.]]>
+        </s:verbatim>
+      </s:paragraph>
+    </s:section>
+  </s:part>
+
+  <s:part>
+    <s:part-title>Tutorial</s:part-title>
+    <s:part-contents/>
+    <s:section>
+      <s:section-title>Tutorial</s:section-title>
+      <s:paragraph>
+        The <s:term type="package">jvvfs</s:term> package arbitrates
+        access to a set of <s:term>archives</s:term> by presenting a
+        unified namespace similar to the UNIX "virtual filesystem".
+      </s:paragraph>
+      <s:paragraph>
+        First, the filesystem is created by specifying a directory
+        containing archives (zip files, directories, etc):
+      </s:paragraph>
+      <s:formal-item kind="example">
+        <s:formal-item-title>Filesystem creation</s:formal-item-title>
+        <s:verbatim><![CDATA[
+final PathReal path = new PathReal("/path/to/application/resources");
+final Filesystem fs = new Filesystem(log, path);]]>
+        </s:verbatim>
+      </s:formal-item>
+      <s:paragraph>
+        Then, individual archives can be mounted into the filesystem
+        in much the same way as disks are mounted in the UNIX filesystem.
+        All archives are treated in a read-only manner. The
+        <s:term type="package">jvvfs</s:term> package never writes to the
+        filesystem or any archives.
+      </s:paragraph>
+      <s:paragraph>
+        Values of type <s:term type="type">PathReal</s:term> denote
+        platform-specific paths (and should therefore be given in
+        platform-specific notation). Use of
+        <s:term type="constant">File.separatorChar</s:term> in the Java
+        standard library is recommended.
+      </s:paragraph>
+      <s:paragraph>
+        Assuming <s:term type="file">archive.zip</s:term> exists in the
+        specified archive directory, the archive can be mounted in the
+        root directory of the virtual filesystem:
+      </s:paragraph>
+      <s:formal-item kind="example">
+        <s:formal-item-title>Mounting archives</s:formal-item-title>
+        <s:verbatim><![CDATA[
+final PathVirtual mount = new PathVirtual("/");
+fs.mount("archive.zip", mount);]]>
+        </s:verbatim>
+      </s:formal-item>
+      <s:paragraph>
+        Values of type <s:term type="type">PathVirtual</s:term> denote
+        paths in the virtual filesystem and are given in platform-independent
+        notation. Virtual path components are separated by
+        <s:term type="constant">/</s:term> and must always begin with
+        a leading <s:term type="constant">/</s:term> (the paths must always
+        be absolute). The filesystem currently has no concept of a "current
+        working directory", so relative paths have no meaning.
+      </s:paragraph>
+      <s:paragraph>
+        The above restrictions on notation are applied as part of the
+        <s:term type="type">PathVirtual</s:term> constructor. Therefore,
+        having a value of type <s:term type="type">PathVirtual</s:term>
+        essentially encodes a proof that the given path is valid.
+      </s:paragraph>
+      <s:paragraph>
+        Assuming <s:term type="file">archive.zip</s:term> contains the
+        file <s:term type="file">/a/b/c/file.txt</s:term>, the file can
+        be opened, unsurprisingly, by the path
+        <s:term type="file">/a/b/c/file.txt</s:term>:
+      </s:paragraph>
+      <s:formal-item kind="example">
+        <s:formal-item-title>Opening a file</s:formal-item-title>
+        <s:verbatim><![CDATA[
+final PathVirthal path   = new PathVirtual("/a/b/c/file.txt");
+final InputStream stream = fs.openFile(path);]]>
+        </s:verbatim>
+      </s:formal-item>
+      <s:paragraph>
+        It is possible to mount archives at paths other than the root, but
+        the paths must be manually created (in other words, it's not possible
+        to mount an archive in a directory that only exists inside another
+        archive). Manually created directories are purely virtual constructs;
+        creating a directory via the <s:term type="package">jvvfs</s:term>
+        API does not modify the real OS filesystem or any archives.
+      </s:paragraph>
+      <s:formal-item kind="example">
+        <s:formal-item-title>Creating a directory</s:formal-item-title>
+        <s:verbatim><![CDATA[
+// The directory "/a" only exists in the virtual filesystem because
+// the originally mounted archive contained a file at "/a/b/c/file.txt"
+
+try {
+  fs.mount("archive2.zip", new PathVirtual("/a"));
+} catch (FilesystemError e) {
+  // ...
+}
+
+// After explicitly creating the "/a" directory, the archive can be mounted
+// without issue.
+
+fs.createDirectory(new PathVirtual("/a"));
+fs.mount("archive2.zip", new PathVirtual("/a"));
+
+// Assuming "/xyz/file.txt" exists in "archive2.zip"... 
+
+final InputStream stream = fs.openFile("/a/xyz/file.txt");]]>
+        </s:verbatim>
+      </s:formal-item>
+      <s:paragraph>
+        The virtual filesystem presented by the
+        <s:term type="package">jvvfs</s:term> package supports a subset
+        of the usual filesystem operations: directories may be listed, files
+        have modification dates and sizes.
+      </s:paragraph>
+    </s:section>
+  </s:part>
+
+  <s:part>
+    <s:part-title>API Reference</s:part-title>
+    <s:part-contents/>
+    <s:section>
+      <s:section-title>Javadoc</s:section-title>
+      <s:paragraph>
+        API documentation for the package is provided via the
+        included <s:link-external target="javadoc">Javadoc</s:link-external>.
+      </s:paragraph>
+    </s:section>
+  </s:part>
+
+</s:document>
