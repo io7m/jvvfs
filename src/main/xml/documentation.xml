@@ -74,7 +74,7 @@
         <s:link-external target="http://maven.apache.org">Maven</s:link-external>:
       </s:paragraph>
       <s:paragraph>
-        <s:verbatim type="example"><![CDATA[$ mvn clean install]]></s:verbatim>     
+        <s:verbatim type="example"><![CDATA[$ mvn -C clean install]]></s:verbatim>     
       </s:paragraph>
     </s:section>
     <s:section>
