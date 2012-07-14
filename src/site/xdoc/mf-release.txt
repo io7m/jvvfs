@@ -1,0 +1,4 @@
+2012-07-14:io7m-jvvfs-2.1.0-sources.jar:15721
+2012-07-14:io7m-jvvfs-2.1.0.jar:32848
+2012-07-14:io7m-jvvfs-2.1.0-javadoc.jar:102551
+2012-07-14:io7m-jvvfs-2.1.0.zip:80878
