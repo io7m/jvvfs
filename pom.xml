@@ -2,9 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.io7m.jvvfs</groupId>
   <artifactId>io7m-jvvfs</artifactId>
-  <version>2.0.0</version>
+  <version>2.1.0</version>
   <name>io7m-jvvfs</name>
-  <description>Hierarchical logging package</description>
+  <description>Virtual filesystem abstraction</description>
   <url>http://io7m.com/software/jvvfs/</url>
 
   <licenses>
@@ -51,12 +51,12 @@
     <dependency>
       <groupId>com.io7m.jaux</groupId>
       <artifactId>io7m-jaux</artifactId>
-      <version>2.0.0</version>
+      <version>2.1.1</version>
     </dependency>
     <dependency>
       <groupId>com.io7m.jlog</groupId>
       <artifactId>io7m-jlog</artifactId>
-      <version>2.0.0</version>
+      <version>2.1.0</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -171,6 +171,70 @@
           </execution>
         </executions>
       </plugin>
+
+      <!-- Validate and transform XML documentation -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xml-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>validate</goal>
+              <goal>transform</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <validationSets>
+            <validationSet>
+              <dir>src/main/xml</dir>
+            </validationSet>
+          </validationSets>
+          <transformationSets>
+            <transformationSet>
+              <dir>src/main/xml</dir>
+              <stylesheet>src/main/xsl/structural-1_0_0-standalone-x20.xsl</stylesheet>
+              <parameters>
+                <parameter>
+                  <name>io7m.structural-1_0_0.output_directory</name>
+                  <value>target/xhtml</value>
+                </parameter>
+              </parameters>
+            </transformationSet>
+          </transformationSets>
+          <catalogs>
+            <catalog>src/main/xml/catalog.xml</catalog>
+          </catalogs>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
+            <version>9.4</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <!-- Produce documentation archive -->
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <descriptors>
+            <descriptor>assembly-doc.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 
     <!-- Allow deployment over ssh -->
@@ -181,10 +245,10 @@
         <version>2.2</version>
       </extension>
     </extensions>
-    
+
+    <!-- Mark certain plugins as ignored in Eclipse. Does not affect the build. -->
     <pluginManagement>
       <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
@@ -199,6 +263,19 @@
                     <versionRange>[1.2,)</versionRange>
                     <goals>
                       <goal>instrument</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>xml-maven-plugin</artifactId>
+                    <versionRange>[1.0,)</versionRange>
+                    <goals>
+                      <goal>transform</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
