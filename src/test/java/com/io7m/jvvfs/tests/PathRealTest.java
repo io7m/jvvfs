@@ -11,8 +11,10 @@ import com.io7m.jvvfs.PathVirtual;
 
 public class PathRealTest
 {
-  @Test public void testConcatenateLeadingSlash()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testConcatenateLeadingSlash()
+      throws ConstraintError
   {
     final StringBuilder base = new StringBuilder();
     base.append(File.separatorChar);
@@ -42,7 +44,7 @@ public class PathRealTest
     Assert.assertEquals(expected.toString(), p1.value);
   }
 
-  @Test public void testEqualsNot()
+  @SuppressWarnings("static-method") @Test public void testEqualsNot()
     throws ConstraintError
   {
     final PathReal va0 = new PathReal("/a");
@@ -51,28 +53,28 @@ public class PathRealTest
     Assert.assertFalse(vb0.equals(va0));
   }
 
-  @Test public void testEqualsNotClass()
+  @SuppressWarnings("static-method") @Test public void testEqualsNotClass()
     throws ConstraintError
   {
     final PathReal va0 = new PathReal("/a");
     Assert.assertFalse(va0.equals(new Integer(23)));
   }
 
-  @Test public void testEqualsNull()
+  @SuppressWarnings("static-method") @Test public void testEqualsNull()
     throws ConstraintError
   {
     final PathReal va0 = new PathReal("/a");
     Assert.assertFalse(va0.equals(null));
   }
 
-  @Test public void testEqualsReflexive()
+  @SuppressWarnings("static-method") @Test public void testEqualsReflexive()
     throws ConstraintError
   {
     final PathReal va0 = new PathReal("/a");
     Assert.assertEquals(va0, va0);
   }
 
-  @Test public void testEqualsSymmetric()
+  @SuppressWarnings("static-method") @Test public void testEqualsSymmetric()
     throws ConstraintError
   {
     final PathReal va0 = new PathReal("/a");
@@ -81,7 +83,7 @@ public class PathRealTest
     Assert.assertEquals(va1, va0);
   }
 
-  @Test public void testEqualsTransitive()
+  @SuppressWarnings("static-method") @Test public void testEqualsTransitive()
     throws ConstraintError
   {
     final PathReal va0 = new PathReal("/a");
@@ -92,7 +94,7 @@ public class PathRealTest
     Assert.assertEquals(va1, va2);
   }
 
-  @Test public void testHash()
+  @SuppressWarnings("static-method") @Test public void testHash()
     throws ConstraintError
   {
     final PathReal va0 = new PathReal("/a");
@@ -100,13 +102,13 @@ public class PathRealTest
     Assert.assertEquals(va0.hashCode(), va1.hashCode());
   }
 
-  @Test public void testInit()
+  @SuppressWarnings("static-method") @Test public void testInit()
     throws ConstraintError
   {
     Assert.assertEquals("/a/b/c", new PathReal("/a/b/c").value);
   }
 
-  @Test public void testToString()
+  @SuppressWarnings("static-method") @Test public void testToString()
     throws ConstraintError
   {
     new PathReal("/a").toString().equals("/a");

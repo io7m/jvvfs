@@ -11,14 +11,14 @@ import com.io7m.jvvfs.PathVirtual;
 
 public class PathVirtualTest
 {
-  @Test public void testClean()
+  @SuppressWarnings("static-method") @Test public void testClean()
     throws ConstraintError
   {
     Assert.assertEquals("/a/b/c", new PathVirtual(
       "//////a//////b//////c/////").toString());
   }
 
-  @Test public void testComponentsThree()
+  @SuppressWarnings("static-method") @Test public void testComponentsThree()
     throws ConstraintError
   {
     final List<String> components =
@@ -30,14 +30,14 @@ public class PathVirtualTest
     Assert.assertEquals("c", components.get(2));
   }
 
-  @Test public void testComponentsZero()
+  @SuppressWarnings("static-method") @Test public void testComponentsZero()
     throws ConstraintError
   {
     final List<String> components = new PathVirtual("/").pathComponents();
     Assert.assertEquals(0, components.size());
   }
 
-  @Test public void testEqualsNot()
+  @SuppressWarnings("static-method") @Test public void testEqualsNot()
     throws ConstraintError
   {
     final PathVirtual va0 = new PathVirtual("/a");
@@ -46,28 +46,28 @@ public class PathVirtualTest
     Assert.assertFalse(vb0.equals(va0));
   }
 
-  @Test public void testEqualsNotClass()
+  @SuppressWarnings("static-method") @Test public void testEqualsNotClass()
     throws ConstraintError
   {
     final PathVirtual va0 = new PathVirtual("/a");
     Assert.assertFalse(va0.equals(new Integer(23)));
   }
 
-  @Test public void testEqualsNull()
+  @SuppressWarnings("static-method") @Test public void testEqualsNull()
     throws ConstraintError
   {
     final PathVirtual va0 = new PathVirtual("/a");
     Assert.assertFalse(va0.equals(null));
   }
 
-  @Test public void testEqualsReflexive()
+  @SuppressWarnings("static-method") @Test public void testEqualsReflexive()
     throws ConstraintError
   {
     final PathVirtual va0 = new PathVirtual("/a");
     Assert.assertEquals(va0, va0);
   }
 
-  @Test public void testEqualsSymmetric()
+  @SuppressWarnings("static-method") @Test public void testEqualsSymmetric()
     throws ConstraintError
   {
     final PathVirtual va0 = new PathVirtual("/a");
@@ -76,7 +76,7 @@ public class PathVirtualTest
     Assert.assertEquals(va1, va0);
   }
 
-  @Test public void testEqualsTransitive()
+  @SuppressWarnings("static-method") @Test public void testEqualsTransitive()
     throws ConstraintError
   {
     final PathVirtual va0 = new PathVirtual("/a");
@@ -87,7 +87,7 @@ public class PathVirtualTest
     Assert.assertEquals(va1, va2);
   }
 
-  @Test public void testHash()
+  @SuppressWarnings("static-method") @Test public void testHash()
     throws ConstraintError
   {
     final PathVirtual va0 = new PathVirtual("/a");
@@ -95,38 +95,35 @@ public class PathVirtualTest
     Assert.assertEquals(va0.hashCode(), va1.hashCode());
   }
 
-  @SuppressWarnings("unused") @Test(expected = ConstraintError.class) public
-    void
-    testInitNoLeadingSlash()
-      throws ConstraintError
+  @SuppressWarnings({ "unused", "static-method" }) @Test(
+    expected = ConstraintError.class) public void testInitNoLeadingSlash()
+    throws ConstraintError
   {
     new PathVirtual("a/b/c");
   }
 
-  @Test public void testInitOK()
+  @SuppressWarnings("static-method") @Test public void testInitOK()
     throws ConstraintError
   {
     final PathVirtual path = new PathVirtual("/a/b/c");
     Assert.assertEquals("/a/b/c", path.toString());
   }
 
-  @SuppressWarnings("unused") @Test(expected = ConstraintError.class) public
-    void
-    testInitWithBackslash()
-      throws ConstraintError
+  @SuppressWarnings({ "unused", "static-method" }) @Test(
+    expected = ConstraintError.class) public void testInitWithBackslash()
+    throws ConstraintError
   {
     new PathVirtual("/a\\b\\c");
   }
 
-  @SuppressWarnings("unused") @Test(expected = ConstraintError.class) public
-    void
-    testInitWithDots()
-      throws ConstraintError
+  @SuppressWarnings({ "unused", "static-method" }) @Test(
+    expected = ConstraintError.class) public void testInitWithDots()
+    throws ConstraintError
   {
     new PathVirtual("/a/../c");
   }
 
-  @Test public void testIsParent()
+  @SuppressWarnings("static-method") @Test public void testIsParent()
     throws ConstraintError
   {
     final PathVirtual abc = new PathVirtual("/a/b/c");
@@ -155,25 +152,25 @@ public class PathVirtualTest
     Assert.assertFalse(abc.isParentOf(abc));
   }
 
-  @Test public void testIsParentRoot()
+  @SuppressWarnings("static-method") @Test public void testIsParentRoot()
     throws ConstraintError
   {
     Assert.assertTrue(new PathVirtual("/").isParentOf(new PathVirtual("/")));
   }
 
-  @Test public void testIsRoot()
+  @SuppressWarnings("static-method") @Test public void testIsRoot()
     throws ConstraintError
   {
     Assert.assertTrue(new PathVirtual("/").isRoot());
   }
 
-  @Test public void testParentRoot()
+  @SuppressWarnings("static-method") @Test public void testParentRoot()
     throws ConstraintError
   {
     Assert.assertEquals("/", new PathVirtual("/").parent().toString());
   }
 
-  @Test public void testParents()
+  @SuppressWarnings("static-method") @Test public void testParents()
     throws ConstraintError
   {
     final PathVirtual abc = new PathVirtual("/a/b/c");
@@ -187,13 +184,13 @@ public class PathVirtualTest
     Assert.assertEquals("/", root.toString());
   }
 
-  @Test public void testRoot()
+  @SuppressWarnings("static-method") @Test public void testRoot()
     throws ConstraintError
   {
     Assert.assertEquals("/", new PathVirtual("/").toString());
   }
 
-  @Test public void testSubtract()
+  @SuppressWarnings("static-method") @Test public void testSubtract()
     throws ConstraintError
   {
     final PathVirtual abc = new PathVirtual("/a/b/c");
@@ -201,7 +198,7 @@ public class PathVirtualTest
     Assert.assertEquals("/c", abc.subtract(ab).toString());
   }
 
-  @Test public void testSubtractAnyRoot()
+  @SuppressWarnings("static-method") @Test public void testSubtractAnyRoot()
     throws ConstraintError
   {
     final PathVirtual abc = new PathVirtual("/a/b/c");
@@ -209,7 +206,7 @@ public class PathVirtualTest
     Assert.assertEquals("/a/b/c", abc.subtract(r).toString());
   }
 
-  @Test public void testSubtractNotRoot()
+  @SuppressWarnings("static-method") @Test public void testSubtractNotRoot()
     throws ConstraintError
   {
     final PathVirtual abc = new PathVirtual("/a/b/c");
@@ -217,14 +214,14 @@ public class PathVirtualTest
     Assert.assertEquals("/", r.subtract(abc).toString());
   }
 
-  @Test public void testSubtractRoot()
+  @SuppressWarnings("static-method") @Test public void testSubtractRoot()
     throws ConstraintError
   {
     final PathVirtual r = new PathVirtual("/");
     Assert.assertEquals("/", r.subtract(r).toString());
   }
 
-  @Test public void testToString()
+  @SuppressWarnings("static-method") @Test public void testToString()
     throws ConstraintError
   {
     new PathVirtual("/a").toString().equals("/a");

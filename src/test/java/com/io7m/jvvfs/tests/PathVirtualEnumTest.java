@@ -10,7 +10,7 @@ import com.io7m.jvvfs.PathVirtualEnum;
 
 public class PathVirtualEnumTest
 {
-  @Test public void testABC()
+  @SuppressWarnings("static-method") @Test public void testABC()
     throws ConstraintError
   {
     final PathVirtualEnum e = new PathVirtualEnum(new PathVirtual("/a/b/c"));
@@ -42,7 +42,7 @@ public class PathVirtualEnumTest
     }
   }
 
-  @Test public void testRoot()
+  @SuppressWarnings("static-method") @Test public void testRoot()
     throws ConstraintError
   {
     final PathVirtualEnum e = new PathVirtualEnum(new PathVirtual("/"));

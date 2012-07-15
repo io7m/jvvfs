@@ -28,10 +28,12 @@ public class ArchiveZipTest
     return log;
   }
 
-  @Test public void testToStringDifferent()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testToStringDifferent()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     final PathReal r0 = new PathReal("test-archives/one.zip");
     final PathReal r1 = new PathReal("test-archives/two.zip");
@@ -43,7 +45,7 @@ public class ArchiveZipTest
     Assert.assertFalse(z0.toString().equals(z1.toString()));
   }
 
-  @Test public void testToStringSame()
+  @SuppressWarnings("static-method") @Test public void testToStringSame()
     throws IOException,
       ConstraintError,
       FilesystemError

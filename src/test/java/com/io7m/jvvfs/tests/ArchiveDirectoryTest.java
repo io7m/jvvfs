@@ -27,9 +27,11 @@ public class ArchiveDirectoryTest
     return log;
   }
 
-  @Test public void testToStringDifferent()
-    throws IOException,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testToStringDifferent()
+      throws IOException,
+        ConstraintError
   {
     final PathReal r0 = new PathReal("test-archives/archive0");
     final PathReal r1 = new PathReal("test-archives/archive1");
@@ -47,7 +49,7 @@ public class ArchiveDirectoryTest
     Assert.assertFalse(z0.toString().equals(z1.toString()));
   }
 
-  @Test public void testToStringSame()
+  @SuppressWarnings("static-method") @Test public void testToStringSame()
     throws IOException,
       ConstraintError
   {

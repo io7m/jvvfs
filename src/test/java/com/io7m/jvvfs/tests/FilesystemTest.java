@@ -39,7 +39,7 @@ public class FilesystemTest
     return new Filesystem(log, new PathReal(FilesystemTest.archive_dir));
   }
 
-  @Before public void setUp()
+  @SuppressWarnings("static-method") @Before public void setUp()
     throws Exception
   {
     {
@@ -60,7 +60,8 @@ public class FilesystemTest
     }
   }
 
-  @SuppressWarnings("unused") @Test(expected = FilesystemError.class) public
+  @SuppressWarnings({ "unused", "static-method" }) @Test(
+    expected = FilesystemError.class) public
     void
     testFilesystemBadArchiveDir()
       throws IOException,
@@ -81,20 +82,24 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemCreateDirectory()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemCreateDirectory()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
     fs.createDirectory(new PathVirtual("/dev"));
     fs.createDirectory(new PathVirtual("/usr/local/lib"));
   }
 
-  @Test public void testFilesystemCreatedIsDirectory()
-    throws ConstraintError,
-      IOException,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemCreatedIsDirectory()
+      throws ConstraintError,
+        IOException,
+        FilesystemError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -111,10 +116,12 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(new PathVirtual("/opt/local/lib")));
   }
 
-  @Test public void testFilesystemDirectoryIsDirectoryCorrect()
-    throws ConstraintError,
-      IOException,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryIsDirectoryCorrect()
+      throws ConstraintError,
+        IOException,
+        FilesystemError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -127,10 +134,12 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(new PathVirtual("/usr/local/lib")));
   }
 
-  @Test public void testFilesystemDirectoryIsFileCorrect()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryIsFileCorrect()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -145,10 +154,12 @@ public class FilesystemTest
     Assert.assertFalse(fs.isDirectory(new PathVirtual("/file.txt")));
   }
 
-  @Test public void testFilesystemDirectoryIsFileCorrectNonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryIsFileCorrectNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -164,10 +175,12 @@ public class FilesystemTest
     Assert.assertFalse(fs.isDirectory(new PathVirtual("/xyz/file.txt")));
   }
 
-  @Test public void testFilesystemDirectoryListComplex0()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex0()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -186,10 +199,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex0NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex0NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -209,10 +224,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex1()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex1()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -235,10 +252,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex1NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex1NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -262,10 +281,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex2()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex2()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -288,10 +309,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex2NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex2NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -315,10 +338,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex3()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex3()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -338,10 +363,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex3NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex3NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -367,10 +394,12 @@ public class FilesystemTest
    * 'FS_ERROR_NOT_A_DIRECTORY'.
    */
 
-  @Test public void testFilesystemDirectoryListComplex4()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex4()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -390,10 +419,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex4NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex4NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -414,10 +445,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex5()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex5()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -437,10 +470,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex5NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex5NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -466,10 +501,12 @@ public class FilesystemTest
    * directory, the directory is invisible.
    */
 
-  @Test public void testFilesystemDirectoryListComplex6()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex6()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -489,10 +526,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex6NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex6NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -513,10 +552,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex7()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex7()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -536,10 +577,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex7NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex7NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -560,10 +603,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex8()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex8()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -583,10 +628,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListComplex8NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListComplex8NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -607,10 +654,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryListCorrectOne()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListCorrectOne()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
     final TreeSet<String> items = new TreeSet<String>();
@@ -626,10 +675,12 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("file.txt"));
   }
 
-  @Test public void testFilesystemDirectoryListCorrectOneNonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListCorrectOneNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
     final TreeSet<String> items = new TreeSet<String>();
@@ -646,10 +697,12 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("file.txt"));
   }
 
-  @Test public void testFilesystemDirectoryListCorrectUnion()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListCorrectUnion()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
     final TreeSet<String> items = new TreeSet<String>();
@@ -670,10 +723,12 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("file33.txt"));
   }
 
-  @Test public void testFilesystemDirectoryListCorrectUnionNonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListCorrectUnionNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
     final TreeSet<String> items = new TreeSet<String>();
@@ -695,10 +750,12 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("file33.txt"));
   }
 
-  @Test public void testFilesystemDirectoryListMountDirect()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListMountDirect()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
     final TreeSet<String> items = new TreeSet<String>();
@@ -716,10 +773,12 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("subdir"));
   }
 
-  @Test public void testFilesystemDirectoryListMountDirectNonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListMountDirectNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
     final TreeSet<String> items = new TreeSet<String>();
@@ -737,7 +796,7 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("subdir"));
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryListNonexistent()
       throws IOException,
@@ -761,7 +820,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryListNonexistentNonRootMount()
       throws IOException,
@@ -786,7 +845,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryListNotDirectory()
       throws IOException,
@@ -810,7 +869,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryListNotDirectoryNonRootMount()
       throws IOException,
@@ -835,7 +894,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryListShadowed()
       throws IOException,
@@ -860,7 +919,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryListShadowedNonRootMount()
       throws IOException,
@@ -886,10 +945,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryModificationTimeCorrect()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryModificationTimeCorrect()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -907,7 +968,7 @@ public class FilesystemTest
     Assert.assertEquals(0, t);
   }
 
-  @Test public
+  @SuppressWarnings("static-method") @Test public
     void
     testFilesystemDirectoryModificationTimeCorrectNonRootMount()
       throws IOException,
@@ -931,7 +992,7 @@ public class FilesystemTest
     Assert.assertEquals(0, t);
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryModificationTimeDirectory()
       throws IOException,
@@ -954,7 +1015,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryModificationTimeDirectoryNonRootMount()
       throws IOException,
@@ -978,7 +1039,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryModificationTimeNonexistent()
       throws IOException,
@@ -1001,7 +1062,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryModificationTimeNonexistentNonRootMount()
       throws IOException,
@@ -1025,10 +1086,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryOpenFileCorrect()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryOpenFileCorrect()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     FilesystemAPI fs = null;
 
@@ -1046,10 +1109,12 @@ public class FilesystemTest
     Assert.assertEquals("Hello archive0.", line);
   }
 
-  @Test public void testFilesystemDirectoryOpenFileCorrectNonRootMount()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryOpenFileCorrectNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     FilesystemAPI fs = null;
 
@@ -1068,7 +1133,7 @@ public class FilesystemTest
     Assert.assertEquals("Hello archive0.", line);
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryOpenFileDirectory()
       throws IOException,
@@ -1093,7 +1158,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryOpenFileDirectoryNonRootMount()
       throws IOException,
@@ -1119,7 +1184,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryOpenFileNonexistent()
       throws IOException,
@@ -1144,7 +1209,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryOpenFileNonexistentNonRootMount()
       throws IOException,
@@ -1170,10 +1235,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryOpenFileNonRootMount()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryOpenFileNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     FilesystemAPI fs = null;
 
@@ -1192,10 +1259,12 @@ public class FilesystemTest
     Assert.assertEquals("Hello archive0.", line);
   }
 
-  @Test public void testFilesystemDirectoryOpenFileOverlayCorrect()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryOpenFileOverlayCorrect()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     FilesystemAPI fs = null;
 
@@ -1214,7 +1283,7 @@ public class FilesystemTest
     Assert.assertEquals("Hello archive1.", line);
   }
 
-  @Test public
+  @SuppressWarnings("static-method") @Test public
     void
     testFilesystemDirectoryOpenFileOverlayCorrectNonRootMount()
       throws IOException,
@@ -1239,7 +1308,7 @@ public class FilesystemTest
     Assert.assertEquals("Hello archive1.", line);
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectoryOpenFileRoot()
       throws IOException,
@@ -1262,10 +1331,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectorySizeCorrect()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectorySizeCorrect()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1279,10 +1350,12 @@ public class FilesystemTest
     Assert.assertEquals(16, size);
   }
 
-  @Test public void testFilesystemDirectorySizeCorrectNonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectorySizeCorrectNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1297,7 +1370,7 @@ public class FilesystemTest
     Assert.assertEquals(16, size);
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectorySizeDirectory()
       throws IOException,
@@ -1320,7 +1393,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectorySizeDirectoryNonRootMount()
       throws IOException,
@@ -1344,7 +1417,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectorySizeNonexistent()
       throws IOException,
@@ -1367,7 +1440,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemDirectorySizeNonexistentNonRootMount()
       throws IOException,
@@ -1391,10 +1464,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemDirectoryUnmountCorrect()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryUnmountCorrect()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1402,10 +1477,12 @@ public class FilesystemTest
     f.unmount(new PathVirtual("/"));
   }
 
-  @Test public void testFilesystemListMkdir()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemListMkdir()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
     final TreeSet<String> items = new TreeSet<String>();
@@ -1446,7 +1523,7 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("z"));
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemMountBadArchive()
       throws IOException,
@@ -1463,7 +1540,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemMountBusy()
       throws IOException,
@@ -1495,10 +1572,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemMountCollision()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemMountCollision()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -1523,7 +1602,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemMountDuplicate()
       throws IOException,
@@ -1546,10 +1625,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemMountedIsDirectoryExternalMakeDir()
-    throws ConstraintError,
-      IOException,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemMountedIsDirectoryExternalMakeDir()
+      throws ConstraintError,
+        IOException,
+        FilesystemError
   {
     final File dir = new File(FilesystemTest.archive_dir + "/local");
     dir.delete();
@@ -1576,10 +1657,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemMountedIsDirectoryOverriddenFile()
-    throws ConstraintError,
-      IOException,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemMountedIsDirectoryOverriddenFile()
+      throws ConstraintError,
+        IOException,
+        FilesystemError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -1596,10 +1679,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemMountInMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemMountInMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -1611,7 +1696,7 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(new PathVirtual("/subdir/subdir")));
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemMountNoArchive()
       throws IOException,
@@ -1628,7 +1713,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemMountNoMountpoint()
       throws IOException,
@@ -1645,10 +1730,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemMountOK()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemMountOK()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -1657,10 +1744,12 @@ public class FilesystemTest
     fs.mount("one.zip", new PathVirtual("/empty"));
   }
 
-  @Test public void testFilesystemUnmountCorrect()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemUnmountCorrect()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -1686,7 +1775,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemUnmountNotMountedRoot()
       throws IOException,
@@ -1702,10 +1791,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipIsDirectoryCorrect()
-    throws ConstraintError,
-      IOException,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipIsDirectoryCorrect()
+      throws ConstraintError,
+        IOException,
+        FilesystemError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -1722,10 +1813,12 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(new PathVirtual("/usr/local/lib")));
   }
 
-  @Test public void testFilesystemZipIsFileCorrect()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipIsFileCorrect()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -1740,10 +1833,12 @@ public class FilesystemTest
     Assert.assertFalse(fs.isDirectory(new PathVirtual("/file.txt")));
   }
 
-  @Test public void testFilesystemZipIsFileCorrectNonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipIsFileCorrectNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI fs = FilesystemTest.makeFS();
 
@@ -1759,10 +1854,12 @@ public class FilesystemTest
     Assert.assertFalse(fs.isDirectory(new PathVirtual("/xyz/file.txt")));
   }
 
-  @Test public void testFilesystemZipListComplex0()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex0()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1781,10 +1878,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex0NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex0NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1804,10 +1903,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex1()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex1()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1830,10 +1931,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex1NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex1NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1857,10 +1960,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex2()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex2()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1883,10 +1988,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex2NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex2NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1910,10 +2017,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex3()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex3()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1933,10 +2042,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex3NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex3NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1957,10 +2068,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex4()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex4()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -1980,10 +2093,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex4NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex4NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2004,10 +2119,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex5()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex5()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2027,10 +2144,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex5NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex5NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2051,10 +2170,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex6()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex6()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2074,10 +2195,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex6NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex6NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2098,10 +2221,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex7()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex7()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2121,10 +2246,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex7NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex7NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2145,10 +2272,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex8()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex8()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2168,10 +2297,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListComplex8NonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListComplex8NonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2192,10 +2323,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipListCorrectOne()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListCorrectOne()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
     final TreeSet<String> items = new TreeSet<String>();
@@ -2211,10 +2344,12 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("file.txt"));
   }
 
-  @Test public void testFilesystemZipListCorrectOneNonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListCorrectOneNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
     final TreeSet<String> items = new TreeSet<String>();
@@ -2231,10 +2366,12 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("file.txt"));
   }
 
-  @Test public void testFilesystemZipListCorrectUnion()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListCorrectUnion()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
     final TreeSet<String> items = new TreeSet<String>();
@@ -2255,10 +2392,12 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("file33.txt"));
   }
 
-  @Test public void testFilesystemZipListCorrectUnionNonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipListCorrectUnionNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
     final TreeSet<String> items = new TreeSet<String>();
@@ -2280,7 +2419,7 @@ public class FilesystemTest
     Assert.assertTrue(items.contains("file33.txt"));
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipListNonexistent()
       throws IOException,
@@ -2304,7 +2443,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipListNonexistentNonRootMount()
       throws IOException,
@@ -2329,7 +2468,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipListNotDirectory()
       throws IOException,
@@ -2353,7 +2492,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipListNotDirectoryNonRootMount()
       throws IOException,
@@ -2378,7 +2517,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipListShadowed()
       throws IOException,
@@ -2403,7 +2542,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipListShadowedNonRootMount()
       throws IOException,
@@ -2429,10 +2568,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipModificationTimeCorrect()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipModificationTimeCorrect()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2446,10 +2587,12 @@ public class FilesystemTest
     Assert.assertEquals(0, t);
   }
 
-  @Test public void testFilesystemZipModificationTimeCorrectNonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipModificationTimeCorrectNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2464,7 +2607,7 @@ public class FilesystemTest
     Assert.assertEquals(0, t);
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipModificationTimeDirectory()
       throws IOException,
@@ -2487,7 +2630,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipModificationTimeDirectoryNonRootMount()
       throws IOException,
@@ -2511,7 +2654,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipModificationTimeNonexistent()
       throws IOException,
@@ -2534,7 +2677,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipModificationTimeNonexistentNonRootMount()
       throws IOException,
@@ -2558,7 +2701,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipMountBusy()
       throws IOException,
@@ -2590,7 +2733,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipMountBusyNoExplicitSubdir()
       throws IOException,
@@ -2622,7 +2765,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipMountEncrypted()
       throws IOException,
@@ -2639,10 +2782,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipNoExplicitSubdirCorrect()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipNoExplicitSubdirCorrect()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     FilesystemAPI fs = null;
 
@@ -2657,10 +2802,12 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(new PathVirtual("/subdir")));
   }
 
-  @Test public void testFilesystemZipNoExplicitSubdirCorrectNonRootMount()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipNoExplicitSubdirCorrectNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     FilesystemAPI fs = null;
 
@@ -2676,10 +2823,12 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(new PathVirtual("/xyz/subdir")));
   }
 
-  @Test public void testFilesystemZipOpenFileCorrect()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipOpenFileCorrect()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     FilesystemAPI fs = null;
 
@@ -2697,10 +2846,12 @@ public class FilesystemTest
     Assert.assertEquals("Hello zip.", line);
   }
 
-  @Test public void testFilesystemZipOpenFileCorrectNonRootMount()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipOpenFileCorrectNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     FilesystemAPI fs = null;
 
@@ -2719,7 +2870,7 @@ public class FilesystemTest
     Assert.assertEquals("Hello zip.", line);
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipOpenFileDirectory()
       throws IOException,
@@ -2744,7 +2895,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipOpenFileDirectoryNonRootMount()
       throws IOException,
@@ -2770,7 +2921,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipOpenFileNoExplicitSubdirCorrect()
       throws IOException,
@@ -2795,7 +2946,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipOpenFileNoExplicitSubdirCorrectNonRootMount()
       throws IOException,
@@ -2821,7 +2972,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipOpenFileNonexistent()
       throws IOException,
@@ -2846,7 +2997,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipOpenFileNonexistentNonRootMount()
       throws IOException,
@@ -2872,10 +3023,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipOpenFileOverlayCorrect()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipOpenFileOverlayCorrect()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     FilesystemAPI fs = null;
 
@@ -2894,10 +3047,12 @@ public class FilesystemTest
     Assert.assertEquals("Hello three.zip.", line);
   }
 
-  @Test public void testFilesystemZipOpenFileOverlayCorrectNonRootMount()
-    throws IOException,
-      ConstraintError,
-      FilesystemError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipOpenFileOverlayCorrectNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
   {
     FilesystemAPI fs = null;
 
@@ -2917,7 +3072,7 @@ public class FilesystemTest
     Assert.assertEquals("Hello three.zip.", line);
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipOpenFileRoot()
       throws IOException,
@@ -2940,10 +3095,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipSizeCorrect()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipSizeCorrect()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2957,10 +3114,12 @@ public class FilesystemTest
     Assert.assertEquals(17, size);
   }
 
-  @Test public void testFilesystemZipSizeCorrectNonRootMount()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipSizeCorrectNonRootMount()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
@@ -2975,7 +3134,7 @@ public class FilesystemTest
     Assert.assertEquals(17, size);
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipSizeDirectory()
       throws IOException,
@@ -2998,7 +3157,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipSizeDirectoryNonRootMount()
       throws IOException,
@@ -3022,7 +3181,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipSizeNonexistent()
       throws IOException,
@@ -3045,7 +3204,7 @@ public class FilesystemTest
     }
   }
 
-  @Test(expected = FilesystemError.class) public
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testFilesystemZipSizeNonexistentNonRootMount()
       throws IOException,
@@ -3069,10 +3228,12 @@ public class FilesystemTest
     }
   }
 
-  @Test public void testFilesystemZipUnmountCorrect()
-    throws IOException,
-      FilesystemError,
-      ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipUnmountCorrect()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
   {
     final FilesystemAPI f = FilesystemTest.makeFS();
 
