@@ -1086,7 +1086,7 @@ public class FilesystemTest
     }
   }
 
-  @SuppressWarnings("static-method") @Test public
+  @SuppressWarnings({ "static-method", "resource" }) @Test public
     void
     testFilesystemDirectoryOpenFileCorrect()
       throws IOException,
@@ -1109,7 +1109,7 @@ public class FilesystemTest
     Assert.assertEquals("Hello archive0.", line);
   }
 
-  @SuppressWarnings("static-method") @Test public
+  @SuppressWarnings({ "static-method", "resource" }) @Test public
     void
     testFilesystemDirectoryOpenFileCorrectNonRootMount()
       throws IOException,
@@ -1235,7 +1235,7 @@ public class FilesystemTest
     }
   }
 
-  @SuppressWarnings("static-method") @Test public
+  @SuppressWarnings({ "static-method", "resource" }) @Test public
     void
     testFilesystemDirectoryOpenFileNonRootMount()
       throws IOException,
@@ -1259,7 +1259,7 @@ public class FilesystemTest
     Assert.assertEquals("Hello archive0.", line);
   }
 
-  @SuppressWarnings("static-method") @Test public
+  @SuppressWarnings({ "static-method", "resource" }) @Test public
     void
     testFilesystemDirectoryOpenFileOverlayCorrect()
       throws IOException,
@@ -1283,7 +1283,7 @@ public class FilesystemTest
     Assert.assertEquals("Hello archive1.", line);
   }
 
-  @SuppressWarnings("static-method") @Test public
+  @SuppressWarnings({ "static-method", "resource" }) @Test public
     void
     testFilesystemDirectoryOpenFileOverlayCorrectNonRootMount()
       throws IOException,
@@ -2823,7 +2823,7 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(new PathVirtual("/xyz/subdir")));
   }
 
-  @SuppressWarnings("static-method") @Test public
+  @SuppressWarnings({ "static-method", "resource" }) @Test public
     void
     testFilesystemZipOpenFileCorrect()
       throws IOException,
@@ -2846,7 +2846,7 @@ public class FilesystemTest
     Assert.assertEquals("Hello zip.", line);
   }
 
-  @SuppressWarnings("static-method") @Test public
+  @SuppressWarnings({ "static-method", "resource" }) @Test public
     void
     testFilesystemZipOpenFileCorrectNonRootMount()
       throws IOException,
@@ -3023,7 +3023,7 @@ public class FilesystemTest
     }
   }
 
-  @SuppressWarnings("static-method") @Test public
+  @SuppressWarnings({ "static-method", "resource" }) @Test public
     void
     testFilesystemZipOpenFileOverlayCorrect()
       throws IOException,
@@ -3047,7 +3047,7 @@ public class FilesystemTest
     Assert.assertEquals("Hello three.zip.", line);
   }
 
-  @SuppressWarnings("static-method") @Test public
+  @SuppressWarnings({ "static-method", "resource" }) @Test public
     void
     testFilesystemZipOpenFileOverlayCorrectNonRootMount()
       throws IOException,
