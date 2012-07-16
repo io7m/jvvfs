@@ -5,7 +5,7 @@
   <version>2.1.0</version>
   <name>io7m-jvvfs</name>
   <description>Virtual filesystem abstraction</description>
-  <url>http://io7m.com/software/jvvfs/</url>
+  <url>http://mvn.io7m.com/jvvfs/</url>
 
   <licenses>
     <license>
@@ -38,7 +38,7 @@
     <site>
       <id>io7m</id>
       <name>io7m.com</name>
-      <url>http://io7m.com/software/jvvfs/</url>
+      <url>http://mvn.io7m.com/jvvfs/</url>
     </site>
   </distributionManagement>
 
