@@ -9,6 +9,12 @@
     <c:item>
       <c:date>2012-07-25</c:date>
       <c:type-code-fix/>
+      <c:summary>Improve installation documentation</c:summary>
+    </c:item>
+ 
+    <c:item>
+      <c:date>2012-07-25</c:date>
+      <c:type-code-fix/>
       <c:summary>Update versions of all plugins in POM</c:summary>
     </c:item>
  
