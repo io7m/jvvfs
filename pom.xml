@@ -208,6 +208,29 @@
         </executions>
       </plugin>
 
+      <!-- Transform XML documentation with Saxon -->
+      <plugin>
+        <groupId>com.io7m.saxon-plugin</groupId>
+        <artifactId>io7m-saxon-plugin</artifactId>
+        <version>1.1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <transformation>
+            <stylesheetFile>src/main/xsl/structural-1_0_0-standalone-x20.xsl</stylesheetFile>
+            <documentFile>src/main/xml/documentation.xml</documentFile>
+            <outputDirectory>${project.build.directory}/xhtml</outputDirectory>
+            <outputDirectoryParameterName>io7m.structural-1_0_0.output_directory</outputDirectoryParameterName>
+            <outputFile>out.txt</outputFile>
+          </transformation>
+        </configuration>
+      </plugin>
+
       <!-- Validate XML documentation -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -226,34 +249,6 @@
               <dir>src/main/xml</dir>
             </validationSet>
           </validationSets>
-        </configuration>
-      </plugin>
-
-      <!-- Transform XML documentation with Saxon -->
-      <plugin>
-        <groupId>com.io7m.saxon-plugin</groupId>
-        <artifactId>io7m-saxon-plugin</artifactId>
-        <version>1.0.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>transform</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <transformation>
-            <stylesheetFile>src/main/xsl/structural-1_0_0-standalone-x20.xsl</stylesheetFile>
-            <documentFile>src/main/xml/documentation.xml</documentFile>
-            <outputDirectory>${project.build.directory}/xhtml</outputDirectory>
-            <outputFile>out.txt</outputFile>
-            <stylesheetParameters>
-              <property>
-                <name>io7m.structural-1_0_0.output_directory</name>
-                <value>${project.build.directory}/xhtml</value>
-              </property>
-            </stylesheetParameters>
-          </transformation>
         </configuration>
       </plugin>
 
