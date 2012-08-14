@@ -2,6 +2,7 @@ package com.io7m.jvvfs;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -629,7 +630,7 @@ public final class Filesystem implements FilesystemAPI
     final URL url = loader.getResource(cname_k);
 
     if (url.getProtocol().equals("file")) {
-      final String real_path = url.getPath();
+      final String real_path = this.urlAbsolutePath(url);
       final String mount_path =
         real_path.substring(0, real_path.length() - cname_k.length());
 
@@ -640,7 +641,7 @@ public final class Filesystem implements FilesystemAPI
         MountCheck.MOUNT_ARCHIVE_DANGEROUSLY_AND_DIRECTLY,
         mount);
     } else if (url.getProtocol().equals("jar")) {
-      final String real_path = url.getPath();
+      final String real_path = this.urlAbsolutePath(url);
 
       /*
        * Path is of the form "file:/x/y/z.jar!/path/to/file.class"
@@ -661,6 +662,21 @@ public final class Filesystem implements FilesystemAPI
         Code.FS_ERROR_UNHANDLED_TYPE,
         "Cannot mount whatever is holding this classpath item");
     }
+  }
+
+  private String urlAbsolutePath(
+    final @Nonnull URL url)
+  {
+    File f = null;
+
+    try {
+      f = new File(url.toURI());
+    } catch (final URISyntaxException e) {
+      this.log.debug("url-absolute-path: bad URI syntax: " + e.getMessage());
+      f = new File(url.getPath());
+    }
+
+    return f.getAbsolutePath();
   }
 
   @Override public @Nonnull InputStream openFile(
