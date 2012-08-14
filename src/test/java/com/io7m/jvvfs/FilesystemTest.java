@@ -1,4 +1,4 @@
-package com.io7m.jvvfs.tests;
+package com.io7m.jvvfs;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,12 +15,7 @@ import org.junit.Test;
 import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.PropertyUtils;
 import com.io7m.jlog.Log;
-import com.io7m.jvvfs.Filesystem;
-import com.io7m.jvvfs.FilesystemAPI;
-import com.io7m.jvvfs.FilesystemError;
 import com.io7m.jvvfs.FilesystemError.Code;
-import com.io7m.jvvfs.PathReal;
-import com.io7m.jvvfs.PathVirtual;
 
 public class FilesystemTest
 {
@@ -1604,7 +1599,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test public
     void
-    testFilesystemMountDangerousClassPath()
+    testFilesystemMountUnsafeClasspathFile()
       throws IOException,
         ConstraintError,
         FilesystemError

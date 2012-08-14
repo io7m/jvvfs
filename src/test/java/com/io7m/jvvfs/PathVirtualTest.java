@@ -1,4 +1,4 @@
-package com.io7m.jvvfs.tests;
+package com.io7m.jvvfs;
 
 import java.util.List;
 

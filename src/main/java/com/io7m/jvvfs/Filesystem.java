@@ -629,26 +629,49 @@ public final class Filesystem implements FilesystemAPI
     final ClassLoader loader = c.getClassLoader();
     final URL url = loader.getResource(cname_k);
 
+    this.log.debug("mount-unsafe-classpath-item: url " + url);
+    final String mount_path =
+      ClassURIHandling.getClassContainerPath(url, cname_k);
+    this.log.debug("mount-unsafe-classpath-item: actual " + mount_path);
+
+    this.mountInternal(
+      mount_path,
+      MountCheck.MOUNT_ARCHIVE_DANGEROUSLY_AND_DIRECTLY,
+      mount);
+  }
+
+  void mountUnsafeURL(
+    final PathVirtual mount,
+    final String canonical_class_name,
+    final URL url)
+    throws FilesystemError,
+      ConstraintError
+  {
     if (url.getProtocol().equals("file")) {
+
+      /**
+       * URL is of the form "file:/path/to/file.class"
+       */
+
       final String real_path = this.urlAbsolutePath(url);
       final String mount_path =
-        real_path.substring(0, real_path.length() - cname_k.length());
+        real_path.substring(
+          0,
+          real_path.length() - canonical_class_name.length());
 
       this.log.info("mount-classpath-file : " + mount_path);
 
-      this.mountInternal(
-        mount_path,
-        MountCheck.MOUNT_ARCHIVE_DANGEROUSLY_AND_DIRECTLY,
-        mount);
     } else if (url.getProtocol().equals("jar")) {
-      final String real_path = this.urlAbsolutePath(url);
 
-      /*
-       * Path is of the form "file:/x/y/z.jar!/path/to/file.class"
+      /**
+       * URL is of the form "jar:file:/x/y/z.jar!/path/to/file.class"
        */
 
+      final String real_path = this.urlAbsolutePath(url);
       final String file_path =
-        real_path.substring(0, real_path.length() - (cname_k.length() + 2));
+        real_path.substring(
+          0,
+          real_path.length() - (canonical_class_name.length() + 2));
       final String mount_path = file_path.replaceFirst("^file:", "");
 
       this.log.info("mount-classpath-jar : " + mount_path);
