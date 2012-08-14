@@ -26,7 +26,7 @@ public class FilesystemTest
 {
   private static final String archive_dir = "test-archives";
 
-  private static FilesystemAPI makeFS()
+  private static Filesystem makeFS()
     throws IOException,
       ConstraintError,
       FilesystemError
@@ -1600,6 +1600,26 @@ public class FilesystemTest
     } catch (final FilesystemError e) {
       Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
     }
+  }
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemMountDangerousClassPath()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.createDirectory("/xyz");
+    fs
+      .mountUnsafeClasspathItem(FilesystemTest.class, new PathVirtual("/xyz"));
+
+    final InputStream is = fs.openFile("/xyz/com/io7m/jvvfs/example.txt");
+    final BufferedReader br = new BufferedReader(new InputStreamReader(is));
+    final String text = br.readLine();
+    Assert.assertEquals("Hello.", text);
+    is.close();
   }
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
