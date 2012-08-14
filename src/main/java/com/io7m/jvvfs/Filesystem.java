@@ -669,6 +669,8 @@ public final class Filesystem implements FilesystemAPI
   {
     File f = null;
 
+    this.log.debug("url-absolute-path: " + url);
+
     try {
       f = new File(url.toURI());
     } catch (final URISyntaxException e) {
