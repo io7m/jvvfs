@@ -3,8 +3,15 @@
   <c:project>io7m-jvvfs</c:project>
 
   <c:release ticket-system="com.io7m.fossil.jvvfs">
-    <c:date>2012-07-27</c:date>
+    <c:date>2012-08-14</c:date>
     <c:version>2.2.1</c:version>
+
+    <c:item>
+      <c:date>2012-08-14</c:date>
+      <c:type-code-fix/>
+      <c:summary>Weaken zip modification time tests, for portability</c:summary>
+    </c:item>
+
     <c:item>
       <c:date>2012-07-27</c:date>
       <c:type-code-fix/>
@@ -21,13 +28,13 @@
       <c:type-code-fix/>
       <c:summary>Improve installation documentation</c:summary>
     </c:item>
- 
+
     <c:item>
       <c:date>2012-07-25</c:date>
       <c:type-code-fix/>
       <c:summary>Update versions of all plugins in POM</c:summary>
     </c:item>
- 
+
     <c:item>
       <c:date>2012-07-15</c:date>
       <c:type-code-fix/>
@@ -44,7 +51,7 @@
       <c:type-code-fix/>
       <c:summary>Produce documentation with Maven</c:summary>
     </c:item>
- 
+
     <c:item>
       <c:date>2012-07-13</c:date>
       <c:type-code-fix/>

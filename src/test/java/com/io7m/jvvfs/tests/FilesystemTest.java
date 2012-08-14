@@ -2583,8 +2583,13 @@ public class FilesystemTest
       Assert.fail();
     }
 
-    final long t = f.modificationTime(new PathVirtual("/file.txt"));
-    Assert.assertEquals(0, t);
+    /**
+     * Unfortunately, it seems there's very little that can be asserted about
+     * the modification time portably, so this test solely exists for code
+     * coverage.
+     */
+
+    f.modificationTime(new PathVirtual("/file.txt"));
   }
 
   @SuppressWarnings("static-method") @Test public
@@ -2603,8 +2608,13 @@ public class FilesystemTest
       Assert.fail();
     }
 
-    final long t = f.modificationTime(new PathVirtual("/xyz/file.txt"));
-    Assert.assertEquals(0, t);
+    /**
+     * Unfortunately, it seems there's very little that can be asserted about
+     * the modification time portably, so this test solely exists for code
+     * coverage.
+     */
+
+    f.modificationTime(new PathVirtual("/xyz/file.txt"));
   }
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
