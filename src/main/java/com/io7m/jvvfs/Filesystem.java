@@ -16,6 +16,8 @@ import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.functional.Option;
+import com.io7m.jaux.functional.Option.Some;
 import com.io7m.jlog.Log;
 import com.io7m.jvvfs.FileReference.Type;
 import com.io7m.jvvfs.FilesystemError.Code;
@@ -56,7 +58,7 @@ public final class Filesystem implements FilesystemAPI
   }
 
   private final @Nonnull Log                                  log;
-  private final @Nonnull PathReal                             archive_path;
+  private final @Nonnull Option<PathReal>                     archive_path;
   private final @Nonnull ArrayList<ArchiveHandler>            handlers;
   private final @Nonnull HashMap<PathVirtual, Stack<Archive>> mounts;
   private final @Nonnull TreeSet<PathVirtual>                 directories;
@@ -70,12 +72,28 @@ public final class Filesystem implements FilesystemAPI
     this.log =
       new Log(Constraints.constrainNotNull(log, "log"), "filesystem");
     this.archive_path =
-      Constraints.constrainNotNull(archives, "archive path");
+      new Option.Some<PathReal>(Constraints.constrainNotNull(
+        archives,
+        "archive path"));
 
-    final File archive_dir = new File(this.archive_path.value);
+    final File archive_dir = new File(archives.value);
     if (archive_dir.isDirectory() == false) {
-      throw FilesystemError.notDirectory(this.archive_path.value);
+      throw FilesystemError.notDirectory(archives.value);
     }
+
+    this.handlers = Filesystem.initializeHandlers(this.log);
+    this.mounts = new HashMap<PathVirtual, Stack<Archive>>();
+    this.directories = new TreeSet<PathVirtual>();
+    this.directories.add(new PathVirtual("/"));
+  }
+
+  public Filesystem(
+    final @Nonnull Log log)
+    throws ConstraintError
+  {
+    this.log =
+      new Log(Constraints.constrainNotNull(log, "log"), "filesystem");
+    this.archive_path = new Option.None<PathReal>();
 
     this.handlers = Filesystem.initializeHandlers(this.log);
     this.mounts = new HashMap<PathVirtual, Stack<Archive>>();
@@ -112,9 +130,16 @@ public final class Filesystem implements FilesystemAPI
     final @Nonnull String archive_name)
     throws ConstraintError
   {
-    return new PathReal(this.archive_path.value
-      + File.separatorChar
-      + archive_name);
+    switch (this.archive_path.type) {
+      case OPTION_NONE:
+      default:
+        throw new AssertionError("unreachable code: report this bug!");
+      case OPTION_SOME:
+        final Some<PathReal> path = (Option.Some<PathReal>) this.archive_path;
+        return new PathReal(path.value.value
+          + File.separatorChar
+          + archive_name);
+    }
   }
 
   @Override public void createDirectory(
@@ -540,7 +565,13 @@ public final class Filesystem implements FilesystemAPI
       if (Filesystem.archiveNameUnsafe(archive_name)) {
         throw FilesystemError.fileNotFound(archive_name);
       }
-      archive_real = this.archiveReal(archive_name);
+
+      switch (this.archive_path.type) {
+        case OPTION_NONE:
+          throw FilesystemError.fileNotFound(archive_name);
+        case OPTION_SOME:
+          archive_real = this.archiveReal(archive_name);
+      }
     } else if (check == MountCheck.MOUNT_ARCHIVE_DANGEROUSLY_AND_DIRECTLY) {
       archive_real = new PathReal(archive_name);
     }

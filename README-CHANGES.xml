@@ -3,13 +3,19 @@
   <c:project>io7m-jvvfs</c:project>
 
   <c:release ticket-system="com.io7m.fossil.jvvfs">
-    <c:date>2012-08-14</c:date>
-    <c:version>2.2.1</c:version>
+    <c:date>2012-09-05</c:date>
+    <c:version>2.3.0</c:version>
+
+    <c:item>
+      <c:date>2012-09-05</c:date>
+      <c:type-code-fix/>
+      <c:summary>Add constructor without archive path in Filesystem, for using classpath-only filesystems</c:summary>
+    </c:item>
 
     <c:item>
       <c:date>2012-08-14</c:date>
       <c:type-code-fix/>
-      <c:summary>Correct mountUnsafeClasspathItem on Windows (URLs are not interchangeable with File paths!)</c:summary>
+      <c:summary>Correct mountunsafeclasspathitem on windows (urls are not interchangeable with file paths!)</c:summary>
     </c:item>
 
     <c:item>
