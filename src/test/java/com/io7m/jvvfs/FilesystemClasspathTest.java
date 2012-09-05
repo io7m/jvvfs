@@ -51,7 +51,8 @@ public class FilesystemClasspathTest
 
     final InputStream stream =
       fs.openFile(new PathVirtual("/com/io7m/jvvfs/Filesystem.class"));
-    assert stream != null;
+    Assert.assertNotNull(stream);
+    stream.close();
   }
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
