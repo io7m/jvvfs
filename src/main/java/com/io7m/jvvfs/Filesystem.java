@@ -45,11 +45,20 @@ public final class Filesystem implements FilesystemAPI
     return archive_name.contains("/") || archive_name.contains("..");
   }
 
+  private static ArrayList<ArchiveHandler> initializeHandlers(
+    final @Nonnull Log log)
+    throws ConstraintError
+  {
+    final ArrayList<ArchiveHandler> h = new ArrayList<ArchiveHandler>();
+    h.add(new ArchiveHandlerDirectory(log));
+    h.add(new ArchiveHandlerZip(log));
+    return h;
+  }
+
   private final @Nonnull Log                                  log;
   private final @Nonnull PathReal                             archive_path;
   private final @Nonnull ArrayList<ArchiveHandler>            handlers;
   private final @Nonnull HashMap<PathVirtual, Stack<Archive>> mounts;
-
   private final @Nonnull TreeSet<PathVirtual>                 directories;
 
   public Filesystem(
@@ -68,10 +77,7 @@ public final class Filesystem implements FilesystemAPI
       throw FilesystemError.notDirectory(this.archive_path.value);
     }
 
-    this.handlers = new ArrayList<ArchiveHandler>();
-    this.handlers.add(new ArchiveHandlerDirectory(this.log));
-    this.handlers.add(new ArchiveHandlerZip(this.log));
-
+    this.handlers = Filesystem.initializeHandlers(this.log);
     this.mounts = new HashMap<PathVirtual, Stack<Archive>>();
     this.directories = new TreeSet<PathVirtual>();
     this.directories.add(new PathVirtual("/"));
@@ -687,23 +693,6 @@ public final class Filesystem implements FilesystemAPI
     }
   }
 
-  private String urlAbsolutePath(
-    final @Nonnull URL url)
-  {
-    File f = null;
-
-    this.log.debug("url-absolute-path: " + url);
-
-    try {
-      f = new File(url.toURI());
-    } catch (final URISyntaxException e) {
-      this.log.debug("url-absolute-path: bad URI syntax: " + e.getMessage());
-      f = new File(url.getPath());
-    }
-
-    return f.getAbsolutePath();
-  }
-
   @Override public @Nonnull InputStream openFile(
     final PathVirtual path)
     throws ConstraintError,
@@ -817,5 +806,22 @@ public final class Filesystem implements FilesystemAPI
 
     final Archive archive = this.archiveCurrentForMount(mount);
     this.unmountArchive(archive);
+  }
+
+  private String urlAbsolutePath(
+    final @Nonnull URL url)
+  {
+    File f = null;
+
+    this.log.debug("url-absolute-path: " + url);
+
+    try {
+      f = new File(url.toURI());
+    } catch (final URISyntaxException e) {
+      this.log.debug("url-absolute-path: bad URI syntax: " + e.getMessage());
+      f = new File(url.getPath());
+    }
+
+    return f.getAbsolutePath();
   }
 }
