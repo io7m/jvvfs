@@ -29,9 +29,11 @@ import java.util.TreeSet;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.UnreachableCodeException;
 import com.io7m.jaux.functional.Option;
 import com.io7m.jaux.functional.Option.Some;
 import com.io7m.jlog.Log;
@@ -42,7 +44,7 @@ import com.io7m.jvvfs.FilesystemError.Code;
  * The default implementation of the filesystem.
  */
 
-public final class Filesystem implements FilesystemAPI
+@NotThreadSafe public final class Filesystem implements FilesystemAPI
 {
   private static enum MountCheck
   {
@@ -79,6 +81,12 @@ public final class Filesystem implements FilesystemAPI
   private final @Nonnull HashMap<PathVirtual, Stack<Archive>> mounts;
   private final @Nonnull TreeSet<PathVirtual>                 directories;
 
+  /**
+   * Construct a new filesystem, with operations logging to <code>log</code>
+   * and using the directory <code>archives</code> from which to load archive
+   * files.
+   */
+
   public Filesystem(
     final @Nonnull Log log,
     final @Nonnull PathReal archives)
@@ -102,6 +110,15 @@ public final class Filesystem implements FilesystemAPI
     this.directories = new TreeSet<PathVirtual>();
     this.directories.add(new PathVirtual("/"));
   }
+
+  /**
+   * Construct a new filesystem, with operations logging to <code>log</code>.
+   * As no archive directory is specified, any attempt to mount an archive
+   * file will fail. This constructor is solely useful for creating
+   * filesystems that will only access items on the Java classpath.
+   * 
+   * @see Filesystem#mountUnsafeClasspathItem(Class, PathVirtual)
+   */
 
   public Filesystem(
     final @Nonnull Log log)
@@ -131,8 +148,7 @@ public final class Filesystem implements FilesystemAPI
       }
     }
 
-    /* UNREACHABLE */
-    throw new AssertionError("bug: unreachable code");
+    throw new UnreachableCodeException();
   }
 
   /*
@@ -148,14 +164,15 @@ public final class Filesystem implements FilesystemAPI
   {
     switch (this.archive_path.type) {
       case OPTION_NONE:
-      default:
-        throw new AssertionError("unreachable code: report this bug!");
+        break;
       case OPTION_SOME:
         final Some<PathReal> path = (Option.Some<PathReal>) this.archive_path;
         return new PathReal(path.value.value
           + File.separatorChar
           + archive_name);
     }
+
+    throw new UnreachableCodeException();
   }
 
   @Override public void createDirectory(

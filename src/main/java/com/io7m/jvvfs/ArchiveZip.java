@@ -29,6 +29,7 @@ import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.UnreachableCodeException;
 import com.io7m.jlog.Log;
 import com.io7m.jvvfs.FileReference.Type;
 
@@ -38,6 +39,11 @@ import com.io7m.jvvfs.FileReference.Type;
 
 public final class ArchiveZip implements Archive
 {
+  /**
+   * XXX: Portability: There are probably systems that aren't UNIX and aren't
+   * Windows.
+   */
+
   private static long convertZipTime(
     final long t)
   {
@@ -62,11 +68,8 @@ public final class ArchiveZip implements Archive
 
   private final @Nonnull PathVirtual  path_mount;
   private final @Nonnull PathReal     path_real;
-
   private final @Nonnull ZipFile      zip;
-
   private final @Nonnull Log          log;
-
   private final @CheckForNull Archive parent;
 
   public ArchiveZip(
@@ -161,8 +164,7 @@ public final class ArchiveZip implements Archive
       }
     }
 
-    /* UNREACHABLE */
-    throw new AssertionError("bug: unreachable code");
+    throw new UnreachableCodeException();
   }
 
   @Override public @Nonnull PathVirtual getMountPath()
@@ -268,11 +270,6 @@ public final class ArchiveZip implements Archive
     throw FilesystemError.fileNotFound(path.toString());
   }
 
-  /*
-   * XXX: Portability: There are probably systems that aren't UNIX and aren't
-   * Windows.
-   */
-
   @Override public long modificationTime(
     final PathVirtual path)
     throws ConstraintError,
@@ -314,8 +311,7 @@ public final class ArchiveZip implements Archive
       }
     }
 
-    /* UNREACHABLE */
-    throw new AssertionError("bug: unreachable code");
+    throw new UnreachableCodeException();
   }
 
   @Override public @Nonnull InputStream openFile(
@@ -353,8 +349,7 @@ public final class ArchiveZip implements Archive
         }
       }
 
-      /* UNREACHABLE */
-      throw new AssertionError("bug: unreachable code");
+      throw new UnreachableCodeException();
     } catch (final IOException e) {
       throw FilesystemError.ioError(path.toString(), e.getMessage());
     }

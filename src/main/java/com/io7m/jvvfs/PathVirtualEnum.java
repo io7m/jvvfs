@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.UnreachableCodeException;
 
 /**
  * Trivial class for iterating over elements of a {@link PathVirtual}.
@@ -57,8 +58,7 @@ public final class PathVirtualEnum implements Enumeration<PathVirtual>
       ++this.index;
       return new PathVirtual(this.builder.toString());
     } catch (final ConstraintError e) {
-      /* UNREACHABLE */
-      throw new AssertionError("bug: unreachable code");
+      throw new UnreachableCodeException();
     }
   }
 }
