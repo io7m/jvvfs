@@ -22,12 +22,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jvvfs.FilesystemError.Code;
 
-final class ClassURIHandling
+@ThreadSafe final class ClassURIHandling
 {
   /**
    * For a given URL returned by a classloader <code>url</code>, and the given

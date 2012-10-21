@@ -19,6 +19,7 @@ package com.io7m.jvvfs;
 import java.io.File;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
@@ -26,9 +27,13 @@ import com.io7m.jlog.Log;
 
 /**
  * Handler for loading archives of type {@link ArchiveDirectory}.
+ * 
+ * Values of this type cannot be accessed safely from multiple threads without
+ * explicit synchronization.
  */
 
-public final class ArchiveHandlerDirectory implements ArchiveHandler
+@NotThreadSafe public final class ArchiveHandlerDirectory implements
+  ArchiveHandler
 {
   private final @Nonnull Log log;
 

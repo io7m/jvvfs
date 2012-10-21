@@ -42,6 +42,9 @@ import com.io7m.jvvfs.FilesystemError.Code;
 
 /**
  * The default implementation of the filesystem.
+ * 
+ * Values of this type cannot be accessed safely from multiple threads without
+ * explicit synchronization.
  */
 
 @NotThreadSafe public final class Filesystem implements FilesystemAPI
@@ -82,6 +85,29 @@ import com.io7m.jvvfs.FilesystemError.Code;
   private final @Nonnull TreeSet<PathVirtual>                 directories;
 
   /**
+   * Construct a new filesystem, with operations logging to <code>log</code>.
+   * As no archive directory is specified, any attempt to mount an archive
+   * file will fail. This constructor is solely useful for creating
+   * filesystems that will only access items on the Java classpath.
+   * 
+   * @see Filesystem#mountUnsafeClasspathItem(Class, PathVirtual)
+   */
+
+  public Filesystem(
+    final @Nonnull Log log)
+    throws ConstraintError
+  {
+    this.log =
+      new Log(Constraints.constrainNotNull(log, "log"), "filesystem");
+    this.archive_path = new Option.None<PathReal>();
+
+    this.handlers = Filesystem.initializeHandlers(this.log);
+    this.mounts = new HashMap<PathVirtual, Stack<Archive>>();
+    this.directories = new TreeSet<PathVirtual>();
+    this.directories.add(new PathVirtual("/"));
+  }
+
+  /**
    * Construct a new filesystem, with operations logging to <code>log</code>
    * and using the directory <code>archives</code> from which to load archive
    * files.
@@ -104,29 +130,6 @@ import com.io7m.jvvfs.FilesystemError.Code;
     if (archive_dir.isDirectory() == false) {
       throw FilesystemError.notDirectory(archives.value);
     }
-
-    this.handlers = Filesystem.initializeHandlers(this.log);
-    this.mounts = new HashMap<PathVirtual, Stack<Archive>>();
-    this.directories = new TreeSet<PathVirtual>();
-    this.directories.add(new PathVirtual("/"));
-  }
-
-  /**
-   * Construct a new filesystem, with operations logging to <code>log</code>.
-   * As no archive directory is specified, any attempt to mount an archive
-   * file will fail. This constructor is solely useful for creating
-   * filesystems that will only access items on the Java classpath.
-   * 
-   * @see Filesystem#mountUnsafeClasspathItem(Class, PathVirtual)
-   */
-
-  public Filesystem(
-    final @Nonnull Log log)
-    throws ConstraintError
-  {
-    this.log =
-      new Log(Constraints.constrainNotNull(log, "log"), "filesystem");
-    this.archive_path = new Option.None<PathReal>();
 
     this.handlers = Filesystem.initializeHandlers(this.log);
     this.mounts = new HashMap<PathVirtual, Stack<Archive>>();

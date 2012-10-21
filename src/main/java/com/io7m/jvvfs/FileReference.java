@@ -18,15 +18,19 @@ package com.io7m.jvvfs;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
 
 /**
  * A reference to a file inside an archive.
+ * 
+ * Values of this type cannot be accessed safely from multiple threads without
+ * explicit synchronization.
  */
 
-public final class FileReference
+@NotThreadSafe public final class FileReference
 {
   public static enum Type
   {

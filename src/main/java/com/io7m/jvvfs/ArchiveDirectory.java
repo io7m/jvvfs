@@ -24,6 +24,7 @@ import java.util.TreeSet;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
@@ -32,9 +33,12 @@ import com.io7m.jvvfs.FileReference.Type;
 
 /**
  * Archiver based on standard filesystem/directory operations.
+ * 
+ * Values of this type cannot be accessed safely from multiple threads without
+ * explicit synchronization.
  */
 
-public final class ArchiveDirectory implements Archive
+@NotThreadSafe public final class ArchiveDirectory implements Archive
 {
   private final @Nonnull PathVirtual  path_mount;
   private final @Nonnull PathReal     path_real;

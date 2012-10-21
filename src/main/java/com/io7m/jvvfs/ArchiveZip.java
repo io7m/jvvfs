@@ -26,6 +26,7 @@ import java.util.zip.ZipFile;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
@@ -35,9 +36,12 @@ import com.io7m.jvvfs.FileReference.Type;
 
 /**
  * Archiver based on zip files.
+ * 
+ * Values of this type cannot be accessed safely from multiple threads without
+ * explicit synchronization.
  */
 
-public final class ArchiveZip implements Archive
+@NotThreadSafe public final class ArchiveZip implements Archive
 {
   /**
    * XXX: Portability: There are probably systems that aren't UNIX and aren't

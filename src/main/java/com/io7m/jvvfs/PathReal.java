@@ -19,6 +19,7 @@ package com.io7m.jvvfs;
 import java.io.File;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
@@ -30,7 +31,7 @@ import com.io7m.jaux.Constraints.ConstraintError;
  * @see PathVirtual
  */
 
-public final class PathReal
+@Immutable public final class PathReal
 {
   public final @Nonnull String value;
 

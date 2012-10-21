@@ -19,6 +19,7 @@ package com.io7m.jvvfs;
 import java.util.Enumeration;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
@@ -26,9 +27,13 @@ import com.io7m.jaux.UnreachableCodeException;
 
 /**
  * Trivial class for iterating over elements of a {@link PathVirtual}.
+ * 
+ * Values of this type cannot be accessed safely from multiple threads without
+ * explicit synchronization.
  */
 
-public final class PathVirtualEnum implements Enumeration<PathVirtual>
+@NotThreadSafe public final class PathVirtualEnum implements
+  Enumeration<PathVirtual>
 {
   private final @Nonnull PathVirtual path;
   private int                        index   = -1;
