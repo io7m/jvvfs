@@ -3,8 +3,14 @@
   <c:project>io7m-jvvfs</c:project>
 
   <c:release ticket-system="com.io7m.fossil.jvvfs">
-    <c:date>2012-10-21</c:date>
+    <c:date>2012-11-10</c:date>
     <c:version>2.3.0</c:version>
+
+    <c:item>
+      <c:date>2012-11-10</c:date>
+      <c:type-code-fix/>
+      <c:summary>Use JSR 305 2.0.1</c:summary>
+    </c:item>
 
     <c:item>
       <c:date>2012-10-21</c:date>
