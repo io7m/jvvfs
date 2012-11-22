@@ -45,6 +45,8 @@ import com.io7m.jvvfs.FilesystemError.Code;
    * <code>("jar:file:/x/y/z/j.jar!/a/b/c/Class.class", "/a/b/c/Class.class") => "/x/y/z/j.jar")</code>
    * <code>("file:/x/y/z/a/b/c/Class.class", "/a/b/c/Class.class") => "/x/y/z")</code>
    * 
+   * Note that the result will actually be in an OS-specific format.
+   * 
    * The function raises {@link FilesystemError} for URL protocols that cannot
    * be handled.
    * 

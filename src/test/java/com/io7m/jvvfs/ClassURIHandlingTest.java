@@ -12,6 +12,26 @@ import com.io7m.jvvfs.FilesystemError.Code;
 
 public class ClassURIHandlingTest
 {
+  private static enum Platform
+  {
+    PLATFORM_POSIX,
+    PLATFORM_WINDOWS
+  }
+
+  /**
+   * XXX: Portability: There are probably systems that aren't POSIX and aren't
+   * Windows.
+   */
+
+  private static Platform currentPlatform()
+  {
+    final String os = System.getProperty("os.name");
+    if ((os.indexOf("win") >= 0) || (os.indexOf("Win") >= 0)) {
+      return Platform.PLATFORM_WINDOWS;
+    }
+    return Platform.PLATFORM_POSIX;
+  }
+
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
     testNullURI()
@@ -67,7 +87,19 @@ public class ClassURIHandlingTest
     final URL url = new URL("file:/a/b/c/x/y/z/C.class");
     final String path = "/x/y/z/C.class";
     final String r = ClassURIHandling.getClassContainerPath(url, path);
-    Assert.assertEquals("/a/b/c", r);
+
+    switch (ClassURIHandlingTest.currentPlatform()) {
+      case PLATFORM_POSIX:
+      {
+        Assert.assertEquals("/a/b/c", r);
+        return;
+      }
+      case PLATFORM_WINDOWS:
+      {
+        Assert.assertTrue(r.endsWith(":\\a\\b\\c"));
+        return;
+      }
+    }
   }
 
   @SuppressWarnings("static-method") @Test public void testFileSpaces()
@@ -78,7 +110,19 @@ public class ClassURIHandlingTest
     final URL url = new URL("file:/a a/b b/c c/x x/y y/z z/C.class");
     final String path = "/x x/y y/z z/C.class";
     final String r = ClassURIHandling.getClassContainerPath(url, path);
-    Assert.assertEquals("/a a/b b/c c", r);
+
+    switch (ClassURIHandlingTest.currentPlatform()) {
+      case PLATFORM_POSIX:
+      {
+        Assert.assertEquals("/a a/b b/c c", r);
+        return;
+      }
+      case PLATFORM_WINDOWS:
+      {
+        Assert.assertTrue(r.endsWith(":\\a a\\b b\\c c"));
+        return;
+      }
+    }
   }
 
   @SuppressWarnings("static-method") @Test public
@@ -92,7 +136,19 @@ public class ClassURIHandlingTest
       new URL("file:/a%20a/b%20b/c%20c/x%20x/y%20y/z%20z/C.class");
     final String path = "/x x/y y/z z/C.class";
     final String r = ClassURIHandling.getClassContainerPath(url, path);
-    Assert.assertEquals("/a a/b b/c c", r);
+
+    switch (ClassURIHandlingTest.currentPlatform()) {
+      case PLATFORM_POSIX:
+      {
+        Assert.assertEquals("/a a/b b/c c", r);
+        return;
+      }
+      case PLATFORM_WINDOWS:
+      {
+        Assert.assertTrue(r.endsWith(":\\a a\\b b\\c c"));
+        return;
+      }
+    }
   }
 
   @SuppressWarnings("static-method") @Test public void testJarNormal()
@@ -103,7 +159,19 @@ public class ClassURIHandlingTest
     final URL url = new URL("jar:file:/a/b/c/j.jar!/x/y/z/C.class");
     final String path = "/x/y/z/C.class";
     final String r = ClassURIHandling.getClassContainerPath(url, path);
-    Assert.assertEquals("/a/b/c/j.jar", r);
+
+    switch (ClassURIHandlingTest.currentPlatform()) {
+      case PLATFORM_POSIX:
+      {
+        Assert.assertEquals("/a/b/c/j.jar", r);
+        return;
+      }
+      case PLATFORM_WINDOWS:
+      {
+        Assert.assertTrue(r.endsWith(":\\a\\b\\c\\j.jar"));
+        return;
+      }
+    }
   }
 
   @SuppressWarnings("static-method") @Test public void testJarSpaces()
@@ -115,7 +183,19 @@ public class ClassURIHandlingTest
       new URL("jar:file:/a a/b b/c c/j.jar!/x x/y y/z z/C.class");
     final String path = "/x x/y y/z z/C.class";
     final String r = ClassURIHandling.getClassContainerPath(url, path);
-    Assert.assertEquals("/a a/b b/c c/j.jar", r);
+
+    switch (ClassURIHandlingTest.currentPlatform()) {
+      case PLATFORM_POSIX:
+      {
+        Assert.assertEquals("/a a/b b/c c/j.jar", r);
+        return;
+      }
+      case PLATFORM_WINDOWS:
+      {
+        Assert.assertTrue(r.endsWith(":\\a a\\b b\\c c\\j.jar"));
+        return;
+      }
+    }
   }
 
   @SuppressWarnings("static-method") @Test public void testJarSpacesEncoded()
@@ -127,6 +207,18 @@ public class ClassURIHandlingTest
       new URL("jar:file:/a%20a/b%20b/c%20c/j.jar!/x%20x/y%20y/z%20z/C.class");
     final String path = "/x x/y y/z z/C.class";
     final String r = ClassURIHandling.getClassContainerPath(url, path);
-    Assert.assertEquals("/a a/b b/c c/j.jar", r);
+
+    switch (ClassURIHandlingTest.currentPlatform()) {
+      case PLATFORM_POSIX:
+      {
+        Assert.assertEquals("/a a/b b/c c/j.jar", r);
+        return;
+      }
+      case PLATFORM_WINDOWS:
+      {
+        Assert.assertTrue(r.endsWith(":\\a a\\b b\\c c\\j.jar"));
+        return;
+      }
+    }
   }
 }
