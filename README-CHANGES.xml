@@ -33,7 +33,7 @@
     <c:item>
       <c:date>2012-08-14</c:date>
       <c:type-code-fix/>
-      <c:summary>Correct mountunsafeclasspathitem on windows (urls are not interchangeable with file paths!)</c:summary>
+      <c:summary>Correct mountUnsafeClassPathItem on windows (urls are not interchangeable with file paths!)</c:summary>
     </c:item>
 
     <c:item>
