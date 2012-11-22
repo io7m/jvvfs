@@ -216,9 +216,6 @@ import com.io7m.jvvfs.FileReference.Type;
       if (file.isDirectory() == true) {
         throw FilesystemError.isDirectory(path.toString());
       }
-      if (file.exists() == false) {
-        throw FilesystemError.fileNotFound(path.toString());
-      }
       return new FileInputStream(file);
     } catch (final FileNotFoundException e) {
       throw FilesystemError.fileNotFound(path.toString());

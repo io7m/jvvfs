@@ -18,7 +18,6 @@ package com.io7m.jvvfs;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -713,53 +712,6 @@ import com.io7m.jvvfs.FilesystemError.Code;
       mount);
   }
 
-  void mountUnsafeURL(
-    final PathVirtual mount,
-    final String canonical_class_name,
-    final URL url)
-    throws FilesystemError,
-      ConstraintError
-  {
-    if (url.getProtocol().equals("file")) {
-
-      /**
-       * URL is of the form "file:/path/to/file.class"
-       */
-
-      final String real_path = this.urlAbsolutePath(url);
-      final String mount_path =
-        real_path.substring(
-          0,
-          real_path.length() - canonical_class_name.length());
-
-      this.log.info("mount-classpath-file : " + mount_path);
-
-    } else if (url.getProtocol().equals("jar")) {
-
-      /**
-       * URL is of the form "jar:file:/x/y/z.jar!/path/to/file.class"
-       */
-
-      final String real_path = this.urlAbsolutePath(url);
-      final String file_path =
-        real_path.substring(
-          0,
-          real_path.length() - (canonical_class_name.length() + 2));
-      final String mount_path = file_path.replaceFirst("^file:", "");
-
-      this.log.info("mount-classpath-jar : " + mount_path);
-
-      this.mountInternal(
-        mount_path,
-        MountCheck.MOUNT_ARCHIVE_DANGEROUSLY_AND_DIRECTLY,
-        mount);
-    } else {
-      throw new FilesystemError(
-        Code.FS_ERROR_UNHANDLED_TYPE,
-        "Cannot mount whatever is holding this classpath item");
-    }
-  }
-
   @Override public @Nonnull InputStream openFile(
     final PathVirtual path)
     throws ConstraintError,
@@ -873,22 +825,5 @@ import com.io7m.jvvfs.FilesystemError.Code;
 
     final Archive archive = this.archiveCurrentForMount(mount);
     this.unmountArchive(archive);
-  }
-
-  private String urlAbsolutePath(
-    final @Nonnull URL url)
-  {
-    File f = null;
-
-    this.log.debug("url-absolute-path: " + url);
-
-    try {
-      f = new File(url.toURI());
-    } catch (final URISyntaxException e) {
-      this.log.debug("url-absolute-path: bad URI syntax: " + e.getMessage());
-      f = new File(url.getPath());
-    }
-
-    return f.getAbsolutePath();
   }
 }

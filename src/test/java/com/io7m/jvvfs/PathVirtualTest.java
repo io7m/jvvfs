@@ -7,10 +7,15 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jvvfs.PathVirtual;
 
 public class PathVirtualTest
 {
+  @SuppressWarnings("static-method") @Test public void testBasenameRoot()
+    throws ConstraintError
+  {
+    Assert.assertTrue(new PathVirtual("/").baseName().equals("/"));
+  }
+
   @SuppressWarnings("static-method") @Test public void testClean()
     throws ConstraintError
   {
@@ -224,6 +229,6 @@ public class PathVirtualTest
   @SuppressWarnings("static-method") @Test public void testToString()
     throws ConstraintError
   {
-    new PathVirtual("/a").toString().equals("/a");
+    Assert.assertTrue(new PathVirtual("/a").toString().equals("/a"));
   }
 }

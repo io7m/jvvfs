@@ -32,53 +32,6 @@ public class ClassURIHandlingTest
     return Platform.PLATFORM_POSIX;
   }
 
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testNullURI()
-      throws FilesystemError,
-        ConstraintError
-  {
-    final String path = "/x/y/z/C.class";
-    ClassURIHandling.getClassContainerPath(null, path);
-  }
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testNullPath()
-      throws MalformedURLException,
-        FilesystemError,
-        ConstraintError
-  {
-    final URL url = new URL("file:/a/b/c/x/y/z/C.class");
-    ClassURIHandling.getClassContainerPath(url, null);
-  }
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testNullNull()
-      throws FilesystemError,
-        ConstraintError
-  {
-    ClassURIHandling.getClassContainerPath(null, null);
-  }
-
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
-    void
-    testNotFileNotJar()
-      throws MalformedURLException,
-        FilesystemError,
-        ConstraintError
-  {
-    try {
-      final URL url = new URL("http://example.org/z/C.class");
-      final String path = "/x/y/z/C.class";
-      ClassURIHandling.getClassContainerPath(url, path);
-    } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_UNHANDLED_TYPE, e.code);
-      throw e;
-    }
-  }
-
   @SuppressWarnings("static-method") @Test public void testFileNormal()
     throws MalformedURLException,
       FilesystemError,
@@ -220,5 +173,52 @@ public class ClassURIHandlingTest
         return;
       }
     }
+  }
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testNotFileNotJar()
+      throws MalformedURLException,
+        FilesystemError,
+        ConstraintError
+  {
+    try {
+      final URL url = new URL("http://example.org/z/C.class");
+      final String path = "/x/y/z/C.class";
+      ClassURIHandling.getClassContainerPath(url, path);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_UNHANDLED_TYPE, e.code);
+      throw e;
+    }
+  }
+
+  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
+    void
+    testNullNull()
+      throws FilesystemError,
+        ConstraintError
+  {
+    ClassURIHandling.getClassContainerPath(null, null);
+  }
+
+  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
+    void
+    testNullPath()
+      throws MalformedURLException,
+        FilesystemError,
+        ConstraintError
+  {
+    final URL url = new URL("file:/a/b/c/x/y/z/C.class");
+    ClassURIHandling.getClassContainerPath(url, null);
+  }
+
+  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
+    void
+    testNullURI()
+      throws FilesystemError,
+        ConstraintError
+  {
+    final String path = "/x/y/z/C.class";
+    ClassURIHandling.getClassContainerPath(null, path);
   }
 }

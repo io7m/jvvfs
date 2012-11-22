@@ -46,13 +46,14 @@ import com.io7m.jlog.Log;
   @Override public boolean canHandle(
     final @Nonnull PathReal name)
   {
-    boolean ok = true;
+    if (name.value.endsWith(".zip")) {
+      return new File(name.value).isFile();
+    }
+    if (name.value.endsWith(".jar")) {
+      return new File(name.value).isFile();
+    }
 
-    ok = ok && name.value.endsWith(".zip");
-    ok = ok || name.value.endsWith(".jar");
-    ok = ok && new File(name.value).isFile();
-
-    return ok;
+    return false;
   }
 
   @Override public Archive load(
