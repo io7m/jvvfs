@@ -15,6 +15,11 @@
   font-family: monospace;
 }
 
+.term
+{
+  font-style: italic;
+}
+
 .example, .license, .terminal
 {
   font-family:    monospace;

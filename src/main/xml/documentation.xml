@@ -55,9 +55,8 @@
       <s:subsection>
         <s:subsection-title>Portability</s:subsection-title>
         <s:paragraph>
-          The package is written in pure Java and uses no system-specific
-          features. It is expected to work in any environment supporting
-          Java 6.
+          The package is written in pure Java and is expected to work
+          in any environment supporting Java 6.
         </s:paragraph>
         <s:paragraph>
           The filesystem abstraction allows developers to access program
@@ -93,7 +92,7 @@
           <s:verbatim type="example"><![CDATA[<dependency>
   <groupId>com.io7m.jvvfs</groupId>
   <artifactId>io7m-jvvfs</artifactId>
-  <version>2.2.0</version>
+  <version>2.3.0</version>
 </dependency>]]></s:verbatim>
         </s:paragraph>
       </s:subsection>
@@ -119,51 +118,55 @@
             <s:table-column-name>VM-Version</s:table-column-name>
           </s:table-head>
           <s:table-body>
-            <s:table-row>
-              <s:table-cell>FreeBSD</s:table-cell>
-              <s:table-cell>8.2-RELEASE-p9</s:table-cell>
-              <s:table-cell>x86_64</s:table-cell>
-              <s:table-cell>Sun Microsystems Inc.</s:table-cell>
-              <s:table-cell>1.6.0_32</s:table-cell>
-              <s:table-cell>OpenJDK 64-Bit Server VM</s:table-cell>
-              <s:table-cell>20.0-b12</s:table-cell>
-            </s:table-row>
-            <s:table-row>
-              <s:table-cell>Linux</s:table-cell>
-              <s:table-cell>3.4.2-2-ARCH</s:table-cell>
-              <s:table-cell>x86_64</s:table-cell>
-              <s:table-cell>Sun Microsystems Inc.</s:table-cell>
-              <s:table-cell>1.6.0_24</s:table-cell>
-              <s:table-cell>OpenJDK 64-Bit Server VM</s:table-cell>
-              <s:table-cell>20.0-b12</s:table-cell>
-            </s:table-row>
-            <s:table-row>
-              <s:table-cell>Mac OS X</s:table-cell>
-              <s:table-cell>10.6.8</s:table-cell>
-              <s:table-cell>x86_64</s:table-cell>
-              <s:table-cell>Apple Inc.</s:table-cell>
-              <s:table-cell>1.6.0_33</s:table-cell>
-              <s:table-cell>Java HotSpot(TM) 64-Bit Server VM</s:table-cell>
-              <s:table-cell>20.8-b03-424</s:table-cell>
-            </s:table-row>
-            <s:table-row>
-              <s:table-cell>SunOS</s:table-cell>
-              <s:table-cell>5.11</s:table-cell>
-              <s:table-cell>x86</s:table-cell>
-              <s:table-cell>Sun Microsystems Inc.</s:table-cell>
-              <s:table-cell>1.6.0_21</s:table-cell>
-              <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
-              <s:table-cell>17.0-b16</s:table-cell>
-            </s:table-row>
-            <s:table-row>
-              <s:table-cell>Windows XP</s:table-cell>
-              <s:table-cell>5.1</s:table-cell>
-              <s:table-cell>x86</s:table-cell>
-              <s:table-cell>Oracle Corporation</s:table-cell>
-              <s:table-cell>1.7.0_02</s:table-cell>
-              <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
-              <s:table-cell>22.0-b10</s:table-cell>
-            </s:table-row>
+<s:table-row>
+  <s:table-cell>Linux</s:table-cell>
+  <s:table-cell>3.6.6-1-ARCH</s:table-cell>
+  <s:table-cell>amd64</s:table-cell>
+  <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+  <s:table-cell>1.6.0_24</s:table-cell>
+  <s:table-cell>OpenJDK 64-Bit Server VM</s:table-cell>
+  <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+  <s:table-cell>20.0-b12</s:table-cell>
+</s:table-row>
+<s:table-row>
+  <s:table-cell>FreeBSD</s:table-cell>
+  <s:table-cell>9.0-RELEASE</s:table-cell>
+  <s:table-cell>x86_64</s:table-cell>
+  <s:table-cell>Oracle Corporation</s:table-cell>
+  <s:table-cell>1.7.0</s:table-cell>
+  <s:table-cell>OpenJDK 64-Bit Server VM</s:table-cell>
+  <s:table-cell>Oracle Corporation</s:table-cell>
+  <s:table-cell>21.0-b17</s:table-cell>
+</s:table-row>
+<s:table-row>
+  <s:table-cell>Mac OS X</s:table-cell>
+  <s:table-cell>10.6.8</s:table-cell>
+  <s:table-cell>x86_64</s:table-cell>
+  <s:table-cell>Apple Inc.</s:table-cell>
+  <s:table-cell>1.6.0_31</s:table-cell>
+  <s:table-cell>Java HotSpot(TM) 64-Bit Server VM</s:table-cell>
+  <s:table-cell>20.6-b01-413</s:table-cell>
+</s:table-row>
+<s:table-row>
+  <s:table-cell>SunOS</s:table-cell>
+  <s:table-cell>5.11</s:table-cell>
+  <s:table-cell>x86</s:table-cell>
+  <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+  <s:table-cell>1.6.0_21</s:table-cell>
+  <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
+  <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+  <s:table-cell>17.0-b16</s:table-cell>
+</s:table-row>
+<s:table-row>
+  <s:table-cell>Windows XP</s:table-cell>
+  <s:table-cell>5.1</s:table-cell>
+  <s:table-cell>x86</s:table-cell>
+  <s:table-cell>Oracle Corporation</s:table-cell>
+  <s:table-cell>1.7.0_09</s:table-cell>
+  <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
+  <s:table-cell>Oracle Corporation</s:table-cell>
+  <s:table-cell>23.5-b02</s:table-cell>
+</s:table-row>
           </s:table-body>
         </s:table>
       </s:formal-item>
@@ -211,8 +214,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.]]>
         unified namespace similar to the UNIX "virtual filesystem".
       </s:paragraph>
       <s:paragraph>
-        First, the filesystem is created by specifying a directory
-        containing archives (zip files, directories, etc):
+        First, the filesystem is created by specifying an
+        <s:term type="term">archive directory</s:term> containing archives
+        (zip files, directories, etc):
       </s:paragraph>
       <s:formal-item kind="example">
         <s:formal-item-title>Filesystem creation</s:formal-item-title>
@@ -311,6 +315,48 @@ final InputStream stream = fs.openFile("/a/xyz/file.txt");]]>
         <s:term type="package">jvvfs</s:term> package supports a subset
         of the usual filesystem operations: directories may be listed, files
         have modification dates and sizes.
+      </s:paragraph>
+    </s:section>
+  </s:part>
+
+  <s:part>
+    <s:part-title>Rationale</s:part-title>
+    <s:part-contents/>
+
+    <s:section>
+      <s:section-title>Why not Java resources?</s:section-title>
+      <s:paragraph>
+        Java resources allow developers to access program resources and
+        data files without explicit access to a filesystem. This is usually
+        sufficient if all the resources in question are conceptually part of
+        the program. The main problem that <s:term type="package">jvvfs</s:term>
+        attempts to solve is the problem of the set of required resources not
+        being known or available on program startup.
+      </s:paragraph>
+      <s:paragraph>
+        Consider a game or simulation that allows the loading of third-party
+        levels or other assets. The <s:link-external target="http://openttd.org">OpenTTD</s:link-external>
+        engine is a good example of this, as it comes with a built-in installer
+        for third party content:
+      </s:paragraph>
+      <s:formal-item kind="illustration">
+        <s:formal-item-title>OpenTTD content installer</s:formal-item-title>
+        <s:image source="openttd_content.png">OpenTTD content installer</s:image>
+      </s:formal-item>
+      <s:paragraph>
+        Implementing the above with Java resources turns out to be rather
+        complicated. Overriding resources (to allow for content "upgrades")
+        is equally difficult.
+      </s:paragraph>
+      <s:paragraph>
+        The <s:term type="package">jvvfs</s:term> package provides a uniform
+        namespace for all resources, and new resources can be added at any time
+        by simply adding new archives and/or directories to the
+        <s:term type="term">archive directory</s:term> and then mounting them
+        as explained elsewhere in this documentation. The actual downloading of
+        external resource archives is considered to be outside of the scope of
+        <s:term type="package">jvvfs</s:term> and can be easily provided by
+        classes in the Java standard library.
       </s:paragraph>
     </s:section>
   </s:part>
