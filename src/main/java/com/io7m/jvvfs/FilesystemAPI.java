@@ -284,6 +284,46 @@ public interface FilesystemAPI
       FilesystemError;
 
   /**
+   * Set the modification time of the file referenced by <code>file</code> to
+   * <code>time</code>. Note that the actual file is not modified in the real
+   * filesystem.
+   * 
+   * @param file
+   *          The target file.
+   * @param time
+   *          The modification time.
+   * @throws ConstraintError
+   *           Iff <code>file == null</code>.
+   * @throws FilesystemError
+   */
+
+  void touch(
+    final @Nonnull PathVirtual file,
+    long time)
+    throws ConstraintError,
+      FilesystemError;
+
+  /**
+   * Set the modification time of the file referenced by <code>file</code> to
+   * <code>time</code>. Note that the actual file is not modified in the real
+   * filesystem.
+   * 
+   * @param file
+   *          The target file.
+   * @param time
+   *          The modification time.
+   * @throws ConstraintError
+   *           Iff <code>file == null</code>.
+   * @throws FilesystemError
+   */
+
+  void touch(
+    final @Nonnull String file,
+    long time)
+    throws ConstraintError,
+      FilesystemError;
+
+  /**
    * Unmounts the most recently mounted archive at <code>mount</code>. If
    * another archive is mounted at a directory contained within the archive
    * that would be unmounted, the operation fails.

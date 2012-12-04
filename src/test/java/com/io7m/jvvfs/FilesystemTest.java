@@ -151,26 +151,6 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test public
     void
-    testFilesystemDirectoryIsFileCorrectString()
-      throws IOException,
-        FilesystemError,
-        ConstraintError
-  {
-    final FilesystemAPI fs = FilesystemTest.makeFS();
-
-    try {
-      fs.mount("archive0", new PathVirtual("/"));
-    } catch (final FilesystemError e) {
-      Assert.fail(e.getMessage());
-    }
-
-    Assert.assertFalse(fs.isFile("/"));
-    Assert.assertTrue(fs.isFile("/file.txt"));
-    Assert.assertFalse(fs.isDirectory("/file.txt"));
-  }
-
-  @SuppressWarnings("static-method") @Test public
-    void
     testFilesystemDirectoryIsFileCorrectNonRootMount()
       throws IOException,
         FilesystemError,
@@ -188,6 +168,26 @@ public class FilesystemTest
     Assert.assertFalse(fs.isFile(new PathVirtual("/xyz")));
     Assert.assertTrue(fs.isFile(new PathVirtual("/xyz/file.txt")));
     Assert.assertFalse(fs.isDirectory(new PathVirtual("/xyz/file.txt")));
+  }
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryIsFileCorrectString()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI fs = FilesystemTest.makeFS();
+
+    try {
+      fs.mount("archive0", new PathVirtual("/"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    Assert.assertFalse(fs.isFile("/"));
+    Assert.assertTrue(fs.isFile("/file.txt"));
+    Assert.assertFalse(fs.isDirectory("/file.txt"));
   }
 
   @SuppressWarnings("static-method") @Test public
@@ -692,27 +692,6 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test public
     void
-    testFilesystemDirectoryListCorrectOneString()
-      throws IOException,
-        FilesystemError,
-        ConstraintError
-  {
-    final FilesystemAPI f = FilesystemTest.makeFS();
-    final TreeSet<String> items = new TreeSet<String>();
-
-    try {
-      f.mount("archive1", new PathVirtual("/"));
-    } catch (final FilesystemError e) {
-      Assert.fail(e.getMessage());
-    }
-
-    f.listDirectory("/", items);
-    Assert.assertTrue(items.contains("subdir"));
-    Assert.assertTrue(items.contains("file.txt"));
-  }
-
-  @SuppressWarnings("static-method") @Test public
-    void
     testFilesystemDirectoryListCorrectOneNonRootMount()
       throws IOException,
         FilesystemError,
@@ -729,6 +708,27 @@ public class FilesystemTest
     }
 
     f.listDirectory(new PathVirtual("/xyz"), items);
+    Assert.assertTrue(items.contains("subdir"));
+    Assert.assertTrue(items.contains("file.txt"));
+  }
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemDirectoryListCorrectOneString()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.mount("archive1", new PathVirtual("/"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    f.listDirectory("/", items);
     Assert.assertTrue(items.contains("subdir"));
     Assert.assertTrue(items.contains("file.txt"));
   }
@@ -1814,6 +1814,68 @@ public class FilesystemTest
     is.close();
   }
 
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemTouchIsDirectory()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    try {
+      final FilesystemAPI fs = FilesystemTest.makeFS();
+      fs.touch("/", 0x10203040);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemTouchModificationTime()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final FilesystemAPI fs = FilesystemTest.makeFS();
+    fs.mount("archive0", new PathVirtual("/"));
+    fs.touch("/file.txt", 0x10203040);
+
+    Assert.assertEquals(0x10203040, fs.modificationTime("/file.txt"));
+  }
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemTouchModificationTimeChanged()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final FilesystemAPI fs = FilesystemTest.makeFS();
+    fs.mount("archive0", new PathVirtual("/"));
+    final long time = fs.modificationTime("/file.txt");
+    fs.touch("/file.txt", 0x10203040);
+    fs.mount("one.zip", new PathVirtual("/"));
+    Assert.assertFalse(time == fs.modificationTime("/file.txt"));
+    Assert.assertFalse(0x10203040 == fs.modificationTime("/file.txt"));
+  }
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemTouchNonexistent()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    try {
+      final FilesystemAPI fs = FilesystemTest.makeFS();
+      fs.touch("/nonexistent", 0x10203040);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    }
+  }
+
   @SuppressWarnings("static-method") @Test public
     void
     testFilesystemUnmountCorrect()
@@ -2695,30 +2757,6 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test public
     void
-    testFilesystemZipModificationTimeCorrectString()
-      throws IOException,
-        FilesystemError,
-        ConstraintError
-  {
-    final FilesystemAPI f = FilesystemTest.makeFS();
-
-    try {
-      f.mount("mtime.zip", new PathVirtual("/"));
-    } catch (final FilesystemError e) {
-      Assert.fail();
-    }
-
-    /**
-     * Unfortunately, it seems there's very little that can be asserted about
-     * the modification time portably, so this test solely exists for code
-     * coverage.
-     */
-
-    f.modificationTime("/file.txt");
-  }
-
-  @SuppressWarnings("static-method") @Test public
-    void
     testFilesystemZipModificationTimeCorrectNonRootMount()
       throws IOException,
         FilesystemError,
@@ -2740,6 +2778,30 @@ public class FilesystemTest
      */
 
     f.modificationTime(new PathVirtual("/xyz/file.txt"));
+  }
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipModificationTimeCorrectString()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.mount("mtime.zip", new PathVirtual("/"));
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    /**
+     * Unfortunately, it seems there's very little that can be asserted about
+     * the modification time portably, so this test solely exists for code
+     * coverage.
+     */
+
+    f.modificationTime("/file.txt");
   }
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
@@ -3251,25 +3313,6 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test public
     void
-    testFilesystemZipSizeCorrectString()
-      throws IOException,
-        FilesystemError,
-        ConstraintError
-  {
-    final FilesystemAPI f = FilesystemTest.makeFS();
-
-    try {
-      f.mount("three.zip", new PathVirtual("/"));
-    } catch (final FilesystemError e) {
-      Assert.fail(e.getMessage());
-    }
-
-    final long size = f.fileSize("/file.txt");
-    Assert.assertEquals(17, size);
-  }
-
-  @SuppressWarnings("static-method") @Test public
-    void
     testFilesystemZipSizeCorrectNonRootMount()
       throws IOException,
         FilesystemError,
@@ -3285,6 +3328,25 @@ public class FilesystemTest
     }
 
     final long size = f.fileSize(new PathVirtual("/xyz/file.txt"));
+    Assert.assertEquals(17, size);
+  }
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testFilesystemZipSizeCorrectString()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = FilesystemTest.makeFS();
+
+    try {
+      f.mount("three.zip", new PathVirtual("/"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    final long size = f.fileSize("/file.txt");
     Assert.assertEquals(17, size);
   }
 

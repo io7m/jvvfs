@@ -54,6 +54,27 @@ import com.io7m.jvvfs.FilesystemError.Code;
     MOUNT_ARCHIVE_FILE_SAFELY_FROM_DIRECTORY
   }
 
+  private static final class TouchEntry
+  {
+    /**
+     * The value that was passed to "touch".
+     */
+
+    long time_touched;
+
+    /**
+     * The file's real modification time.
+     */
+
+    long time_previous_actual;
+
+    TouchEntry()
+    {
+      this.time_touched = 0;
+      this.time_previous_actual = 0;
+    }
+  }
+
   private static boolean archiveExists(
     final @Nonnull PathReal archive_real)
   {
@@ -83,6 +104,8 @@ import com.io7m.jvvfs.FilesystemError.Code;
   private final @Nonnull HashMap<PathVirtual, Stack<Archive>> mounts;
   private final @Nonnull TreeSet<PathVirtual>                 directories;
 
+  private final @Nonnull HashMap<PathVirtual, TouchEntry>     touches;
+
   /**
    * Construct a new filesystem, with operations logging to <code>log</code>.
    * As no archive directory is specified, any attempt to mount an archive
@@ -100,6 +123,7 @@ import com.io7m.jvvfs.FilesystemError.Code;
       new Log(Constraints.constrainNotNull(log, "log"), "filesystem");
     this.archive_path = new Option.None<PathReal>();
 
+    this.touches = new HashMap<PathVirtual, Filesystem.TouchEntry>();
     this.handlers = Filesystem.initializeHandlers(this.log);
     this.mounts = new HashMap<PathVirtual, Stack<Archive>>();
     this.directories = new TreeSet<PathVirtual>();
@@ -130,6 +154,7 @@ import com.io7m.jvvfs.FilesystemError.Code;
       throw FilesystemError.notDirectory(archives.value);
     }
 
+    this.touches = new HashMap<PathVirtual, Filesystem.TouchEntry>();
     this.handlers = Filesystem.initializeHandlers(this.log);
     this.mounts = new HashMap<PathVirtual, Stack<Archive>>();
     this.directories = new TreeSet<PathVirtual>();
@@ -543,6 +568,62 @@ import com.io7m.jvvfs.FilesystemError.Code;
     throws FilesystemError,
       ConstraintError
   {
+    long current_time;
+
+    try {
+      current_time = this.modificationTimeInternalActualFile(path);
+    } catch (final FilesystemError e) {
+      switch (e.code) {
+        case FS_ERROR_IS_A_DIRECTORY:
+        case FS_ERROR_NONEXISTENT:
+        {
+          /**
+           * The file doesn't exist, or existed once but has now become a
+           * directory. Delete any stale "touch" entry that might exist for
+           * it.
+           */
+
+          this.touches.remove(path);
+          break;
+        }
+        case FS_ERROR_ARCHIVE_DAMAGED:
+        case FS_ERROR_BUSY:
+        case FS_ERROR_CONSTRAINT_ERROR:
+        case FS_ERROR_DUPLICATE_MOUNT:
+        case FS_ERROR_IO_ERROR:
+        case FS_ERROR_NOT_A_DIRECTORY:
+        case FS_ERROR_NOT_MOUNTED:
+        case FS_ERROR_UNHANDLED_TYPE:
+        default:
+          break;
+      }
+      throw e;
+    }
+
+    /**
+     * If there's a "touch" entry for this file, check to see if the real
+     * modification time for the file matches the recorded real modification
+     * time from when the entry was created. If the file's real modification
+     * time has changed, return it. Otherwise, return the "touch" time.
+     */
+
+    if (this.touches.containsKey(path)) {
+      final TouchEntry entry = this.touches.get(path);
+      if (entry.time_previous_actual != current_time) {
+        this.touches.remove(path);
+        return current_time;
+      }
+      return entry.time_touched;
+    }
+
+    return current_time;
+  }
+
+  private long modificationTimeInternalActualFile(
+    final @Nonnull PathVirtual path)
+    throws ConstraintError,
+      FilesystemError
+  {
     final FileReference ref = this.lookup(path);
     if (ref.type == Type.TYPE_FILE) {
       final PathVirtual path_sub = path.subtract(ref.archive.getMountPath());
@@ -773,6 +854,28 @@ import com.io7m.jvvfs.FilesystemError.Code;
     }
     builder.append("]");
     return builder.toString();
+  }
+
+  @Override public void touch(
+    final @Nonnull PathVirtual file,
+    final long time)
+    throws ConstraintError,
+      FilesystemError
+  {
+    final long current_time = this.modificationTimeInternalActualFile(file);
+    final TouchEntry entry = new TouchEntry();
+    entry.time_previous_actual = current_time;
+    entry.time_touched = time;
+    this.touches.put(file, entry);
+  }
+
+  @Override public void touch(
+    final @Nonnull String file,
+    final long time)
+    throws ConstraintError,
+      FilesystemError
+  {
+    this.touch(new PathVirtual(file), time);
   }
 
   @Override public void unmount(
