@@ -4,6 +4,17 @@
 
   <c:release ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2012-11-22</c:date>
+    <c:version>2.4.0</c:version>
+
+    <c:item>
+      <c:date>2012-12-04</c:date>
+      <c:type-code-fix/>
+      <c:summary>Use version ranges in dependencies</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2012-11-22</c:date>
     <c:version>2.3.0</c:version>
 
     <c:item>
