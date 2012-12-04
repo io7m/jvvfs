@@ -9,10 +9,6 @@ import org.junit.Test;
 import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.PropertyUtils;
 import com.io7m.jlog.Log;
-import com.io7m.jvvfs.ArchiveZip;
-import com.io7m.jvvfs.FilesystemError;
-import com.io7m.jvvfs.PathReal;
-import com.io7m.jvvfs.PathVirtual;
 
 public class ArchiveZipTest
 {

@@ -6,8 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jvvfs.PathReal;
-import com.io7m.jvvfs.PathVirtual;
 
 public class PathRealTest
 {
