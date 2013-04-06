@@ -3,8 +3,7 @@ package com.io7m.jvvfs;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.io7m.jaux.Constraints.ConstraintError;
