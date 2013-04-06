@@ -1794,7 +1794,7 @@ public class FilesystemTest
     fs.mount("one.zip", "/empty");
   }
 
-  @SuppressWarnings("static-method") @Test public
+  @SuppressWarnings({ "static-method", "resource" }) @Test public
     void
     testFilesystemMountUnsafeClasspathFile()
       throws IOException,

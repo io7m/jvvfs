@@ -39,7 +39,7 @@ public class FilesystemClasspathTest
    * @throws ConstraintError
    */
 
-  @SuppressWarnings("static-method") @Test public
+  @SuppressWarnings({ "static-method", "resource" }) @Test public
     void
     testFilesystemClasspathMountFile()
       throws IOException,
