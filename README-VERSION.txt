@@ -1,1 +1,1 @@
-io7m-jvvfs 2.3.0
+io7m-jvvfs 2.4.0
