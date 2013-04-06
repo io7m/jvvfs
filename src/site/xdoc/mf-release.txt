@@ -10,3 +10,8 @@
 2012-11-22:io7m-jvvfs-2.3.0-sources.jar:24188
 2012-11-22:io7m-jvvfs-2.3.0.jar:35775
 2012-11-22:io7m-jvvfs-2.3.0.zip:379884
+2013-04-06:io7m-jvvfs-2.4.0-sources.jar:24908
+2013-04-06:io7m-jvvfs-2.4.0-javadoc.jar:116691
+2013-04-06:io7m-jvvfs-2.4.0.jar:37258
+2013-04-06:io7m-jvvfs-2.4.0.zip:381175
+2013-04-06:io7m-jvvfs-2.4.0-documentation.zip:416674
