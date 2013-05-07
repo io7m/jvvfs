@@ -35,12 +35,41 @@ import com.io7m.jaux.Constraints.ConstraintError;
 {
   public final @Nonnull String value;
 
+  /**
+   * Construct a path from the given {@link String}.
+   * 
+   * @throws ConstraintError
+   *           Iff <code>path == null</code>
+   */
+
   public PathReal(
     final @Nonnull String path)
     throws ConstraintError
   {
     this.value = Constraints.constrainNotNull(path, "path");
   }
+
+  /**
+   * Construct a path from the given {@link File}.
+   * 
+   * @throws ConstraintError
+   *           Iff <code>path == null</code>
+   * @since 2.5.0
+   */
+
+  public PathReal(
+    final @Nonnull File path)
+    throws ConstraintError
+  {
+    this.value = Constraints.constrainNotNull(path, "path").toString();
+  }
+
+  /**
+   * Concatenate a virtual path onto this real path.
+   * 
+   * @throws ConstraintError
+   *           Iff <code>path == null</code>.
+   */
 
   public PathReal concatenate(
     final @Nonnull PathVirtual path)
@@ -52,11 +81,6 @@ import com.io7m.jaux.Constraints.ConstraintError;
       + path.inRealNotation());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override public boolean equals(
     final Object obj)
   {
@@ -73,11 +97,6 @@ import com.io7m.jaux.Constraints.ConstraintError;
     return this.value.equals(other.value);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#hashCode()
-   */
   @Override public int hashCode()
   {
     final int prime = 31;
@@ -86,11 +105,6 @@ import com.io7m.jaux.Constraints.ConstraintError;
     return result;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
   @Override public String toString()
   {
     return this.value;

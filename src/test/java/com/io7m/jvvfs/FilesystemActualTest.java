@@ -18,36 +18,26 @@ package com.io7m.jvvfs;
 
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Test;
+import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jlog.Log;
 
-public class ArchiveHandlerZipTest
+public final class FilesystemActualTest extends FilesystemAPIContract
 {
-  @SuppressWarnings("static-method") @Test public void testCanHandleCases()
-    throws ConstraintError,
-      IOException
+  @Override @Nonnull FilesystemAPI makeFilesystem(
+    final PathReal path)
+    throws FilesystemError,
+      IOException,
+      ConstraintError
   {
-    final Log log = TestData.getLog();
-    final ArchiveHandlerZip a = new ArchiveHandlerZip(log);
+    return new Filesystem(TestData.getLog(), path);
+  }
 
-    {
-      final boolean ok = a.canHandle(new PathReal("test-archives/empty.zip"));
-      Assert.assertTrue(ok);
-    }
-
-    {
-      final boolean ok =
-        a.canHandle(new PathReal("test-archives/Example.jar"));
-      Assert.assertTrue(ok);
-    }
-
-    {
-      final boolean ok =
-        a.canHandle(new PathReal("test-archives/archive0/file.txt"));
-      Assert.assertFalse(ok);
-    }
+  @Override @Nonnull FilesystemAPI makeFilesystem()
+    throws FilesystemError,
+      IOException,
+      ConstraintError
+  {
+    return new Filesystem(TestData.getLog());
   }
 }
