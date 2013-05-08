@@ -142,6 +142,7 @@ final class TestData
     TestData.zip_list = new HashSet<String>();
     TestData.zip_list.add("single-file.zip");
     TestData.zip_list.add("single-file-and-subdir.zip");
+    TestData.zip_list.add("single-file-and-subdir-implicit.zip");
     TestData.zip_list.add("complex.zip");
     TestData.zip_list.add("subdir-shadow.zip");
     TestData.zip_list.add("encrypted.zip");

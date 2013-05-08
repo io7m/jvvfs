@@ -217,6 +217,45 @@ abstract public class FilesystemAPIZipContract
   }
 
   /**
+   * Unmounting a mount that is "busy" (as in providing a directory for
+   * another mount), fails, and fails correctly for zipfiles without explicit
+   * directory entries.
+   */
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemZipMountBusyNoExplicitSubdir()
+      throws IOException,
+        FilesystemError,
+        ConstraintError
+  {
+    final FilesystemAPI f = this.makeFilesystemWithTestData();
+
+    try {
+      f.createDirectory(new PathVirtual("/usr"));
+      Assert.assertTrue(f.isDirectory(new PathVirtual("/usr")));
+      Assert.assertFalse(f.isDirectory(new PathVirtual("/usr/subdir")));
+      f.mount("single-file-and-subdir-implicit.zip", new PathVirtual("/usr"));
+      Assert.assertTrue(f.isDirectory(new PathVirtual("/usr")));
+      Assert.assertTrue(f.isDirectory(new PathVirtual("/usr/subdir")));
+      f.mount("single-file-and-subdir-implicit.zip", new PathVirtual(
+        "/usr/subdir"));
+      Assert.assertTrue(f.isDirectory(new PathVirtual("/usr")));
+      Assert.assertTrue(f.isDirectory(new PathVirtual("/usr/subdir")));
+      Assert.assertTrue(f.isDirectory(new PathVirtual("/usr/subdir/subdir")));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      f.unmount(new PathVirtual("/usr/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_BUSY, e.code);
+      throw e;
+    }
+  }
+
+  /**
    * Colliding mounts are an error.
    */
 
@@ -1515,6 +1554,68 @@ abstract public class FilesystemAPIZipContract
       fs = this.makeFilesystemWithTestData();
       fs.createDirectory("/xyz");
       fs.mount("single-file-and-subdir.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      assert fs != null;
+      fs.openFile(new PathVirtual("/xyz/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  /**
+   * A zipfile that doesn't contain an explicit directory entry nevertheless
+   * still produces the correct directories for paths.
+   */
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemZipOpenFileNoExplicitSubdirCorrect()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = this.makeFilesystemWithTestData();
+      fs.mount("single-file-and-subdir-implicit.zip", new PathVirtual("/"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    try {
+      assert fs != null;
+      fs.openFile(new PathVirtual("/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_IS_A_DIRECTORY, e.code);
+      throw e;
+    }
+  }
+
+  /**
+   * A zipfile that doesn't contain an explicit directory entry nevertheless
+   * still produces the correct directories for paths, in non-root mounts.
+   */
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemZipOpenFileNoExplicitSubdirCorrectNonRootMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    FilesystemAPI fs = null;
+
+    try {
+      fs = this.makeFilesystemWithTestData();
+      fs.createDirectory("/xyz");
+      fs
+        .mount("single-file-and-subdir-implicit.zip", new PathVirtual("/xyz"));
     } catch (final FilesystemError e) {
       Assert.fail(e.getMessage());
     }
