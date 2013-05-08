@@ -66,59 +66,6 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test public
     void
-    testFilesystemDirectoryListCorrectUnion()
-      throws IOException,
-        FilesystemError,
-        ConstraintError
-  {
-    final FilesystemAPI f = FilesystemTest.makeFS();
-    final TreeSet<String> items = new TreeSet<String>();
-
-    try {
-      f.mount("archive2", new PathVirtual("/"));
-      f.mount("archive3", new PathVirtual("/"));
-    } catch (final FilesystemError e) {
-      Assert.fail(e.getMessage());
-    }
-
-    f.listDirectory(new PathVirtual("/"), items);
-    Assert.assertTrue(items.contains("file21.txt"));
-    Assert.assertTrue(items.contains("file22.txt"));
-    Assert.assertTrue(items.contains("file23.txt"));
-    Assert.assertTrue(items.contains("file31.txt"));
-    Assert.assertTrue(items.contains("file32.txt"));
-    Assert.assertTrue(items.contains("file33.txt"));
-  }
-
-  @SuppressWarnings("static-method") @Test public
-    void
-    testFilesystemDirectoryListCorrectUnionNonRootMount()
-      throws IOException,
-        FilesystemError,
-        ConstraintError
-  {
-    final FilesystemAPI f = FilesystemTest.makeFS();
-    final TreeSet<String> items = new TreeSet<String>();
-
-    try {
-      f.createDirectory("/xyz");
-      f.mount("archive2", new PathVirtual("/xyz"));
-      f.mount("archive3", new PathVirtual("/xyz"));
-    } catch (final FilesystemError e) {
-      Assert.fail(e.getMessage());
-    }
-
-    f.listDirectory(new PathVirtual("/xyz"), items);
-    Assert.assertTrue(items.contains("file21.txt"));
-    Assert.assertTrue(items.contains("file22.txt"));
-    Assert.assertTrue(items.contains("file23.txt"));
-    Assert.assertTrue(items.contains("file31.txt"));
-    Assert.assertTrue(items.contains("file32.txt"));
-    Assert.assertTrue(items.contains("file33.txt"));
-  }
-
-  @SuppressWarnings("static-method") @Test public
-    void
     testFilesystemDirectoryModificationTimeCorrect()
       throws IOException,
         FilesystemError,
@@ -320,59 +267,6 @@ public class FilesystemTest
     f.listDirectory(new PathVirtual("/xyz"), items);
     Assert.assertTrue(items.contains("subdir"));
     Assert.assertTrue(items.contains("file.txt"));
-  }
-
-  @SuppressWarnings("static-method") @Test public
-    void
-    testFilesystemZipListCorrectUnion()
-      throws IOException,
-        FilesystemError,
-        ConstraintError
-  {
-    final FilesystemAPI f = FilesystemTest.makeFS();
-    final TreeSet<String> items = new TreeSet<String>();
-
-    try {
-      f.mount("zip2.zip", new PathVirtual("/"));
-      f.mount("zip3.zip", new PathVirtual("/"));
-    } catch (final FilesystemError e) {
-      Assert.fail(e.getMessage());
-    }
-
-    f.listDirectory(new PathVirtual("/"), items);
-    Assert.assertTrue(items.contains("file21.txt"));
-    Assert.assertTrue(items.contains("file22.txt"));
-    Assert.assertTrue(items.contains("file23.txt"));
-    Assert.assertTrue(items.contains("file31.txt"));
-    Assert.assertTrue(items.contains("file32.txt"));
-    Assert.assertTrue(items.contains("file33.txt"));
-  }
-
-  @SuppressWarnings("static-method") @Test public
-    void
-    testFilesystemZipListCorrectUnionNonRootMount()
-      throws IOException,
-        FilesystemError,
-        ConstraintError
-  {
-    final FilesystemAPI f = FilesystemTest.makeFS();
-    final TreeSet<String> items = new TreeSet<String>();
-
-    try {
-      f.createDirectory("/xyz");
-      f.mount("zip2.zip", new PathVirtual("/xyz"));
-      f.mount("zip3.zip", new PathVirtual("/xyz"));
-    } catch (final FilesystemError e) {
-      Assert.fail(e.getMessage());
-    }
-
-    f.listDirectory(new PathVirtual("/xyz"), items);
-    Assert.assertTrue(items.contains("file21.txt"));
-    Assert.assertTrue(items.contains("file22.txt"));
-    Assert.assertTrue(items.contains("file23.txt"));
-    Assert.assertTrue(items.contains("file31.txt"));
-    Assert.assertTrue(items.contains("file32.txt"));
-    Assert.assertTrue(items.contains("file33.txt"));
   }
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public

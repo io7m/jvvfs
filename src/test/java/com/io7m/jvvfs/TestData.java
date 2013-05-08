@@ -146,6 +146,8 @@ final class TestData
     TestData.zip_list.add("complex.zip");
     TestData.zip_list.add("subdir-shadow.zip");
     TestData.zip_list.add("encrypted.zip");
+    TestData.zip_list.add("files1-3.zip");
+    TestData.zip_list.add("files4-6.zip");
 
     TestData.zip_unpack_map = new HashMap<String, String>();
     TestData.zip_unpack_map.put("single-file.zip", "single-file");
@@ -154,6 +156,8 @@ final class TestData
       "single-file-and-subdir");
     TestData.zip_unpack_map.put("complex.zip", "complex");
     TestData.zip_unpack_map.put("subdir-shadow.zip", "subdir-shadow");
+    TestData.zip_unpack_map.put("files1-3.zip", "files1-3");
+    TestData.zip_unpack_map.put("files4-6.zip", "files4-6");
   }
 
   /**

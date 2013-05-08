@@ -1992,4 +1992,62 @@ abstract public class FilesystemAPIZipContract
     f.mount("single-file.zip", new PathVirtual("/"));
     f.unmount(new PathVirtual("/"));
   }
+
+  /**
+   * Mounting two archives in the same place produces a union of the mounts.
+   */
+
+  @Test public void testFilesystemZipListCorrectUnion()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = this.makeFilesystemWithTestData();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.mount("files1-3.zip", new PathVirtual("/"));
+      f.mount("files4-6.zip", new PathVirtual("/"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    f.listDirectory(new PathVirtual("/"), items);
+    Assert.assertTrue(items.contains("file1.txt"));
+    Assert.assertTrue(items.contains("file2.txt"));
+    Assert.assertTrue(items.contains("file3.txt"));
+    Assert.assertTrue(items.contains("file4.txt"));
+    Assert.assertTrue(items.contains("file5.txt"));
+    Assert.assertTrue(items.contains("file6.txt"));
+  }
+
+  /**
+   * Mounting two archives in the same non-root place produces a union of the
+   * mounts.
+   */
+
+  @Test public void testFilesystemZipListCorrectUnionNonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = this.makeFilesystemWithTestData();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("files1-3.zip", new PathVirtual("/xyz"));
+      f.mount("files4-6.zip", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    f.listDirectory(new PathVirtual("/xyz"), items);
+    Assert.assertTrue(items.contains("file1.txt"));
+    Assert.assertTrue(items.contains("file2.txt"));
+    Assert.assertTrue(items.contains("file3.txt"));
+    Assert.assertTrue(items.contains("file4.txt"));
+    Assert.assertTrue(items.contains("file5.txt"));
+    Assert.assertTrue(items.contains("file6.txt"));
+  }
 }

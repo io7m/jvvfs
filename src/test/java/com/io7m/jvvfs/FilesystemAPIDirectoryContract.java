@@ -701,6 +701,64 @@ abstract public class FilesystemAPIDirectoryContract
   }
 
   /**
+   * Mounting two archives in the same place produces a union of the mounts.
+   */
+
+  @Test public void testFilesystemDirectoryListCorrectUnion()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = this.makeFilesystemWithTestData();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.mount("files1-3", new PathVirtual("/"));
+      f.mount("files4-6", new PathVirtual("/"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    f.listDirectory(new PathVirtual("/"), items);
+    Assert.assertTrue(items.contains("file1.txt"));
+    Assert.assertTrue(items.contains("file2.txt"));
+    Assert.assertTrue(items.contains("file3.txt"));
+    Assert.assertTrue(items.contains("file4.txt"));
+    Assert.assertTrue(items.contains("file5.txt"));
+    Assert.assertTrue(items.contains("file6.txt"));
+  }
+
+  /**
+   * Mounting two archives in the same non-root place produces a union of the
+   * mounts.
+   */
+
+  @Test public void testFilesystemDirectoryListCorrectUnionNonRootMount()
+    throws IOException,
+      FilesystemError,
+      ConstraintError
+  {
+    final FilesystemAPI f = this.makeFilesystemWithTestData();
+    final TreeSet<String> items = new TreeSet<String>();
+
+    try {
+      f.createDirectory("/xyz");
+      f.mount("files1-3", new PathVirtual("/xyz"));
+      f.mount("files4-6", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    f.listDirectory(new PathVirtual("/xyz"), items);
+    Assert.assertTrue(items.contains("file1.txt"));
+    Assert.assertTrue(items.contains("file2.txt"));
+    Assert.assertTrue(items.contains("file3.txt"));
+    Assert.assertTrue(items.contains("file4.txt"));
+    Assert.assertTrue(items.contains("file5.txt"));
+    Assert.assertTrue(items.contains("file6.txt"));
+  }
+
+  /**
    * Listing mounts directly works.
    */
 
@@ -1446,6 +1504,50 @@ abstract public class FilesystemAPIDirectoryContract
     } catch (final FilesystemError e) {
       Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
       throw e;
+    }
+  }
+
+  /**
+   * Mounting an archive at a directory provided by another directory archive
+   * mount remains consistent even if that directory is deleted in the real
+   * filesystem.
+   */
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFilesystemMountVanished()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final FilesystemAPI fs = this.makeFilesystemWithTestData();
+
+    final File tdir =
+      new File(new File(TestData.getTestDataDirectory(), "temporary"), "xyz");
+    tdir.mkdirs();
+
+    try {
+      fs.mount("temporary", new PathVirtual("/"));
+      fs.mount("single-file", new PathVirtual("/xyz"));
+    } catch (final FilesystemError e) {
+      Assert.fail(e.getMessage());
+    }
+
+    {
+      final TreeSet<String> items = new TreeSet<String>();
+      fs.listDirectory("/xyz", items);
+      Assert.assertEquals(1, items.size());
+      Assert.assertTrue(items.contains("file.txt"));
+    }
+
+    tdir.delete();
+
+    {
+      Assert.assertTrue(fs.isDirectory("/xyz"));
+      final TreeSet<String> items = new TreeSet<String>();
+      fs.listDirectory("/xyz", items);
+      Assert.assertEquals(1, items.size());
+      Assert.assertTrue(items.contains("file.txt"));
     }
   }
 
