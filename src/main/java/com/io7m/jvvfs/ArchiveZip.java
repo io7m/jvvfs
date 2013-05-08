@@ -219,6 +219,11 @@ import com.io7m.jvvfs.FileReference.Type;
       if (en0.startsWith(ps)) {
         final String en1 = en0.substring(ps.length());
         final String en2 = en1.replaceFirst("^/", "");
+
+        if (en2.length() == 0) {
+          continue;
+        }
+
         if (en2.contains("/")) {
           final String en3 = en2.substring(0, en2.indexOf('/'));
           items.add(en3);

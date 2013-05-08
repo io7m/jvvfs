@@ -22,10 +22,19 @@ import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints.ConstraintError;
 
-public final class FilesystemActualTest extends FilesystemAPIContract
+public final class FilesystemDirectoryTest extends FilesystemAPIDirectoryContract
 {
-  @Override @Nonnull FilesystemAPI makeFilesystem(
-    final PathReal path)
+  @Override @Nonnull FilesystemAPI makeFilesystemWithTestData()
+    throws FilesystemError,
+      IOException,
+      ConstraintError
+  {
+    return new Filesystem(TestData.getLog(), new PathReal(
+      TestData.getTestDataDirectory()));
+  }
+
+  @Override @Nonnull FilesystemAPI makeFilesystemWithPath(
+    final @Nonnull PathReal path)
     throws FilesystemError,
       IOException,
       ConstraintError

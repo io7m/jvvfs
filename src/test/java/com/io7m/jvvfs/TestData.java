@@ -142,12 +142,17 @@ final class TestData
     TestData.zip_list = new HashSet<String>();
     TestData.zip_list.add("single-file.zip");
     TestData.zip_list.add("single-file-and-subdir.zip");
+    TestData.zip_list.add("complex.zip");
+    TestData.zip_list.add("subdir-shadow.zip");
+    TestData.zip_list.add("encrypted.zip");
 
     TestData.zip_unpack_map = new HashMap<String, String>();
     TestData.zip_unpack_map.put("single-file.zip", "single-file");
     TestData.zip_unpack_map.put(
       "single-file-and-subdir.zip",
       "single-file-and-subdir");
+    TestData.zip_unpack_map.put("complex.zip", "complex");
+    TestData.zip_unpack_map.put("subdir-shadow.zip", "subdir-shadow");
   }
 
   /**
