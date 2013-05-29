@@ -103,7 +103,6 @@ import com.io7m.jvvfs.FilesystemError.Code;
   private final @Nonnull ArrayList<ArchiveHandler>            handlers;
   private final @Nonnull HashMap<PathVirtual, Stack<Archive>> mounts;
   private final @Nonnull TreeSet<PathVirtual>                 directories;
-
   private final @Nonnull HashMap<PathVirtual, TouchEntry>     touches;
 
   /**
