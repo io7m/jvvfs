@@ -16,9 +16,7 @@
 
 package com.io7m.jvvfs;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -27,8 +25,7 @@ import com.io7m.jaux.Constraints.ConstraintError;
 
 /**
  * <p>
- * The sequential enumeration of a path is defined as a list of the prefixes
- * of the path, with the first element being the shortest (the root).
+ * A reference to a file inside an archive.
  * </p>
  * <p>
  * Values of this type cannot be accessed safely from multiple threads without
@@ -36,39 +33,26 @@ import com.io7m.jaux.Constraints.ConstraintError;
  * </p>
  */
 
-@NotThreadSafe public final class PathVirtualEnum implements
-  Enumeration<PathVirtual>
+@NotThreadSafe final class FileReference
 {
-  private final @Nonnull PathVirtual       path;
-  private final @Nonnull ArrayList<String> names;
-  private int                              index = -1;
+  static enum Type
+  {
+    TYPE_FILE,
+    TYPE_DIRECTORY
+  }
 
-  PathVirtualEnum(
-    final @Nonnull PathVirtual path)
+  final @CheckForNull Archive       archive;
+  final @Nonnull PathVirtual        path;
+  final @Nonnull FileReference.Type type;
+
+  FileReference(
+    final @CheckForNull Archive archive,
+    final @Nonnull PathVirtual path,
+    final @Nonnull FileReference.Type type)
     throws ConstraintError
   {
-    this.path = Constraints.constrainNotNull(path, "Path");
-    this.names = new ArrayList<String>();
-  }
-
-  @Override public boolean hasMoreElements()
-  {
-    return this.index < this.path.length();
-  }
-
-  @Override public PathVirtual nextElement()
-  {
-    try {
-      if (this.index == -1) {
-        return PathVirtual.ROOT;
-      }
-
-      this.names.add(this.path.getUnsafe(this.index));
-      return PathVirtual.ofNames(this.names);
-    } catch (final ConstraintError e) {
-      throw new AssertionError(e);
-    } finally {
-      ++this.index;
-    }
+    this.archive = archive;
+    this.path = Constraints.constrainNotNull(path, "path");
+    this.type = Constraints.constrainNotNull(type, "type");
   }
 }

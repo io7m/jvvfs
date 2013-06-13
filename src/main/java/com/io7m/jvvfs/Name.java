@@ -23,7 +23,9 @@ import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.UnreachableCodeException;
 
 /**
+ * <p>
  * Names of files and directories.
+ * </p>
  */
 
 public final class Name

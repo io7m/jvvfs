@@ -35,7 +35,7 @@ import com.io7m.jaux.Constraints.ConstraintError;
  * </p>
  * <p>
  * The concrete syntax of virtual paths is given by the following EBNF grammar
- * (where <code>name</code> indicates a string representing a valid name:
+ * (where <code>name</code> indicates a string representing a valid name):
  * </p>
  * 
  * <pre>
