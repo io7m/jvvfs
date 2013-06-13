@@ -16,234 +16,523 @@
 
 package com.io7m.jvvfs;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nonnull;
+
+import net.java.quickcheck.Characteristic;
+import net.java.quickcheck.Generator;
+import net.java.quickcheck.QuickCheck;
+import net.java.quickcheck.characteristic.AbstractCharacteristic;
+import net.java.quickcheck.generator.support.CharacterGenerator;
+import net.java.quickcheck.generator.support.IntegerGenerator;
+import net.java.quickcheck.generator.support.StringGenerator;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.functional.Pair;
+import com.io7m.jvvfs.NameTest.ValidNameGenerator;
 
-public class PathVirtualTest
+public final class PathVirtualTest
 {
-  @SuppressWarnings("static-method") @Test public void testBasenameRoot()
-    throws ConstraintError
+  /**
+   * A random virtual path generator.
+   */
+
+  final static class PathVirtualGenerator implements Generator<PathVirtual>
   {
-    Assert.assertTrue(new PathVirtual("/").baseName().equals("/"));
+    private final @Nonnull ValidNameGenerator gen;
+
+    PathVirtualGenerator()
+    {
+      this.gen = new NameTest.ValidNameGenerator();
+    }
+
+    @Override public PathVirtual next()
+    {
+      final int count = (int) Math.round(Math.random() * 16);
+      final ArrayList<String> names = new ArrayList<String>();
+
+      for (int index = 0; index < count; ++index) {
+        final String name = this.gen.next();
+        names.add(name);
+      }
+
+      try {
+        return PathVirtual.ofNames(names);
+      } catch (final ConstraintError e) {
+        throw new AssertionError("Invalid name generated, report this bug!");
+      }
+    }
   }
 
-  @SuppressWarnings("static-method") @Test public void testClean()
-    throws ConstraintError
+  /**
+   * A generator for pairs of virtual paths.
+   */
+
+  final static class PathVirtualPairGenerator implements
+    Generator<Pair<PathVirtual, PathVirtual>>
   {
-    Assert.assertEquals("/a/b/c", new PathVirtual(
-      "//////a//////b//////c/////").toString());
+    private final @Nonnull PathVirtualGenerator gen;
+
+    public PathVirtualPairGenerator()
+    {
+      this.gen = new PathVirtualGenerator();
+    }
+
+    @Override public Pair<PathVirtual, PathVirtual> next()
+    {
+      return new Pair<PathVirtual, PathVirtual>(
+        this.gen.next(),
+        this.gen.next());
+    }
   }
 
-  @SuppressWarnings("static-method") @Test public void testComponentsThree()
-    throws ConstraintError
+  private static void runWithGenerator(
+    final Characteristic<PathVirtual> c)
   {
-    final List<String> components =
-      new PathVirtual("/a/b/c").pathComponents();
-
-    Assert.assertEquals(3, components.size());
-    Assert.assertEquals("a", components.get(0));
-    Assert.assertEquals("b", components.get(1));
-    Assert.assertEquals("c", components.get(2));
+    QuickCheck.forAll(new PathVirtualGenerator(), c);
   }
 
-  @SuppressWarnings("static-method") @Test public void testComponentsZero()
-    throws ConstraintError
+  private static void runWithNameListGenerator(
+    final Characteristic<List<String>> c)
   {
-    final List<String> components = new PathVirtual("/").pathComponents();
-    Assert.assertEquals(0, components.size());
+    QuickCheck.forAll(new NameTest.ValidNameListGenerator(), c);
   }
 
-  @SuppressWarnings("static-method") @Test public void testEqualsNot()
-    throws ConstraintError
+  private static void runWithPairGenerator(
+    final Characteristic<Pair<PathVirtual, PathVirtual>> c)
   {
-    final PathVirtual va0 = new PathVirtual("/a");
-    final PathVirtual vb0 = new PathVirtual("/b");
-    Assert.assertFalse(va0.equals(vb0));
-    Assert.assertFalse(vb0.equals(va0));
+    QuickCheck.forAll(new PathVirtualPairGenerator(), c);
   }
 
-  @SuppressWarnings("static-method") @Test public void testEqualsNotClass()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public void testEqualsClass()
   {
-    final PathVirtual va0 = new PathVirtual("/a");
-    Assert.assertFalse(va0.equals(new Integer(23)));
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          final IntegerGenerator g = new IntegerGenerator();
+          Assert.assertFalse(p.equals(g.next()));
+        }
+      });
+  }
+
+  @SuppressWarnings("static-method") @Test public void testEqualsContent()
+  {
+    PathVirtualTest
+      .runWithNameListGenerator(new AbstractCharacteristic<List<String>>() {
+        @Override protected void doSpecify(
+          final @Nonnull List<String> names)
+          throws Throwable
+        {
+          final PathVirtual p0 = PathVirtual.ofNames(names);
+          final PathVirtual p1 = PathVirtual.ofNames(names);
+          Assert.assertEquals(p0, p1);
+        }
+      });
   }
 
   @SuppressWarnings("static-method") @Test public void testEqualsNull()
-    throws ConstraintError
   {
-    final PathVirtual va0 = new PathVirtual("/a");
-    Assert.assertFalse(va0.equals(null));
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          Assert.assertFalse(p.equals(null));
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testEqualsReflexive()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public void testHashcodeContent()
   {
-    final PathVirtual va0 = new PathVirtual("/a");
-    Assert.assertEquals(va0, va0);
+    PathVirtualTest
+      .runWithNameListGenerator(new AbstractCharacteristic<List<String>>() {
+        @Override protected void doSpecify(
+          final @Nonnull List<String> names)
+          throws Throwable
+        {
+          final PathVirtual p0 = PathVirtual.ofNames(names);
+          final PathVirtual p1 = PathVirtual.ofNames(names);
+          Assert.assertEquals(p0.hashCode(), p1.hashCode());
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testEqualsSymmetric()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testIsAncestorOfAppend()
   {
-    final PathVirtual va0 = new PathVirtual("/a");
-    final PathVirtual va1 = new PathVirtual("/a");
-    Assert.assertEquals(va0, va1);
-    Assert.assertEquals(va1, va0);
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p0)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          final PathVirtual p1 = p0.appendName(g.next());
+          final PathVirtual p2 = p1.appendName(g.next());
+          Assert.assertTrue(p0.isAncestorOf(p2));
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testEqualsTransitive()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testIsAncestorOfAppendPath()
   {
-    final PathVirtual va0 = new PathVirtual("/a");
-    final PathVirtual va1 = new PathVirtual("/a");
-    final PathVirtual va2 = new PathVirtual("/a");
-    Assert.assertEquals(va0, va1);
-    Assert.assertEquals(va0, va2);
-    Assert.assertEquals(va1, va2);
+    PathVirtualTest
+      .runWithPairGenerator(new AbstractCharacteristic<Pair<PathVirtual, PathVirtual>>() {
+        @Override protected void doSpecify(
+          final @Nonnull Pair<PathVirtual, PathVirtual> pair)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          final PathVirtual p0l = pair.first.appendName(g.next());
+          Assert.assertTrue(p0l.isAncestorOf(p0l.append(p0l)));
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testHash()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testIsAncestorOfEqualFalse()
   {
-    final PathVirtual va0 = new PathVirtual("/a");
-    final PathVirtual va1 = new PathVirtual("/a");
-    Assert.assertEquals(va0.hashCode(), va1.hashCode());
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p0)
+          throws Throwable
+        {
+          Assert.assertFalse(p0.isAncestorOf(p0));
+        }
+      });
   }
 
-  @SuppressWarnings({ "unused", "static-method" }) @Test(
-    expected = ConstraintError.class) public void testInitNoLeadingSlash()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testIsAncestorOfFalse()
   {
-    new PathVirtual("a/b/c");
+    PathVirtualTest
+      .runWithPairGenerator(new AbstractCharacteristic<Pair<PathVirtual, PathVirtual>>() {
+        @Override protected void doSpecify(
+          final @Nonnull Pair<PathVirtual, PathVirtual> pair)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          final PathVirtual p0 = pair.first.appendName(g.next());
+          final PathVirtual p1 = pair.second.appendName(g.next());
+          Assert.assertFalse(p0.isAncestorOf(p1));
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testInitOK()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public void testIsAncestorOfRoot()
   {
-    final PathVirtual path = new PathVirtual("/a/b/c");
-    Assert.assertEquals("/a/b/c", path.toString());
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          final PathVirtual p0 = p.appendName(g.next());
+          Assert.assertFalse(p0.isAncestorOf(PathVirtual.ROOT));
+        }
+      });
   }
 
-  @SuppressWarnings({ "unused", "static-method" }) @Test(
-    expected = ConstraintError.class) public void testInitWithBackslash()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public void testIsParentOfAppend()
   {
-    new PathVirtual("/a\\b\\c");
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p0)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          final PathVirtual p1 = p0.appendName(g.next());
+          Assert.assertTrue(p0.isParentOf(p1));
+        }
+      });
   }
 
-  @SuppressWarnings({ "unused", "static-method" }) @Test(
-    expected = ConstraintError.class) public void testInitWithDots()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testIsParentOfAppendFalse()
   {
-    new PathVirtual("/a/../c");
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p0)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          final PathVirtual p0l0 = p0.appendName(g.next());
+          final PathVirtual p0r0 = p0.appendName(g.next());
+          final PathVirtual p0r1 = p0r0.appendName(g.next());
+          Assert.assertFalse(p0l0.isParentOf(p0r1));
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testIsParent()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public
+    void
+    testIsParentOfEqualFalse()
   {
-    final PathVirtual abc = new PathVirtual("/a/b/c");
-    final PathVirtual ab = new PathVirtual("/a/b");
-    final PathVirtual a = new PathVirtual("/a");
-    final PathVirtual r = new PathVirtual("/");
-
-    Assert.assertTrue(r.isParentOf(r));
-    Assert.assertTrue(r.isParentOf(a));
-    Assert.assertTrue(r.isParentOf(ab));
-    Assert.assertTrue(r.isParentOf(abc));
-
-    Assert.assertFalse(a.isParentOf(r));
-    Assert.assertFalse(a.isParentOf(a));
-    Assert.assertTrue(a.isParentOf(ab));
-    Assert.assertTrue(a.isParentOf(abc));
-
-    Assert.assertFalse(ab.isParentOf(r));
-    Assert.assertFalse(ab.isParentOf(a));
-    Assert.assertFalse(ab.isParentOf(ab));
-    Assert.assertTrue(ab.isParentOf(abc));
-
-    Assert.assertFalse(abc.isParentOf(r));
-    Assert.assertFalse(abc.isParentOf(a));
-    Assert.assertFalse(abc.isParentOf(ab));
-    Assert.assertFalse(abc.isParentOf(abc));
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p0)
+          throws Throwable
+        {
+          Assert.assertFalse(p0.isParentOf(p0));
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testIsParentRoot()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public void testIsParentOfFalse()
   {
-    Assert.assertTrue(new PathVirtual("/").isParentOf(new PathVirtual("/")));
+    PathVirtualTest
+      .runWithPairGenerator(new AbstractCharacteristic<Pair<PathVirtual, PathVirtual>>() {
+        @Override protected void doSpecify(
+          final @Nonnull Pair<PathVirtual, PathVirtual> pair)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+
+          final PathVirtual p0 = pair.first;
+          PathVirtual p1 = pair.second;
+          if (Math.abs(pair.first.length() - pair.second.length()) == 1) {
+            p1 = p1.appendName(g.next());
+          }
+
+          Assert.assertFalse(p0.isParentOf(p1));
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testIsRoot()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public void testIsRootAncestorOf()
   {
-    Assert.assertTrue(new PathVirtual("/").isRoot());
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          final PathVirtual p0 = p.appendName(g.next());
+          Assert.assertTrue(PathVirtual.ROOT.isAncestorOf(p0));
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testParentRoot()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public void testIsRootFalse()
   {
-    Assert.assertEquals("/", new PathVirtual("/").parent().toString());
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          Assert.assertFalse(p.appendName(g.next()).isRoot());
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testParents()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public void testOfString()
   {
-    final PathVirtual abc = new PathVirtual("/a/b/c");
+    PathVirtualTest
+      .runWithNameListGenerator(new AbstractCharacteristic<List<String>>() {
+        @Override protected void doSpecify(
+          final @Nonnull List<String> names)
+          throws Throwable
+        {
+          final StringBuilder s = new StringBuilder("/");
+          for (int index = 0; index < names.size(); ++index) {
+            s.append(names.get(index));
 
-    final PathVirtual ab = abc.parent();
-    Assert.assertEquals("/a/b", ab.toString());
-    final PathVirtual a = ab.parent();
-    Assert.assertEquals("/a", a.toString());
-    final PathVirtual root = a.parent();
-    Assert.assertTrue(root.isRoot());
-    Assert.assertEquals("/", root.toString());
+            if ((index + 1) == names.size()) {
+              // No slash
+            } else {
+              s.append("/");
+            }
+          }
+
+          final String s0 = PathVirtual.ofString(s.toString()).toString();
+          final String s1 = s.toString();
+          Assert.assertEquals(s0, s1);
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testRoot()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
+    void
+    testOfStringEmpty()
+      throws ConstraintError
   {
-    Assert.assertEquals("/", new PathVirtual("/").toString());
+    PathVirtual.ofString("");
   }
 
-  @SuppressWarnings("static-method") @Test public void testSubtract()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public void testOfStringLax()
   {
-    final PathVirtual abc = new PathVirtual("/a/b/c");
-    final PathVirtual ab = new PathVirtual("/a/b");
-    Assert.assertEquals("/c", abc.subtract(ab).toString());
+    PathVirtualTest
+      .runWithNameListGenerator(new AbstractCharacteristic<List<String>>() {
+        @Override protected void doSpecify(
+          final @Nonnull List<String> names)
+          throws Throwable
+        {
+          final StringGenerator slash_g =
+            new StringGenerator(
+              new IntegerGenerator(1, 16),
+              new CharacterGenerator('/', '/'));
+
+          final StringBuilder s = new StringBuilder(slash_g.next());
+          for (int index = 0; index < names.size(); ++index) {
+            s.append(names.get(index));
+            s.append(slash_g.next());
+          }
+
+          final String s0 = PathVirtual.ofStringLax(s.toString()).toString();
+          final String s1 = PathVirtual.ofStringLaxScrub(s.toString());
+          Assert.assertEquals(s0, s1);
+        }
+      });
   }
 
-  @SuppressWarnings("static-method") @Test public void testSubtractAnyRoot()
+  @SuppressWarnings("static-method") @Test public void testOfStringLaxRoot()
     throws ConstraintError
   {
-    final PathVirtual abc = new PathVirtual("/a/b/c");
-    final PathVirtual r = new PathVirtual("/");
-    Assert.assertEquals("/a/b/c", abc.subtract(r).toString());
+    final PathVirtual p = PathVirtual.ofStringLax("/////////");
+    Assert.assertTrue(p.isRoot());
+    Assert.assertEquals(p.toString(), "/");
   }
 
-  @SuppressWarnings("static-method") @Test public void testSubtractNotRoot()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
+    void
+    testOfStringNonEmpty()
+      throws ConstraintError
   {
-    final PathVirtual abc = new PathVirtual("/a/b/c");
-    final PathVirtual r = new PathVirtual("/");
-    Assert.assertEquals("/", r.subtract(abc).toString());
+    PathVirtual.ofString(" ");
   }
 
-  @SuppressWarnings("static-method") @Test public void testSubtractRoot()
+  @SuppressWarnings("static-method") @Test public void testOfStringRoot()
     throws ConstraintError
   {
-    final PathVirtual r = new PathVirtual("/");
-    Assert.assertEquals("/", r.subtract(r).toString());
+    final PathVirtual p = PathVirtual.ofString("/");
+    Assert.assertTrue(p.isRoot());
+    Assert.assertEquals(p.toString(), "/");
   }
 
-  @SuppressWarnings("static-method") @Test public void testToString()
-    throws ConstraintError
+  @SuppressWarnings("static-method") @Test public void testRootCompare()
   {
-    Assert.assertTrue(new PathVirtual("/a").toString().equals("/a"));
+    Assert.assertEquals(PathVirtual.ROOT.compareTo(PathVirtual.ROOT), 0);
+  }
+
+  @SuppressWarnings("static-method") @Test public void testRootEquals()
+  {
+    Assert.assertEquals(PathVirtual.ROOT, PathVirtual.ROOT);
+  }
+
+  @SuppressWarnings("static-method") @Test public void testRootImage()
+  {
+    Assert.assertEquals(PathVirtual.ROOT.toString(), "/");
+  }
+
+  @SuppressWarnings("static-method") @Test public void testRootIsRoot()
+  {
+    Assert.assertTrue(PathVirtual.ROOT.isRoot());
+  }
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testSubtractAppendNameIdentity()
+  {
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          final String n0 = g.next();
+          final String n1 = g.next();
+
+          final PathVirtual p0 = p.appendName(n0);
+          final PathVirtual p1 = p0.appendName(n1);
+          final PathVirtual pr = p1.subtract(p0);
+
+          Assert.assertEquals("/" + n1, pr.toString());
+        }
+      });
+  }
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testSubtractAppendSelfIdentity()
+  {
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          final String n0 = g.next();
+
+          final PathVirtual p0 = p.appendName(n0);
+          final PathVirtual p1 = p0.append(p0);
+          final PathVirtual pr = p1.subtract(p0);
+
+          Assert.assertEquals(pr, p0);
+        }
+      });
+  }
+
+  @SuppressWarnings("static-method") @Test public void testSubtractFromRoot()
+  {
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          Assert.assertEquals(PathVirtual.ROOT.subtract(p), PathVirtual.ROOT);
+        }
+      });
+  }
+
+  @SuppressWarnings("static-method") @Test public void testSubtractRootFrom()
+  {
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          Assert.assertEquals(p.subtract(PathVirtual.ROOT), p);
+        }
+      });
+  }
+
+  @SuppressWarnings("static-method") @Test public void testSubtractSelfRoot()
+  {
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          Assert.assertEquals(p.subtract(p), PathVirtual.ROOT);
+        }
+      });
   }
 }

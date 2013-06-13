@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 http://io7m.com
+ * Copyright © 2013 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,10 +16,8 @@
 
 package com.io7m.jvvfs;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -29,26 +27,128 @@ import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
 
 /**
- * Type representing virtual paths. That is, paths inside the virtual
- * filesystem created by mounting archives.
+ * <p>
+ * A virtual path represents a path in the virtual filesystem.
+ * </p>
+ * <p>
+ * Virtual paths are always absolute.
+ * </p>
+ * <p>
+ * The concrete syntax of virtual paths is given by the following EBNF grammar
+ * (where <code>name</code> indicates a string representing a valid name:
+ * </p>
  * 
- * @see PathReal
+ * <pre>
+ * path = "/" , [ name , ("/" , name)* ] ;
+ * </pre>
+ * <p>
+ * A virtual path is conceptually a list of names, with the empty list
+ * representing the root directory.
+ * </p>
+ * 
+ * @see Name#isValid(String)
  */
 
 @Immutable public final class PathVirtual implements Comparable<PathVirtual>
 {
-  public static boolean isSafe(
+  private final @Nonnull List<String>      names;
+  private final @Nonnull String            image;
+
+  /**
+   * <p>
+   * A virtual path representing the root directory.
+   * </p>
+   */
+
+  public static final @Nonnull PathVirtual ROOT;
+
+  static {
+    ROOT = new PathVirtual();
+  }
+
+  /**
+   * <p>
+   * Produce a virtual path from the list of names. The list is assumed to be
+   * in the correct order. That is, the path <code>/usr/bin/ps</code> would be
+   * represented by the list of names <code>"usr" "bin" "ps"</code>, in that
+   * order.
+   * </p>
+   * 
+   * @throws ConstraintError
+   *           Iff any of the values in <code>names</code> are not valid.
+   * @see Name#isValid(String)
+   */
+
+  public static @Nonnull PathVirtual ofNames(
+    final @Nonnull List<String> names)
+    throws ConstraintError
+  {
+    Constraints.constrainNotNull(names, "Names not null");
+    for (final String name : names) {
+      Constraints.constrainArbitrary(Name.isValid(name), "Name is valid");
+    }
+
+    return new PathVirtual(names);
+  }
+
+  /**
+   * <p>
+   * Parse the given <code>path</code> according to the EBNF grammar given at
+   * the start of this file, and produce a virtual path.
+   * </p>
+   * 
+   * @throws ConstraintError
+   *           If the given path does not conform to the given grammar (such
+   *           as being empty, not absolute, or containing a name that is not
+   *           valid).
+   * 
+   * @see Name#isValid(String)
+   */
+
+  public static @Nonnull PathVirtual ofString(
     final @Nonnull String path)
     throws ConstraintError
   {
-    Constraints.constrainNotNull(path, "path");
-    final boolean no_dots = path.contains("..") == false;
-    final boolean no_backslash = path.contains("\\") == false;
-    final boolean is_absolute = path.startsWith("/");
-    return no_dots && no_backslash && is_absolute;
+    Constraints.constrainArbitrary(path.length() > 0, "Path is not empty");
+    Constraints.constrainArbitrary(
+      path.charAt(0) == '/',
+      "Path begins with slash");
+
+    if (path.equals("/")) {
+      return PathVirtual.ROOT;
+    }
+
+    final String[] elements = path.substring(1).split("/");
+    final ArrayList<String> names = new ArrayList<String>();
+
+    for (final String name : elements) {
+      Constraints.constrainArbitrary(Name.isValid(name), "Name is valid");
+      names.add(name);
+    }
+
+    return new PathVirtual(names);
   }
 
-  private static @Nonnull String scrubPath(
+  /**
+   * <p>
+   * Normalize <code>path</code> by stripping trailing slashes and eliminating
+   * multiple consecutive slashes, and then pass the result to
+   * {@link #ofString(String)}.
+   * </p>
+   */
+
+  public static @Nonnull PathVirtual ofStringLax(
+    final @Nonnull String path)
+    throws ConstraintError
+  {
+    final String result = PathVirtual.ofStringLaxScrub(path);
+    if (result.equals("/")) {
+      return PathVirtual.ROOT;
+    }
+    return PathVirtual.ofString(result);
+  }
+
+  static @Nonnull String ofStringLaxScrub(
     final @Nonnull String path)
   {
     final String result =
@@ -56,66 +156,87 @@ import com.io7m.jaux.Constraints.ConstraintError;
     if (result.equals("")) {
       return "/";
     }
-    return result;
+    return "/" + result;
   }
-
-  private final @Nonnull ArrayList<String> components;
-  private final @Nonnull String            image;
-  public static final @Nonnull PathVirtual root = new PathVirtual();
 
   private PathVirtual()
   {
-    this.components = new ArrayList<String>();
+    this.names = new ArrayList<String>();
     this.image = "/";
   }
 
-  public PathVirtual(
-    final @Nonnull String path)
-    throws ConstraintError
+  private PathVirtual(
+    final @Nonnull List<String> p)
   {
-    Constraints.constrainArbitrary(PathVirtual.isSafe(path), "path is safe");
-    final String scrubbed = PathVirtual.scrubPath(path);
+    final int size = p.size();
+    final StringBuilder b = new StringBuilder("/");
 
-    this.components = new ArrayList<String>();
-    if (scrubbed.equals("/") == false) {
-      final List<String> parts = Arrays.asList(scrubbed.split("/"));
-      for (final String k : parts) {
-        this.components.add(k);
+    for (int index = 0; index < size; ++index) {
+      final String name = p.get(index);
+      b.append(name);
+
+      if ((index + 1) == size) {
+        // No slash
+      } else {
+        b.append("/");
       }
     }
 
-    if (this.isRoot()) {
-      this.image = "/";
-      return;
-    }
-
-    final StringBuilder builder = new StringBuilder();
-    for (final String component : this.components) {
-      builder.append("/");
-      builder.append(component);
-    }
-    this.image = builder.toString();
+    this.names = p;
+    this.image = b.toString();
   }
 
-  public @Nonnull String baseName()
+  /**
+   * <p>
+   * Append all elements of <code>p</code> to the current path, returning a
+   * new path.
+   * </p>
+   */
+
+  public @Nonnull PathVirtual append(
+    final @Nonnull PathVirtual p)
   {
-    if (this.isRoot()) {
-      return "/";
-    }
-    return this.components.get(this.components.size() - 1);
+    final ArrayList<String> new_names = new ArrayList<String>(this.names);
+    new_names.addAll(p.names);
+    return new PathVirtual(new_names);
   }
+
+  /**
+   * <p>
+   * Append the name <code>name</code> to the current path, returning a new
+   * path.
+   * </p>
+   * 
+   * @throws ConstraintError
+   *           Iff <code>name</code> is not valid.
+   * @see Name#isValid(String)
+   */
+
+  public @Nonnull PathVirtual appendName(
+    final @Nonnull String name)
+    throws ConstraintError
+  {
+    Constraints.constrainArbitrary(Name.isValid(name), "Name is valid");
+
+    final ArrayList<String> new_names = new ArrayList<String>(this.names);
+    new_names.add(name);
+    return new PathVirtual(new_names);
+  }
+
+  /**
+   * <p>
+   * Compare the image of this path with the image of the given path using
+   * {@link String#compareTo(String)}. Solely included to allow paths to be
+   * placed into ordered sets.
+   * </p>
+   */
 
   @Override public int compareTo(
-    final PathVirtual other)
+    final PathVirtual o)
   {
-    return this.toString().compareTo(other.toString());
+    return this.toString().compareTo(o.toString());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override public boolean equals(
     final Object obj)
   {
@@ -129,44 +250,108 @@ import com.io7m.jaux.Constraints.ConstraintError;
       return false;
     }
     final PathVirtual other = (PathVirtual) obj;
-    return this.toString().equals(other.toString());
+    return this.image.equals(other.image);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#hashCode()
-   */
   @Override public int hashCode()
   {
-    final int prime = 31;
-    int result = 1;
-    result = (prime * result) + this.toString().hashCode();
-    return result;
+    return this.image.hashCode();
   }
 
-  public @Nonnull String inRealNotation()
-  {
-    final String trimmed = this.toString().replaceAll("^/+", "");
-    return trimmed.replace('/', File.separatorChar);
-  }
+  /**
+   * <p>
+   * Determine whether <code>p</code> is an ancestor of the current path.
+   * </p>
+   * <p>
+   * <code>p0</code> is an ancestor of <code>p1</code> iff:
+   * </p>
+   * 
+   * <pre>
+   * p0 != p1 /\ ∃ p : PathVirtual. p0.append(p) == p1
+   * </pre>
+   */
 
-  public boolean isParentOf(
-    final @Nonnull PathVirtual other)
-    throws ConstraintError
+  public boolean isAncestorOf(
+    final @Nonnull PathVirtual p)
   {
-    Constraints.constrainNotNull(other, "other path");
+    /**
+     * Early exit: the paths are equal and therefore one cannot be the
+     * ancestor of the other.
+     */
+
+    if (this.image.equals(p.image)) {
+      return false;
+    }
+
+    /**
+     * Early exit: the current path is root, and therefore must be an ancestor
+     * of the other (given that they're not equal).
+     */
 
     if (this.isRoot()) {
       return true;
     }
 
-    final String this_image = this.toString();
-    final String other_image = other.toString();
+    /**
+     * Early exit: the other path is root, and therefore the current path
+     * cannot be an ancestor of it.
+     */
 
-    if (other_image.startsWith(this_image)) {
-      if (other_image.equals(this_image)) {
+    if (p.isRoot()) {
+      return false;
+    }
+
+    /**
+     * Otherwise, the paths may share a common prefix.
+     */
+
+    final int p0s = this.names.size();
+    final int p1s = p.names.size();
+    final int ms = Math.min(p0s, p1s);
+
+    for (int index = 0; index < ms; ++index) {
+      final String n0 = this.names.get(index);
+      final String n1 = p.names.get(index);
+      if (n0.equals(n1) == false) {
         return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * <p>
+   * Determine whether <code>p0</code> is the parent of <code>p1</code>.
+   * </p>
+   * <p>
+   * <code>p0</code> is the parent of <code>p1</code> iff:
+   * </p>
+   * 
+   * <pre>
+   * ∃ n : String. p0.appendName(n) == p1
+   * </pre>
+   */
+
+  public boolean isParentOf(
+    final @Nonnull PathVirtual p)
+  {
+    if (this.image.equals(p.image)) {
+      return false;
+    }
+
+    final int p0s = this.names.size();
+    final int p1s = p.names.size();
+
+    if ((p1s - 1) == p0s) {
+      final int ms = Math.min(p0s, p1s);
+
+      for (int index = 0; index < ms; ++index) {
+        final String n0 = this.names.get(index);
+        final String n1 = p.names.get(index);
+        if (n0.equals(n1) == false) {
+          return false;
+        }
       }
       return true;
     }
@@ -174,55 +359,49 @@ import com.io7m.jaux.Constraints.ConstraintError;
     return false;
   }
 
-  public boolean isRoot()
+  boolean isRoot()
   {
-    return this.components.size() == 0;
+    return this.names.size() == 0;
   }
 
-  public @Nonnull PathVirtual parent()
-    throws ConstraintError
-  {
-    if (this.isRoot()) {
-      return new PathVirtual("/");
-    }
+  /**
+   * Return the number of components in the current path.
+   */
 
-    final int size = this.components.size() - 1;
-    if (size > 0) {
-      final StringBuilder builder = new StringBuilder();
-      for (int index = 0; index < size; ++index) {
-        builder.append("/");
-        builder.append(this.components.get(index));
+  int length()
+  {
+    return this.names.size();
+  }
+
+  /**
+   * <p>
+   * "Subtract" the path <code>p</code> from the current path.
+   * </p>
+   * <p>
+   * The subtraction of <code>p1</code> from <code>p0</code> is defined as
+   * removing the first <code>p1.length</code> elements of <code>p0</code>, if
+   * <code>p0</code> is an ancestor of or is equal to <code>p1</code>.
+   * </p>
+   */
+
+  public @Nonnull PathVirtual subtract(
+    final @Nonnull PathVirtual other)
+  {
+    final boolean ancestor = other.isAncestorOf(this);
+    final boolean equal = other.equals(this);
+
+    if (ancestor || equal) {
+      final LinkedList<String> new_names = new LinkedList<String>(this.names);
+      for (int index = 0; index < other.names.size(); ++index) {
+        new_names.remove(0);
       }
-      return new PathVirtual(builder.toString());
+      return new PathVirtual(new_names);
     }
-    return new PathVirtual("/");
-  }
 
-  public @Nonnull List<String> pathComponents()
-  {
-    return Collections.unmodifiableList(this.components);
-  }
-
-  public PathVirtual subtract(
-    final PathVirtual other)
-    throws ConstraintError
-  {
-    if (other.isRoot()) {
-      return this;
-    }
-    if (other.isParentOf(this)) {
-      return new PathVirtual(this.toString().substring(
-        other.toString().length()));
-    }
     return this;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
-  @Override public String toString()
+  @Override public @Nonnull String toString()
   {
     return this.image;
   }

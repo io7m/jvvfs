@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 http://io7m.com
+ * Copyright © 2013 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,69 +16,27 @@
 
 package com.io7m.jvvfs;
 
-import java.io.File;
-
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import com.io7m.jaux.Constraints;
-import com.io7m.jaux.Constraints.ConstraintError;
+/**
+ * A path in the operating system's filesystem, in OS-specific syntax.
+ */
 
 /**
- * Type representing "real" paths. That is, paths to files in the real OS
- * filesystem.
+ * A real path represents a path in the real (not virtual) filesystem.
  * 
- * @see PathVirtual
+ * The concrete syntax of real paths is operating-system specific.
  */
 
 @Immutable public final class PathReal
 {
-  public final @Nonnull String value;
-
-  /**
-   * Construct a path from the given {@link String}.
-   * 
-   * @throws ConstraintError
-   *           Iff <code>path == null</code>
-   */
+  private final @Nonnull String actual;
 
   public PathReal(
-    final @Nonnull String path)
-    throws ConstraintError
+    final @Nonnull String actual)
   {
-    this.value = Constraints.constrainNotNull(path, "path");
-  }
-
-  /**
-   * Construct a path from the given {@link File}.
-   * 
-   * @throws ConstraintError
-   *           Iff <code>path == null</code>
-   * @since 2.5.0
-   */
-
-  public PathReal(
-    final @Nonnull File path)
-    throws ConstraintError
-  {
-    this.value = Constraints.constrainNotNull(path, "path").toString();
-  }
-
-  /**
-   * Concatenate a virtual path onto this real path.
-   * 
-   * @throws ConstraintError
-   *           Iff <code>path == null</code>.
-   */
-
-  public PathReal concatenate(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError
-  {
-    Constraints.constrainNotNull(path, "path");
-    return new PathReal(this.value
-      + File.separatorChar
-      + path.inRealNotation());
+    this.actual = actual;
   }
 
   @Override public boolean equals(
@@ -94,19 +52,16 @@ import com.io7m.jaux.Constraints.ConstraintError;
       return false;
     }
     final PathReal other = (PathReal) obj;
-    return this.value.equals(other.value);
+    return this.actual.equals(other.actual);
   }
 
   @Override public int hashCode()
   {
-    final int prime = 31;
-    int result = 1;
-    result = (prime * result) + (this.value.hashCode());
-    return result;
+    return this.actual.hashCode();
   }
 
   @Override public String toString()
   {
-    return this.value;
+    return this.actual;
   }
 }
