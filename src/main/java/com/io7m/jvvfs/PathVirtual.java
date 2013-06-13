@@ -253,6 +253,16 @@ import com.io7m.jaux.Constraints.ConstraintError;
     return this.image.equals(other.image);
   }
 
+  /**
+   * Retrieve the component of the path at <code>index</code>, if any.
+   */
+
+  String getUnsafe(
+    final int index)
+  {
+    return this.names.get(index);
+  }
+
   @Override public int hashCode()
   {
     return this.image.hashCode();

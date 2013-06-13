@@ -91,19 +91,19 @@ public final class PathVirtualTest
     }
   }
 
-  private static void runWithGenerator(
+  static void runWithGenerator(
     final Characteristic<PathVirtual> c)
   {
     QuickCheck.forAll(new PathVirtualGenerator(), c);
   }
 
-  private static void runWithNameListGenerator(
+  static void runWithNameListGenerator(
     final Characteristic<List<String>> c)
   {
     QuickCheck.forAll(new NameTest.ValidNameListGenerator(), c);
   }
 
-  private static void runWithPairGenerator(
+  static void runWithPairGenerator(
     final Characteristic<Pair<PathVirtual, PathVirtual>> c)
   {
     QuickCheck.forAll(new PathVirtualPairGenerator(), c);
