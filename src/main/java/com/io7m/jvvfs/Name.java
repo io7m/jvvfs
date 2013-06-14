@@ -30,11 +30,6 @@ import com.io7m.jaux.UnreachableCodeException;
 
 public final class Name
 {
-  private Name()
-  {
-    throw new UnreachableCodeException();
-  }
-
   /**
    * <p>
    * Determine whether or not the given <code>name</code> is valid.
@@ -95,5 +90,10 @@ public final class Name
     }
 
     return true;
+  }
+
+  private Name()
+  {
+    throw new UnreachableCodeException();
   }
 }

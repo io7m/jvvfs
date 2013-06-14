@@ -16,46 +16,39 @@
 
 package com.io7m.jvvfs;
 
+import javax.annotation.Nonnull;
+
 import net.java.quickcheck.characteristic.AbstractCharacteristic;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.functional.Pair;
+import com.io7m.jvvfs.FileReference.Type;
 
-public class PathVirtualEnumTest
+public final class FileReferenceTest
 {
-  @SuppressWarnings("static-method") @Test public void testEnumeration()
+  @SuppressWarnings("static-method") @Test public void testToString()
   {
     PathVirtualTest
-      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+      .runWithPairGenerator(new AbstractCharacteristic<Pair<PathVirtual, PathVirtual>>() {
         @Override protected void doSpecify(
-          final PathVirtual p)
+          final @Nonnull Pair<PathVirtual, PathVirtual> pair)
           throws Throwable
         {
-          final PathVirtualEnum e = new PathVirtualEnum(p);
+          final FileReference r0 =
+            new FileReference(
+              new ArchiveIdentity(),
+              pair.first,
+              Type.TYPE_FILE);
+          final FileReference r1 =
+            new FileReference(
+              new ArchiveIdentity(),
+              pair.second,
+              Type.TYPE_FILE);
 
-          System.out.println("Enumerating " + p);
-
-          int count = 0;
-          while (e.hasMoreElements()) {
-            final PathVirtual k = e.nextElement();
-            System.out.println(String.format(
-              "enum %d: %s",
-              Integer.valueOf(count),
-              k));
-            ++count;
-          }
-
-          Assert.assertEquals(p.length(), count);
+          Assert.assertFalse(r0.toString().equals(r1.toString()));
         }
       });
-  }
-
-  @SuppressWarnings("static-method") @Test public void testEnumerationRoot()
-    throws ConstraintError
-  {
-    final PathVirtualEnum e = new PathVirtualEnum(PathVirtual.ROOT);
-    Assert.assertFalse(e.hasMoreElements());
   }
 }

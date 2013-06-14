@@ -100,43 +100,18 @@ final class TestData
     }
   }
 
-  static void deleteOnExit(
-    final @Nonnull File file)
-  {
-    System.err.println("test-data: Marking for deletion: " + file);
-    file.deleteOnExit();
-  }
-
-  @SuppressWarnings("resource") static Log getLog()
-    throws IOException
-  {
-    InputStream stream = null;
-
-    try {
-      stream =
-        TestData.class.getResourceAsStream(TestData
-          .resourcePath("io7m-jvvfs.properties"));
-
-      final Properties properties = new Properties();
-      properties.load(stream);
-      return new Log(properties, "com.io7m.jvvfs", "main");
-    } finally {
-      stream.close();
-    }
-  }
-
   /**
    * A list of zip files that should be copied to the filesystem.
    */
 
-  private static @Nonnull Set<String>         zip_list;
+  private static @Nonnull Set<String>             zip_list;
 
   /**
    * A mapping from zip file names to the names of the directories to which
    * they will be unpacked.
    */
 
-  private static @Nonnull Map<String, String> zip_unpack_map;
+  private static @Nonnull Map<String, String>     zip_unpack_map;
 
   static {
     TestData.zip_list = new HashSet<String>();
@@ -161,47 +136,11 @@ final class TestData
   }
 
   /**
-   * Copy the contents of stream <code>input<code> to <code>output</code>.
+   * The current test data directory. Initialized by
+   * {@link #getTestDataDirectory()}.
    */
 
-  private static void copyStreams(
-    final @Nonnull InputStream input,
-    final @Nonnull OutputStream output)
-    throws IOException
-  {
-    final byte buffer[] = new byte[8192];
-
-    for (;;) {
-      final int r = input.read(buffer);
-      if (r == -1) {
-        output.flush();
-        return;
-      }
-      output.write(buffer, 0, r);
-    }
-  }
-
-  /**
-   * Copy the contents of <code>stream</code> to the file <code>out</code>.
-   */
-
-  @SuppressWarnings("resource") private static void copyStreamOut(
-    final @Nonnull InputStream input,
-    final @Nonnull File out)
-    throws FileNotFoundException,
-      IOException
-  {
-    FileOutputStream stream = null;
-
-    try {
-      stream = new FileOutputStream(out);
-      TestData.copyStreams(input, stream);
-    } finally {
-      if (stream != null) {
-        stream.close();
-      }
-    }
-  }
+  private static @CheckForNull TemporaryDirectory test_data_directory;
 
   /**
    * Copy the resource <code>name</code> to the file <code>out</code>.
@@ -228,10 +167,47 @@ final class TestData
     }
   }
 
-  private static @Nonnull String resourcePath(
-    final @Nonnull String file)
+  /**
+   * Copy the contents of <code>stream</code> to the file <code>out</code>.
+   */
+
+  @SuppressWarnings("resource") private static void copyStreamOut(
+    final @Nonnull InputStream input,
+    final @Nonnull File out)
+    throws FileNotFoundException,
+      IOException
   {
-    return "/com/io7m/jvvfs/" + file;
+    FileOutputStream stream = null;
+
+    try {
+      stream = new FileOutputStream(out);
+      TestData.copyStreams(input, stream);
+    } finally {
+      if (stream != null) {
+        stream.close();
+      }
+    }
+  }
+
+  /**
+   * Copy the contents of stream <code>input<code> to <code>output</code>.
+   */
+
+  private static void copyStreams(
+    final @Nonnull InputStream input,
+    final @Nonnull OutputStream output)
+    throws IOException
+  {
+    final byte buffer[] = new byte[8192];
+
+    for (;;) {
+      final int r = input.read(buffer);
+      if (r == -1) {
+        output.flush();
+        return;
+      }
+      output.write(buffer, 0, r);
+    }
   }
 
   /**
@@ -280,6 +256,52 @@ final class TestData
     }
   }
 
+  static void deleteOnExit(
+    final @Nonnull File file)
+  {
+    System.err.println("test-data: Marking for deletion: " + file);
+    file.deleteOnExit();
+  }
+
+  @SuppressWarnings("resource") static Log getLog()
+    throws IOException
+  {
+    InputStream stream = null;
+
+    try {
+      stream =
+        TestData.class.getResourceAsStream(TestData
+          .resourcePath("io7m-jvvfs.properties"));
+
+      final Properties properties = new Properties();
+      properties.load(stream);
+      return new Log(properties, "com.io7m.jvvfs", "main");
+    } finally {
+      stream.close();
+    }
+  }
+
+  /**
+   * Return the name of the temporary test data directory, creating it
+   * unpacking test data into it, if necessary.
+   */
+
+  public static @Nonnull File getTestDataDirectory()
+    throws FileNotFoundException,
+      IOException
+  {
+    if (TestData.test_data_directory == null) {
+      TestData.test_data_directory = TestData.unpackTestData();
+    }
+    return TestData.test_data_directory.getFile();
+  }
+
+  private static @Nonnull String resourcePath(
+    final @Nonnull String file)
+  {
+    return "/com/io7m/jvvfs/" + file;
+  }
+
   /**
    * Unpack all zip files given in the resource lists above to a temporary
    * directory prior to test execution.
@@ -320,27 +342,5 @@ final class TestData
     }
 
     return d;
-  }
-
-  /**
-   * The current test data directory. Initialized by
-   * {@link #getTestDataDirectory()}.
-   */
-
-  private static @CheckForNull TemporaryDirectory test_data_directory;
-
-  /**
-   * Return the name of the temporary test data directory, creating it
-   * unpacking test data into it, if necessary.
-   */
-
-  public static @Nonnull File getTestDataDirectory()
-    throws FileNotFoundException,
-      IOException
-  {
-    if (TestData.test_data_directory == null) {
-      TestData.test_data_directory = TestData.unpackTestData();
-    }
-    return TestData.test_data_directory.getFile();
   }
 }

@@ -113,24 +113,6 @@ public class PathRealTest
     });
   }
 
-  @SuppressWarnings("static-method") @Test public void testToString()
-  {
-    final StringGenerator gen =
-      new StringGenerator(
-        new IntegerGenerator(1, 16),
-        new CharacterGenerator());
-
-    QuickCheck.forAll(gen, new AbstractCharacteristic<String>() {
-      @Override protected void doSpecify(
-        final String s)
-        throws Throwable
-      {
-        final PathReal p = new PathReal(s);
-        Assert.assertFalse(p.equals(p.toString()));
-      }
-    });
-  }
-
   @SuppressWarnings("static-method") @Test public void testHashcodeEquals()
   {
     final StringGenerator gen =
@@ -146,6 +128,24 @@ public class PathRealTest
         final PathReal p0 = new PathReal(s);
         final PathReal p1 = new PathReal(s);
         Assert.assertEquals(p0.hashCode(), p1.hashCode());
+      }
+    });
+  }
+
+  @SuppressWarnings("static-method") @Test public void testToString()
+  {
+    final StringGenerator gen =
+      new StringGenerator(
+        new IntegerGenerator(1, 16),
+        new CharacterGenerator());
+
+    QuickCheck.forAll(gen, new AbstractCharacteristic<String>() {
+      @Override protected void doSpecify(
+        final String s)
+        throws Throwable
+      {
+        final PathReal p = new PathReal(s);
+        Assert.assertFalse(p.equals(p.toString()));
       }
     });
   }

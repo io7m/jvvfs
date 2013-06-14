@@ -55,4 +55,15 @@ import com.io7m.jaux.Constraints.ConstraintError;
     this.path = Constraints.constrainNotNull(path, "path");
     this.type = Constraints.constrainNotNull(type, "type");
   }
+
+  @Override public String toString()
+  {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("[FileReference ");
+    builder.append(this.type);
+    builder.append(" ");
+    builder.append(this.path);
+    builder.append("]");
+    return builder.toString();
+  }
 }

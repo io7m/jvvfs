@@ -16,8 +16,10 @@
 
 package com.io7m.jvvfs;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.functional.Option;
 
 /**
@@ -43,6 +45,15 @@ abstract class Archive
 {
   /**
    * <p>
+   * Close the archive, freeing any resources used.
+   * </p>
+   */
+
+  abstract void close()
+    throws FilesystemError;
+
+  /**
+   * <p>
    * The path at which the archive is mounted.
    * </p>
    */
@@ -55,9 +66,56 @@ abstract class Archive
    * "primitive" operation; all other functions should use <code>lookup</code>
    * internally in order to provide consistent semantics.
    * </p>
+   * 
+   * @throws ConstraintError
+   *           If <code>path == null</code>.
    */
 
-  abstract @Nonnull Option<FileReference> lookup(
+  final @Nonnull Option<FileReference> lookup(
     final @Nonnull PathVirtual path)
-    throws FilesystemError;
+    throws FilesystemError,
+      ConstraintError
+  {
+    final PathVirtualEnum e = new PathVirtualEnum(path);
+    while (e.hasMoreElements()) {
+      final PathVirtual p = e.nextElement();
+      final FileReference r = this.lookupActual(p);
+      if (r == null) {
+        return new Option.None<FileReference>();
+      }
+      switch (r.type) {
+        case TYPE_DIRECTORY:
+        {
+          break;
+        }
+        case TYPE_FILE:
+        {
+          throw FilesystemError.notDirectory(p.toString());
+        }
+      }
+    }
+
+    final FileReference r = this.lookupActual(path);
+    if (r == null) {
+      return new Option.None<FileReference>();
+    }
+
+    return new Option.Some<FileReference>(r);
+  }
+
+  /**
+   * <p>
+   * Retrieve a reference to the object at the given path directly, without
+   * inspecting any ancestors of the given path.
+   * </p>
+   * 
+   * @return A reference to the filesystem object at <code>path</code>,
+   *         <code>null</code> if no object exists at <code>path</code>.
+   * @throws ConstraintError
+   *           If <code>path == null</code>.
+   */
+
+  abstract @CheckForNull FileReference lookupActual(
+    final @Nonnull PathVirtual path)
+    throws ConstraintError;
 }

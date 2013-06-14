@@ -16,61 +16,64 @@
 
 package com.io7m.jvvfs;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.io.File;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnreachableCodeException;
+import com.io7m.jvvfs.FileReference.Type;
 
 /**
  * <p>
- * The sequential enumeration of the ancestors of a path is defined as a list
- * of the prefixes of the path, with the first element being the shortest (the
- * root).
+ * Archive based on standard filesystem/directory operations.
  * </p>
+ * 
  * <p>
  * Values of this type cannot be accessed safely from multiple threads without
  * explicit synchronization.
  * </p>
  */
 
-@NotThreadSafe public final class PathVirtualEnum implements
-  Enumeration<PathVirtual>
+@NotThreadSafe final class ArchiveDirectory extends Archive
 {
-  private final @Nonnull PathVirtual       path;
-  private final @Nonnull ArrayList<String> names;
-  private int                              index = -1;
+  private final @Nonnull File        base;
+  private final @Nonnull PathVirtual mount;
 
-  PathVirtualEnum(
+  ArchiveDirectory(
+    final @Nonnull PathReal base_path,
+    final @Nonnull PathVirtual mount)
+    throws ConstraintError
+  {
+    this.mount = Constraints.constrainNotNull(mount, "Mount path");
+    this.base = new File(base_path.toString());
+  }
+
+  @Override void close()
+    throws FilesystemError
+  {
+    // Nothing required
+  }
+
+  @Override @Nonnull PathVirtual getMountPath()
+  {
+    return this.mount;
+  }
+
+  @Override @CheckForNull FileReference lookupActual(
     final @Nonnull PathVirtual path)
     throws ConstraintError
   {
-    this.path = Constraints.constrainNotNull(path, "Path");
-    this.names = new ArrayList<String>();
-  }
-
-  @Override public boolean hasMoreElements()
-  {
-    return this.index < (this.path.length() - 1);
-  }
-
-  @Override public PathVirtual nextElement()
-  {
-    try {
-      if (this.index == -1) {
-        return PathVirtual.ROOT;
-      }
-
-      this.names.add(this.path.getUnsafe(this.index));
-      return PathVirtual.ofNames(this.names);
-    } catch (final ConstraintError e) {
-      throw new UnreachableCodeException();
-    } finally {
-      ++this.index;
+    final File f = new File(this.base, path.toString());
+    if (f.exists()) {
+      final FileReference r =
+        new FileReference(this, path, f.isDirectory()
+          ? Type.TYPE_DIRECTORY
+          : Type.TYPE_FILE);
+      return r;
     }
+    return null;
   }
 }
