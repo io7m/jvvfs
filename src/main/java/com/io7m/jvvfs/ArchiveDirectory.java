@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -78,13 +80,22 @@ import com.io7m.jvvfs.FileReference.Type;
     // Nothing required
   }
 
-  @Override long fileSizeActual(
+  @Override long getFileSizeActual(
     final @Nonnull FileReference<ArchiveDirectoryKind> r)
     throws FilesystemError,
       ConstraintError
   {
     final ArchiveDirectoryReference ra = (ArchiveDirectoryReference) r;
     return ra.actual.length();
+  }
+
+  @Override @Nonnull Calendar getModificationTimeActual(
+    final @Nonnull FileReference<ArchiveDirectoryKind> r)
+  {
+    final ArchiveDirectoryReference ra = (ArchiveDirectoryReference) r;
+    final Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    c.setTimeInMillis(ra.actual.lastModified());
+    return c;
   }
 
   @Override @Nonnull PathVirtual getMountPath()

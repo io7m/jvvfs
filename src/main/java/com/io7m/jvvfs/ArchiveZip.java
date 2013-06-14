@@ -18,7 +18,9 @@ package com.io7m.jvvfs;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -107,13 +109,22 @@ import com.io7m.jvvfs.FileReference.Type;
     return null;
   }
 
-  @Override long fileSizeActual(
+  @Override long getFileSizeActual(
     final @Nonnull FileReference<ArchiveZipKind> r)
     throws FilesystemError,
       ConstraintError
   {
     final ArchiveZipReference ra = (ArchiveZipReference) r;
     return ra.actual.getSize();
+  }
+
+  @Override @Nonnull Calendar getModificationTimeActual(
+    final FileReference<ArchiveZipKind> r)
+  {
+    final ArchiveZipReference ra = (ArchiveZipReference) r;
+    final Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    c.setTimeInMillis(ra.actual.getTime());
+    return c;
   }
 
   @Override @Nonnull PathVirtual getMountPath()

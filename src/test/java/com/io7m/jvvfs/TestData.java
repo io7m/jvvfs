@@ -171,7 +171,7 @@ final class TestData
    * Copy the contents of <code>stream</code> to the file <code>out</code>.
    */
 
-  @SuppressWarnings("resource") private static void copyStreamOut(
+  private static void copyStreamOut(
     final @Nonnull InputStream input,
     final @Nonnull File out)
     throws FileNotFoundException,
@@ -226,6 +226,8 @@ final class TestData
         return;
       }
 
+      final long time = entry.getTime();
+
       final File output_file = new File(outdir, entry.getName());
       if (entry.isDirectory()) {
         System.err.println("test-data: unzip: Creating directory "
@@ -249,6 +251,33 @@ final class TestData
 
         System.err.println("test-data: unzip: Creating file " + output_file);
         TestData.copyStreamOut(zip_stream, output_file);
+      }
+
+      /**
+       * Force modification time to match that of the zip file.
+       */
+
+      System.err.println("test-data: unzip: Setting time to "
+        + time
+        + " on file "
+        + output_file);
+      if (output_file.setLastModified(time) == false) {
+        throw new IOException(
+          "test-data: unzip: could not set time on file: " + output_file);
+      }
+
+      /**
+       * Reset the modification time of the parent directory.
+       */
+
+      final File parent = output_file.getParentFile();
+      System.err.println("test-data: unzip: Setting time to "
+        + time
+        + " on parent directory "
+        + parent);
+      if (parent.setLastModified(time) == false) {
+        throw new IOException(
+          "test-data: unzip: could not set time on directory: " + parent);
       }
 
       TestData.deleteOnExit(output_file);
@@ -307,11 +336,9 @@ final class TestData
    * directory prior to test execution.
    */
 
-  @SuppressWarnings("resource") static @Nonnull
-    TemporaryDirectory
-    unpackTestData()
-      throws FileNotFoundException,
-        IOException
+  static @Nonnull TemporaryDirectory unpackTestData()
+    throws FileNotFoundException,
+      IOException
   {
     final TemporaryDirectory d = new TemporaryDirectory();
     final File outdir = d.getFile();

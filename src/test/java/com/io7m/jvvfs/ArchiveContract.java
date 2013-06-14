@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Calendar;
 
 import javax.annotation.Nonnull;
 
@@ -62,7 +63,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
     try {
       final PathVirtual p = PathVirtual.ofString("/file.txt");
-      final long s = a.fileSize(p);
+      final long s = a.getFileSize(p);
       Assert.assertEquals(15, s);
     } finally {
       a.close();
@@ -80,7 +81,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
     try {
       final PathVirtual p = PathVirtual.ofString("/nonexistent");
-      a.fileSize(p);
+      a.getFileSize(p);
     } catch (final FilesystemError e) {
       Assert.assertEquals(FilesystemError.Code.FS_ERROR_NONEXISTENT, e.code);
       throw e;
@@ -100,7 +101,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
     try {
       final PathVirtual p = PathVirtual.ofString("/nonexistent/file.txt");
-      a.fileSize(p);
+      a.getFileSize(p);
     } catch (final FilesystemError e) {
       Assert.assertEquals(FilesystemError.Code.FS_ERROR_NONEXISTENT, e.code);
       throw e;
@@ -119,7 +120,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
     try {
       final PathVirtual p = PathVirtual.ofString("/subdir");
-      a.fileSize(p);
+      a.getFileSize(p);
     } catch (final FilesystemError e) {
       Assert.assertEquals(FilesystemError.Code.FS_ERROR_NOT_A_FILE, e.code);
       throw e;
@@ -139,11 +140,78 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
     try {
       final PathVirtual p = PathVirtual.ofString("/file.txt/file.txt");
-      a.fileSize(p);
+      a.getFileSize(p);
     } catch (final FilesystemError e) {
       Assert.assertEquals(
         FilesystemError.Code.FS_ERROR_NOT_A_DIRECTORY,
         e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test public void testFileTimeDirectory()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/subdir");
+      final Calendar c = a.getModificationTime(p);
+
+      Assert.assertEquals(2012, c.get(Calendar.YEAR));
+      Assert.assertEquals(0, c.get(Calendar.MONTH));
+      Assert.assertEquals(23, c.get(Calendar.DAY_OF_MONTH));
+      Assert.assertEquals(21, c.get(Calendar.HOUR_OF_DAY));
+      Assert.assertEquals(50, c.get(Calendar.MINUTE));
+      Assert.assertEquals(42, c.get(Calendar.SECOND));
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test public void testFileTimeFile()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/file.txt");
+      final Calendar c = a.getModificationTime(p);
+
+      Assert.assertEquals(2012, c.get(Calendar.YEAR));
+      Assert.assertEquals(0, c.get(Calendar.MONTH));
+      Assert.assertEquals(23, c.get(Calendar.DAY_OF_MONTH));
+      Assert.assertEquals(21, c.get(Calendar.HOUR_OF_DAY));
+      Assert.assertEquals(50, c.get(Calendar.MINUTE));
+      Assert.assertEquals(10, c.get(Calendar.SECOND));
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFileTimeNonexistent()
+      throws FileNotFoundException,
+        IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/nonexistent");
+      a.getModificationTime(p);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
       throw e;
     } finally {
       a.close();

@@ -17,6 +17,7 @@
 package com.io7m.jvvfs;
 
 import java.io.InputStream;
+import java.util.Calendar;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -70,7 +71,7 @@ abstract class Archive<T extends ArchiveKind>
    *           </ul>
    */
 
-  final long fileSize(
+  final long getFileSize(
     final @Nonnull PathVirtual path)
     throws FilesystemError,
       ConstraintError
@@ -93,7 +94,7 @@ abstract class Archive<T extends ArchiveKind>
           }
           case TYPE_FILE:
           {
-            return this.fileSizeActual(ar);
+            return this.getFileSizeActual(ar);
           }
         }
         break;
@@ -117,10 +118,62 @@ abstract class Archive<T extends ArchiveKind>
    *           </ul>
    */
 
-  abstract long fileSizeActual(
+  abstract long getFileSizeActual(
     final @Nonnull FileReference<T> r)
     throws FilesystemError,
       ConstraintError;
+
+  /**
+   * <p>
+   * Retrieve the modification time of the file or directory at
+   * <code>path</code>.
+   * </p>
+   * 
+   * @throws FilesystemError
+   *           If:
+   *           <ul>
+   *           <li>No object exists at <code>r</code>.</li>
+   *           <li>An I/O error occurs.</li>
+   *           </ul>
+   */
+
+  final @Nonnull Calendar getModificationTime(
+    final @Nonnull PathVirtual path)
+    throws FilesystemError,
+      ConstraintError
+  {
+    final Option<FileReference<T>> ro = this.lookup(path);
+    switch (ro.type) {
+      case OPTION_NONE:
+      {
+        throw FilesystemError.fileNotFound(path.toString());
+      }
+      case OPTION_SOME:
+      {
+        final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) ro;
+        return this.getModificationTimeActual(s.value);
+      }
+    }
+
+    throw new UnreachableCodeException();
+  }
+
+  /**
+   * <p>
+   * Retrieve the modification time of the object at the given reference
+   * <code>r</code>.
+   * </p>
+   * 
+   * @throws FilesystemError
+   *           If:
+   *           <ul>
+   *           <li>No object exists at <code>r</code>.</li>
+   *           <li>An I/O error occurs.</li>
+   *           </ul>
+   */
+
+  abstract @Nonnull Calendar getModificationTimeActual(
+    final @Nonnull FileReference<T> r);
 
   /**
    * <p>
