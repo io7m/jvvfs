@@ -45,7 +45,7 @@ import com.io7m.jvvfs.FileReference.Type;
 @NotThreadSafe final class ArchiveDirectory extends
   Archive<ArchiveDirectoryKind>
 {
-  private static final class ArchiveDirectoryReference extends
+  static final class ArchiveDirectoryReference extends
     FileReference<ArchiveDirectoryKind>
   {
     final @Nonnull File actual;

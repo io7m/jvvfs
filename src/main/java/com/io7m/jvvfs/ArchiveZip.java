@@ -45,7 +45,7 @@ import com.io7m.jvvfs.FileReference.Type;
 
 @NotThreadSafe final class ArchiveZip extends Archive<ArchiveZipKind>
 {
-  private static final class ArchiveZipReference extends
+  static final class ArchiveZipReference extends
     FileReference<ArchiveZipKind>
   {
     /** <code>null</code> iff <code>path.isRoot()</code>. */

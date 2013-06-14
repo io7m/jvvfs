@@ -22,7 +22,13 @@ import java.io.IOException;
 
 import javax.annotation.Nonnull;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jvvfs.ArchiveDirectory.ArchiveDirectoryReference;
+import com.io7m.jvvfs.FileReference.Type;
+import com.io7m.jvvfs.FilesystemError.Code;
 
 public final class ArchiveDirectoryTest extends
   ArchiveContract<ArchiveDirectoryKind>
@@ -37,5 +43,32 @@ public final class ArchiveDirectoryTest extends
     final File tempdir = TestData.getTestDataDirectory();
     final PathReal r = new PathReal(new File(tempdir, basename).toString());
     return new ArchiveDirectory(r, mount);
+  }
+
+  @Test(expected = FilesystemError.class) public void testFileVanished()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Archive<ArchiveDirectoryKind> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/file.txt");
+
+      final ArchiveDirectoryReference r =
+        new ArchiveDirectory.ArchiveDirectoryReference(
+          a,
+          p,
+          Type.TYPE_FILE,
+          new File("/nonexistent"));
+
+      a.openFileActual(r);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
   }
 }
