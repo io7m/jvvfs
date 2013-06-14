@@ -37,8 +37,26 @@ import com.io7m.jvvfs.FileReference.Type;
  * </p>
  */
 
-@NotThreadSafe final class ArchiveDirectory extends Archive
+@NotThreadSafe final class ArchiveDirectory extends
+  Archive<ArchiveDirectoryKind>
 {
+  private static final class ArchiveDirectoryReference extends
+    FileReference<ArchiveDirectoryKind>
+  {
+    final @Nonnull File actual;
+
+    ArchiveDirectoryReference(
+      final @Nonnull Archive<ArchiveDirectoryKind> archive,
+      final @Nonnull PathVirtual path,
+      final @Nonnull Type type,
+      final @Nonnull File actual)
+      throws ConstraintError
+    {
+      super(archive, path, type);
+      this.actual = actual;
+    }
+  }
+
   private final @Nonnull File        base;
   private final @Nonnull PathVirtual mount;
 
@@ -57,21 +75,30 @@ import com.io7m.jvvfs.FileReference.Type;
     // Nothing required
   }
 
+  @Override long fileSizeActual(
+    final @Nonnull FileReference<ArchiveDirectoryKind> r)
+    throws FilesystemError,
+      ConstraintError
+  {
+    final ArchiveDirectoryReference ra = (ArchiveDirectoryReference) r;
+    return ra.actual.length();
+  }
+
   @Override @Nonnull PathVirtual getMountPath()
   {
     return this.mount;
   }
 
-  @Override @CheckForNull FileReference lookupActual(
+  @Override @CheckForNull FileReference<ArchiveDirectoryKind> lookupActual(
     final @Nonnull PathVirtual path)
     throws ConstraintError
   {
     final File f = new File(this.base, path.toString());
     if (f.exists()) {
-      final FileReference r =
-        new FileReference(this, path, f.isDirectory()
+      final FileReference<ArchiveDirectoryKind> r =
+        new ArchiveDirectoryReference(this, path, f.isDirectory()
           ? Type.TYPE_DIRECTORY
-          : Type.TYPE_FILE);
+          : Type.TYPE_FILE, f);
       return r;
     }
     return null;

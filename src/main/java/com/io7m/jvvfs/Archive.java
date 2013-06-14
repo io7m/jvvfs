@@ -20,7 +20,9 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.UnreachableCodeException;
 import com.io7m.jaux.functional.Option;
+import com.io7m.jaux.functional.Option.Some;
 
 /**
  * <p>
@@ -41,7 +43,7 @@ import com.io7m.jaux.functional.Option;
  * </p>
  */
 
-abstract class Archive
+abstract class Archive<T extends ArchiveKind>
 {
   /**
    * <p>
@@ -62,6 +64,72 @@ abstract class Archive
 
   /**
    * <p>
+   * Retrieve the size of the file at <code>path</code>.
+   * </p>
+   * 
+   * @throws FilesystemError
+   *           If:
+   *           <ul>
+   *           <li>No object exists at <code>path</code>.</li>
+   *           <li>The object at <code>path</code> is not a file</li>
+   *           <li>An I/O error occurs</li>
+   *           </ul>
+   */
+
+  final long fileSize(
+    final @Nonnull PathVirtual path)
+    throws FilesystemError,
+      ConstraintError
+  {
+    final Option<FileReference<T>> ro = this.lookup(path);
+    switch (ro.type) {
+      case OPTION_NONE:
+      {
+        throw FilesystemError.fileNotFound(path.toString());
+      }
+      case OPTION_SOME:
+      {
+        final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) ro;
+        final FileReference<T> ar = s.value;
+
+        switch (s.value.type) {
+          case TYPE_DIRECTORY:
+          {
+            throw FilesystemError.notFile(path.toString());
+          }
+          case TYPE_FILE:
+          {
+            return this.fileSizeActual(ar);
+          }
+        }
+        break;
+      }
+    }
+
+    throw new UnreachableCodeException();
+  }
+
+  /**
+   * <p>
+   * Retrieve the size of the file at the given reference <code>r</code>.
+   * </p>
+   * 
+   * @throws FilesystemError
+   *           If:
+   *           <ul>
+   *           <li>No object exists at <code>path</code>.</li>
+   *           <li>The object at <code>path</code> is not a file</li>
+   *           <li>An I/O error occurs</li>
+   *           </ul>
+   */
+
+  abstract long fileSizeActual(
+    final @Nonnull FileReference<T> r)
+    throws FilesystemError,
+      ConstraintError;
+
+  /**
+   * <p>
    * Retrieve a reference to the object at the given path. This is a
    * "primitive" operation; all other functions should use <code>lookup</code>
    * internally in order to provide consistent semantics.
@@ -71,7 +139,7 @@ abstract class Archive
    *           If <code>path == null</code>.
    */
 
-  final @Nonnull Option<FileReference> lookup(
+  final @Nonnull Option<FileReference<T>> lookup(
     final @Nonnull PathVirtual path)
     throws FilesystemError,
       ConstraintError
@@ -79,9 +147,9 @@ abstract class Archive
     final PathVirtualEnum e = new PathVirtualEnum(path);
     while (e.hasMoreElements()) {
       final PathVirtual p = e.nextElement();
-      final FileReference r = this.lookupActual(p);
+      final FileReference<T> r = this.lookupActual(p);
       if (r == null) {
-        return new Option.None<FileReference>();
+        return new Option.None<FileReference<T>>();
       }
       switch (r.type) {
         case TYPE_DIRECTORY:
@@ -95,12 +163,12 @@ abstract class Archive
       }
     }
 
-    final FileReference r = this.lookupActual(path);
+    final FileReference<T> r = this.lookupActual(path);
     if (r == null) {
-      return new Option.None<FileReference>();
+      return new Option.None<FileReference<T>>();
     }
 
-    return new Option.Some<FileReference>(r);
+    return new Option.Some<FileReference<T>>(r);
   }
 
   /**
@@ -115,7 +183,7 @@ abstract class Archive
    *           If <code>path == null</code>.
    */
 
-  abstract @CheckForNull FileReference lookupActual(
+  abstract @CheckForNull FileReference<T> lookupActual(
     final @Nonnull PathVirtual path)
     throws ConstraintError;
 }

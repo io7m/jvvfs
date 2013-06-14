@@ -28,12 +28,17 @@ import com.io7m.jaux.Constraints.ConstraintError;
  * A reference to a file inside an archive.
  * </p>
  * <p>
+ * The type parameter <code>T</code> is used as a phantom type to distinguish
+ * between references from different archive implementations at the type
+ * level.
+ * </p>
+ * <p>
  * Values of this type cannot be accessed safely from multiple threads without
  * explicit synchronization.
  * </p>
  */
 
-@NotThreadSafe final class FileReference
+@NotThreadSafe abstract class FileReference<T extends ArchiveKind>
 {
   static enum Type
   {
@@ -41,12 +46,12 @@ import com.io7m.jaux.Constraints.ConstraintError;
     TYPE_DIRECTORY
   }
 
-  final @CheckForNull Archive       archive;
+  final @CheckForNull Archive<T>    archive;
   final @Nonnull PathVirtual        path;
   final @Nonnull FileReference.Type type;
 
   FileReference(
-    final @CheckForNull Archive archive,
+    final @CheckForNull Archive<T> archive,
     final @Nonnull PathVirtual path,
     final @Nonnull FileReference.Type type)
     throws ConstraintError
@@ -56,7 +61,7 @@ import com.io7m.jaux.Constraints.ConstraintError;
     this.type = Constraints.constrainNotNull(type, "type");
   }
 
-  @Override public String toString()
+  @Override public final String toString()
   {
     final StringBuilder builder = new StringBuilder();
     builder.append("[FileReference ");

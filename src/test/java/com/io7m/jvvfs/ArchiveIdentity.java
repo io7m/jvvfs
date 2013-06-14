@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.UnimplementedCodeException;
 
-final class ArchiveIdentity extends Archive
+final class ArchiveIdentity extends Archive<ArchiveKind>
 {
   @Override void close()
     throws FilesystemError
@@ -37,9 +37,18 @@ final class ArchiveIdentity extends Archive
     throw new UnimplementedCodeException();
   }
 
-  @Override @CheckForNull FileReference lookupActual(
-    @Nonnull final PathVirtual path)
+  @Override @CheckForNull FileReference<ArchiveKind> lookupActual(
+    final @Nonnull PathVirtual path)
     throws ConstraintError
+  {
+    // TODO Auto-generated method stub
+    throw new UnimplementedCodeException();
+  }
+
+  @Override long fileSizeActual(
+    final @Nonnull FileReference<ArchiveKind> r)
+    throws FilesystemError,
+      ConstraintError
   {
     // TODO Auto-generated method stub
     throw new UnimplementedCodeException();

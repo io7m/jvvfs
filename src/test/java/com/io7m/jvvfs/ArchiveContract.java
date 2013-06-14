@@ -29,7 +29,7 @@ import com.io7m.jaux.functional.Option;
 import com.io7m.jaux.functional.Option.Some;
 import com.io7m.jvvfs.FileReference.Type;
 
-public abstract class ArchiveContract
+public abstract class ArchiveContract<T extends ArchiveKind>
 {
   /**
    * Retrieve a reference to the test archive named <code>basename</code>.
@@ -42,12 +42,133 @@ public abstract class ArchiveContract
    * @throws ConstraintError
    */
 
-  abstract @Nonnull Archive getArchive(
+  abstract @Nonnull Archive<T> getArchive(
     final @Nonnull String basename,
     final @Nonnull PathVirtual mount)
     throws FileNotFoundException,
       IOException,
       ConstraintError;
+
+  @Test public void testFileSizeFile()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/file.txt");
+      final long s = a.fileSize(p);
+      Assert.assertEquals(15, s);
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFileSizeNonexistent()
+      throws FileNotFoundException,
+        IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/nonexistent");
+      a.fileSize(p);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(FilesystemError.Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFileSizeNonexistentParent()
+      throws FileNotFoundException,
+        IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/nonexistent/file.txt");
+      a.fileSize(p);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(FilesystemError.Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public void testFileSizeNotFile()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/subdir");
+      a.fileSize(p);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(FilesystemError.Code.FS_ERROR_NOT_A_FILE, e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testFileSizeParentNotDirectory()
+      throws FileNotFoundException,
+        IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/file.txt/file.txt");
+      a.fileSize(p);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(
+        FilesystemError.Code.FS_ERROR_NOT_A_DIRECTORY,
+        e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test public void testLookupSingleDirectory()
+    throws FilesystemError,
+      ConstraintError,
+      FileNotFoundException,
+      IOException
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+
+    try {
+      final PathVirtual p = PathVirtual.ofString("/subdir");
+      final Option<FileReference<T>> r = a.lookup(p);
+
+      Assert.assertTrue(r.isSome());
+      final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) r;
+      Assert.assertTrue(s.value.type == Type.TYPE_DIRECTORY);
+      Assert.assertTrue(s.value.path.equals(p));
+      Assert.assertTrue(s.value.archive == a);
+    } finally {
+      a.close();
+    }
+  }
 
   @Test public void testLookupSingleFile()
     throws FilesystemError,
@@ -55,14 +176,14 @@ public abstract class ArchiveContract
       FileNotFoundException,
       IOException
   {
-    final Archive a = this.getArchive("single-file", PathVirtual.ROOT);
+    final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
 
     try {
       final PathVirtual p = PathVirtual.ofString("/file.txt");
-      final Option<FileReference> r = a.lookup(p);
+      final Option<FileReference<T>> r = a.lookup(p);
 
       Assert.assertTrue(r.isSome());
-      final Some<FileReference> s = (Option.Some<FileReference>) r;
+      final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) r;
       Assert.assertTrue(s.value.type == Type.TYPE_FILE);
       Assert.assertTrue(s.value.path.equals(p));
       Assert.assertTrue(s.value.archive == a);
@@ -77,10 +198,10 @@ public abstract class ArchiveContract
       FileNotFoundException,
       IOException
   {
-    final Archive a = this.getArchive("single-file", PathVirtual.ROOT);
+    final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
     try {
       final PathVirtual p = PathVirtual.ofString("/nonexistent");
-      final Option<FileReference> r = a.lookup(p);
+      final Option<FileReference<T>> r = a.lookup(p);
 
       Assert.assertTrue(r.isNone());
     } finally {
@@ -94,10 +215,10 @@ public abstract class ArchiveContract
       FileNotFoundException,
       IOException
   {
-    final Archive a = this.getArchive("single-file", PathVirtual.ROOT);
+    final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
     try {
       final PathVirtual p = PathVirtual.ofString("/nonexistent/file.txt");
-      final Option<FileReference> r = a.lookup(p);
+      final Option<FileReference<T>> r = a.lookup(p);
       Assert.assertTrue(r.isNone());
     } finally {
       a.close();
@@ -112,7 +233,7 @@ public abstract class ArchiveContract
         FileNotFoundException,
         IOException
   {
-    final Archive a = this.getArchive("single-file", PathVirtual.ROOT);
+    final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
 
     try {
       final PathVirtual p = PathVirtual.ofString("/file.txt/xyz");
@@ -134,7 +255,7 @@ public abstract class ArchiveContract
       FilesystemError
   {
     final PathVirtual p = PathVirtual.ofString("/x/y/z");
-    final Archive a = this.getArchive("single-file", p);
+    final Archive<T> a = this.getArchive("single-file", p);
     try {
       Assert.assertEquals(p, a.getMountPath());
     } finally {
@@ -148,11 +269,11 @@ public abstract class ArchiveContract
       FileNotFoundException,
       IOException
   {
-    final Archive a = this.getArchive("single-file", PathVirtual.ROOT);
-    final Option<FileReference> r = a.lookup(PathVirtual.ROOT);
+    final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
+    final Option<FileReference<T>> r = a.lookup(PathVirtual.ROOT);
 
     Assert.assertTrue(r.isSome());
-    final Some<FileReference> s = (Option.Some<FileReference>) r;
+    final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) r;
     Assert.assertTrue(s.value.type == Type.TYPE_DIRECTORY);
     Assert.assertTrue(s.value.path.equals(PathVirtual.ROOT));
     Assert.assertTrue(s.value.archive == a);

@@ -37,7 +37,8 @@ public final class FilesystemError extends Exception
     FS_ERROR_NOT_A_DIRECTORY,
     FS_ERROR_UNHANDLED_TYPE,
     FS_ERROR_BUSY,
-    FS_ERROR_NOT_MOUNTED
+    FS_ERROR_NOT_MOUNTED,
+    FS_ERROR_NOT_A_FILE
   }
 
   private static final long serialVersionUID = -2828062375812503115L;
@@ -80,13 +81,9 @@ public final class FilesystemError extends Exception
   }
 
   static @Nonnull FilesystemError ioError(
-    final String archive,
-    final String message)
+    final @Nonnull Exception e)
   {
-    return new FilesystemError(Code.FS_ERROR_IO_ERROR, "i/o error for '"
-      + archive
-      + "': "
-      + message);
+    return new FilesystemError(e);
   }
 
   static @Nonnull FilesystemError isDirectory(
@@ -103,6 +100,14 @@ public final class FilesystemError extends Exception
     return new FilesystemError(Code.FS_ERROR_NOT_A_DIRECTORY, "file '"
       + path
       + "' is not a directory");
+  }
+
+  static @Nonnull FilesystemError notFile(
+    final String path)
+  {
+    return new FilesystemError(Code.FS_ERROR_NOT_A_FILE, "directory '"
+      + path
+      + "' is not a file");
   }
 
   static @Nonnull FilesystemError notMounted(
@@ -129,5 +134,12 @@ public final class FilesystemError extends Exception
   {
     super(message);
     this.code = code;
+  }
+
+  FilesystemError(
+    final @Nonnull Exception cause)
+  {
+    super(cause);
+    this.code = Code.FS_ERROR_IO_ERROR;
   }
 }

@@ -16,26 +16,13 @@
 
 package com.io7m.jvvfs;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+/**
+ * <p>
+ * The kind of directory archive implementations.
+ * </p>
+ */
 
-import javax.annotation.Nonnull;
-
-import com.io7m.jaux.Constraints.ConstraintError;
-
-public final class ArchiveDirectoryTest extends
-  ArchiveContract<ArchiveDirectoryKind>
+interface ArchiveDirectoryKind extends ArchiveKind
 {
-  @Override @Nonnull Archive<ArchiveDirectoryKind> getArchive(
-    final @Nonnull String basename,
-    final @Nonnull PathVirtual mount)
-    throws FileNotFoundException,
-      IOException,
-      ConstraintError
-  {
-    final File tempdir = TestData.getTestDataDirectory();
-    final PathReal r = new PathReal(new File(tempdir, basename).toString());
-    return new ArchiveDirectory(r, mount);
-  }
+  // No value-level representation.
 }

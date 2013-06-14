@@ -23,11 +23,24 @@ import net.java.quickcheck.characteristic.AbstractCharacteristic;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.functional.Pair;
 import com.io7m.jvvfs.FileReference.Type;
 
 public final class FileReferenceTest
 {
+  static final class FileReferenceId extends FileReference<ArchiveKind>
+  {
+    FileReferenceId(
+      final @Nonnull Archive<ArchiveKind> archive,
+      final @Nonnull PathVirtual path,
+      final @Nonnull Type type)
+      throws ConstraintError
+    {
+      super(archive, path, type);
+    }
+  }
+
   @SuppressWarnings("static-method") @Test public void testToString()
   {
     PathVirtualTest
@@ -36,16 +49,12 @@ public final class FileReferenceTest
           final @Nonnull Pair<PathVirtual, PathVirtual> pair)
           throws Throwable
         {
-          final FileReference r0 =
-            new FileReference(
-              new ArchiveIdentity(),
-              pair.first,
-              Type.TYPE_FILE);
-          final FileReference r1 =
-            new FileReference(
-              new ArchiveIdentity(),
-              pair.second,
-              Type.TYPE_FILE);
+          final FileReference<ArchiveKind> r0 =
+            new FileReferenceId(new ArchiveIdentity(), pair.first
+              .appendName("xyz"), Type.TYPE_FILE);
+          final FileReference<ArchiveKind> r1 =
+            new FileReferenceId(new ArchiveIdentity(), pair.second
+              .appendName("abc"), Type.TYPE_FILE);
 
           Assert.assertFalse(r0.toString().equals(r1.toString()));
         }
