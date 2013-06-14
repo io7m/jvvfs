@@ -17,6 +17,7 @@
 package com.io7m.jvvfs;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -106,6 +107,15 @@ import com.io7m.jvvfs.FileReference.Type;
     return null;
   }
 
+  @Override long fileSizeActual(
+    final @Nonnull FileReference<ArchiveZipKind> r)
+    throws FilesystemError,
+      ConstraintError
+  {
+    final ArchiveZipReference ra = (ArchiveZipReference) r;
+    return ra.actual.getSize();
+  }
+
   @Override @Nonnull PathVirtual getMountPath()
   {
     return this.mount;
@@ -150,12 +160,16 @@ import com.io7m.jvvfs.FileReference.Type;
     return null;
   }
 
-  @Override long fileSizeActual(
+  @Override @Nonnull InputStream openFileActual(
     final @Nonnull FileReference<ArchiveZipKind> r)
     throws FilesystemError,
       ConstraintError
   {
     final ArchiveZipReference ra = (ArchiveZipReference) r;
-    return ra.actual.getSize();
+    try {
+      return this.zip.getInputStream(ra.actual);
+    } catch (final IOException e) {
+      throw FilesystemError.ioError(e);
+    }
   }
 }

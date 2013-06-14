@@ -16,6 +16,8 @@
 
 package com.io7m.jvvfs;
 
+import java.io.InputStream;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
@@ -53,14 +55,6 @@ abstract class Archive<T extends ArchiveKind>
 
   abstract void close()
     throws FilesystemError;
-
-  /**
-   * <p>
-   * The path at which the archive is mounted.
-   * </p>
-   */
-
-  abstract @Nonnull PathVirtual getMountPath();
 
   /**
    * <p>
@@ -130,6 +124,14 @@ abstract class Archive<T extends ArchiveKind>
 
   /**
    * <p>
+   * The path at which the archive is mounted.
+   * </p>
+   */
+
+  abstract @Nonnull PathVirtual getMountPath();
+
+  /**
+   * <p>
    * Retrieve a reference to the object at the given path. This is a
    * "primitive" operation; all other functions should use <code>lookup</code>
    * internally in order to provide consistent semantics.
@@ -186,4 +188,70 @@ abstract class Archive<T extends ArchiveKind>
   abstract @CheckForNull FileReference<T> lookupActual(
     final @Nonnull PathVirtual path)
     throws ConstraintError;
+
+  /**
+   * <p>
+   * Open the file at <code>path</code>.
+   * </p>
+   * 
+   * @throws FilesystemError
+   *           If:
+   *           <ul>
+   *           <li>No object exists at <code>path</code>.</li>
+   *           <li>The object at <code>path</code> is not a file</li>
+   *           <li>An I/O error occurs</li>
+   *           </ul>
+   */
+
+  final @Nonnull InputStream openFile(
+    final @Nonnull PathVirtual path)
+    throws FilesystemError,
+      ConstraintError
+  {
+    final Option<FileReference<T>> ro = this.lookup(path);
+    switch (ro.type) {
+      case OPTION_NONE:
+      {
+        throw FilesystemError.fileNotFound(path.toString());
+      }
+      case OPTION_SOME:
+      {
+        final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) ro;
+        final FileReference<T> ar = s.value;
+
+        switch (s.value.type) {
+          case TYPE_DIRECTORY:
+          {
+            throw FilesystemError.notFile(path.toString());
+          }
+          case TYPE_FILE:
+          {
+            return this.openFileActual(ar);
+          }
+        }
+        break;
+      }
+    }
+
+    throw new UnreachableCodeException();
+  }
+
+  /**
+   * <p>
+   * Open the file at the given reference <code>r</code>.
+   * </p>
+   * 
+   * @throws FilesystemError
+   *           If:
+   *           <ul>
+   *           <li>No object exists at <code>path</code>.</li>
+   *           <li>The object at <code>path</code> is not a file</li>
+   *           <li>An I/O error occurs</li>
+   *           </ul>
+   */
+
+  abstract @Nonnull InputStream openFileActual(
+    final @Nonnull FileReference<T> r)
+    throws FilesystemError,
+      ConstraintError;
 }

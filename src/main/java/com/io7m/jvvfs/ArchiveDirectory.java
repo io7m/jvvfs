@@ -17,6 +17,9 @@
 package com.io7m.jvvfs;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -102,5 +105,18 @@ import com.io7m.jvvfs.FileReference.Type;
       return r;
     }
     return null;
+  }
+
+  @Override @Nonnull InputStream openFileActual(
+    final @Nonnull FileReference<ArchiveDirectoryKind> r)
+    throws FilesystemError,
+      ConstraintError
+  {
+    final ArchiveDirectoryReference ra = (ArchiveDirectoryReference) r;
+    try {
+      return new FileInputStream(ra.actual);
+    } catch (final FileNotFoundException e) {
+      throw FilesystemError.fileNotFound(ra.path.toString());
+    }
   }
 }

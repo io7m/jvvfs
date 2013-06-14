@@ -16,8 +16,10 @@
 
 package com.io7m.jvvfs;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import javax.annotation.Nonnull;
 
@@ -28,6 +30,7 @@ import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.functional.Option;
 import com.io7m.jaux.functional.Option.Some;
 import com.io7m.jvvfs.FileReference.Type;
+import com.io7m.jvvfs.FilesystemError.Code;
 
 public abstract class ArchiveContract<T extends ArchiveKind>
 {
@@ -258,6 +261,114 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     final Archive<T> a = this.getArchive("single-file", p);
     try {
       Assert.assertEquals(p, a.getMountPath());
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test public void testOpenFile()
+    throws FilesystemError,
+      ConstraintError,
+      FileNotFoundException,
+      IOException
+  {
+    final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
+
+    try {
+      final PathVirtual p = PathVirtual.ofString("/file.txt");
+      final BufferedReader r =
+        new BufferedReader(new InputStreamReader(a.openFile(p)));
+
+      final String s = r.readLine();
+      Assert.assertEquals(s, "Hello zip.");
+
+      r.close();
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testOpenFileNonexistent()
+      throws FilesystemError,
+        ConstraintError,
+        FileNotFoundException,
+        IOException
+  {
+    final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
+
+    try {
+      final PathVirtual p = PathVirtual.ofString("/nonexistent");
+      a.openFile(p);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public void testOpenFileNotAFile()
+    throws FilesystemError,
+      ConstraintError,
+      FileNotFoundException,
+      IOException
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+
+    try {
+      final PathVirtual p = PathVirtual.ofString("/subdir");
+      a.openFile(p);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testOpenFileParentNotDirectory()
+      throws FilesystemError,
+        ConstraintError,
+        FileNotFoundException,
+        IOException
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+
+    try {
+      final PathVirtual p = PathVirtual.ofString("/file.txt/file.txt");
+      a.openFile(p);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test public void testOpenFileSubdirectory()
+    throws FilesystemError,
+      ConstraintError,
+      FileNotFoundException,
+      IOException
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+
+    try {
+      final PathVirtual p = PathVirtual.ofString("/subdir/file.txt");
+      final BufferedReader r =
+        new BufferedReader(new InputStreamReader(a.openFile(p)));
+
+      final String s = r.readLine();
+      Assert.assertEquals(s, "Hello two.zip subdir.");
+
+      r.close();
     } finally {
       a.close();
     }

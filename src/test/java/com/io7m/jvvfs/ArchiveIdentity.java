@@ -16,6 +16,8 @@
 
 package com.io7m.jvvfs;
 
+import java.io.InputStream;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
@@ -26,6 +28,15 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
 {
   @Override void close()
     throws FilesystemError
+  {
+    // TODO Auto-generated method stub
+    throw new UnimplementedCodeException();
+  }
+
+  @Override long fileSizeActual(
+    final @Nonnull FileReference<ArchiveKind> r)
+    throws FilesystemError,
+      ConstraintError
   {
     // TODO Auto-generated method stub
     throw new UnimplementedCodeException();
@@ -45,8 +56,8 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     throw new UnimplementedCodeException();
   }
 
-  @Override long fileSizeActual(
-    final @Nonnull FileReference<ArchiveKind> r)
+  @Override @Nonnull InputStream openFileActual(
+    final FileReference<ArchiveKind> r)
     throws FilesystemError,
       ConstraintError
   {
