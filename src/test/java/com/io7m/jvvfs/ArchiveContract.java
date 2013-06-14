@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Calendar;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -212,6 +213,184 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       a.getModificationTime(p);
     } catch (final FilesystemError e) {
       Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test public void testListDirectory()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    try {
+      final Set<String> files = a.listDirectory(PathVirtual.ROOT);
+      Assert.assertEquals(2, files.size());
+      Assert.assertTrue(files.contains("file.txt"));
+      Assert.assertTrue(files.contains("subdir"));
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test public void testListDirectoryComplex()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Archive<T> a = this.getArchive("complex", PathVirtual.ROOT);
+    try {
+
+      {
+        final Set<String> files = a.listDirectory(PathVirtual.ROOT);
+        Assert.assertEquals(2, files.size());
+        Assert.assertTrue(files.contains("a"));
+        Assert.assertTrue(files.contains("b"));
+      }
+
+      {
+        final PathVirtual p = PathVirtual.ofString("/a");
+        final Set<String> files = a.listDirectory(p);
+        Assert.assertEquals(6, files.size());
+        Assert.assertTrue(files.contains("a"));
+        Assert.assertTrue(files.contains("b"));
+        Assert.assertTrue(files.contains("c"));
+        Assert.assertTrue(files.contains("a1.txt"));
+        Assert.assertTrue(files.contains("a2.txt"));
+        Assert.assertTrue(files.contains("a3.txt"));
+      }
+
+      {
+        final PathVirtual p = PathVirtual.ofString("/a/a");
+        final Set<String> files = a.listDirectory(p);
+        Assert.assertEquals(3, files.size());
+        Assert.assertTrue(files.contains("aa1.txt"));
+        Assert.assertTrue(files.contains("aa2.txt"));
+        Assert.assertTrue(files.contains("aa3.txt"));
+      }
+
+      {
+        final PathVirtual p = PathVirtual.ofString("/a/b");
+        final Set<String> files = a.listDirectory(p);
+        Assert.assertEquals(3, files.size());
+        Assert.assertTrue(files.contains("ab1.txt"));
+        Assert.assertTrue(files.contains("ab2.txt"));
+        Assert.assertTrue(files.contains("ab3.txt"));
+      }
+
+      {
+        final PathVirtual p = PathVirtual.ofString("/a/c");
+        final Set<String> files = a.listDirectory(p);
+        Assert.assertEquals(3, files.size());
+        Assert.assertTrue(files.contains("ac1.txt"));
+        Assert.assertTrue(files.contains("ac2.txt"));
+        Assert.assertTrue(files.contains("ac3.txt"));
+      }
+
+      {
+        final PathVirtual p = PathVirtual.ofString("/b");
+        final Set<String> files = a.listDirectory(p);
+        Assert.assertEquals(6, files.size());
+        Assert.assertTrue(files.contains("a"));
+        Assert.assertTrue(files.contains("b"));
+        Assert.assertTrue(files.contains("c"));
+        Assert.assertTrue(files.contains("b1.txt"));
+        Assert.assertTrue(files.contains("b2.txt"));
+        Assert.assertTrue(files.contains("b3.txt"));
+      }
+
+      {
+        final PathVirtual p = PathVirtual.ofString("/b/a");
+        final Set<String> files = a.listDirectory(p);
+        Assert.assertEquals(3, files.size());
+        Assert.assertTrue(files.contains("ba1.txt"));
+        Assert.assertTrue(files.contains("ba2.txt"));
+        Assert.assertTrue(files.contains("ba3.txt"));
+      }
+
+      {
+        final PathVirtual p = PathVirtual.ofString("/b/b");
+        final Set<String> files = a.listDirectory(p);
+        Assert.assertEquals(3, files.size());
+        Assert.assertTrue(files.contains("bb1.txt"));
+        Assert.assertTrue(files.contains("bb2.txt"));
+        Assert.assertTrue(files.contains("bb3.txt"));
+      }
+
+      {
+        final PathVirtual p = PathVirtual.ofString("/b/c");
+        final Set<String> files = a.listDirectory(p);
+        Assert.assertEquals(3, files.size());
+        Assert.assertTrue(files.contains("bc1.txt"));
+        Assert.assertTrue(files.contains("bc2.txt"));
+        Assert.assertTrue(files.contains("bc3.txt"));
+      }
+
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public void testListDirectoryFile()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/file.txt");
+      a.listDirectory(p);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testListDirectoryNonexistent()
+      throws FileNotFoundException,
+        IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/nonexistent");
+      a.listDirectory(p);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testListDirectoryParentFile()
+      throws FileNotFoundException,
+        IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/file.txt/file.txt");
+      a.listDirectory(p);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
       throw e;
     } finally {
       a.close();

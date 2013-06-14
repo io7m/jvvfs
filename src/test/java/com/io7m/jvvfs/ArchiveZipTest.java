@@ -19,6 +19,7 @@ package com.io7m.jvvfs;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -43,6 +44,42 @@ public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
     final PathReal r =
       new PathReal(new File(tempdir, basename).toString() + ".zip");
     return new ArchiveZip(r, mount);
+  }
+
+  @Test public void testListDirectoryImplicit()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Archive<ArchiveZipKind> a =
+      this.getArchive("single-file-and-subdir-implicit", PathVirtual.ROOT);
+    try {
+      final Set<String> files = a.listDirectory(PathVirtual.ROOT);
+      Assert.assertEquals(2, files.size());
+      Assert.assertTrue(files.contains("file.txt"));
+      Assert.assertTrue(files.contains("subdir"));
+    } finally {
+      a.close();
+    }
+  }
+
+  @Test public void testListDirectoryImplicitImplicit()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Archive<ArchiveZipKind> a =
+      this.getArchive("single-file-and-subdir-implicit", PathVirtual.ROOT);
+    try {
+      final PathVirtual p = PathVirtual.ofString("/subdir");
+      final Set<String> files = a.listDirectory(p);
+      Assert.assertEquals(1, files.size());
+      Assert.assertTrue(files.contains("file.txt"));
+    } finally {
+      a.close();
+    }
   }
 
   @Test public void testLookupSingleDirectoryImplicit()

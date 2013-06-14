@@ -18,6 +18,7 @@ package com.io7m.jvvfs;
 
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.Set;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -43,7 +44,23 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     throw new UnimplementedCodeException();
   }
 
+  @Override @Nonnull Calendar getModificationTimeActual(
+    final FileReference<ArchiveKind> r)
+  {
+    // TODO Auto-generated method stub
+    throw new UnimplementedCodeException();
+  }
+
   @Override @Nonnull PathVirtual getMountPath()
+  {
+    // TODO Auto-generated method stub
+    throw new UnimplementedCodeException();
+  }
+
+  @Override @Nonnull Set<String> listDirectory(
+    final PathVirtual path)
+    throws FilesystemError,
+      ConstraintError
   {
     // TODO Auto-generated method stub
     throw new UnimplementedCodeException();
@@ -61,13 +78,6 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     final FileReference<ArchiveKind> r)
     throws FilesystemError,
       ConstraintError
-  {
-    // TODO Auto-generated method stub
-    throw new UnimplementedCodeException();
-  }
-
-  @Override @Nonnull Calendar getModificationTimeActual(
-    final FileReference<ArchiveKind> r)
   {
     // TODO Auto-generated method stub
     throw new UnimplementedCodeException();

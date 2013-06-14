@@ -21,7 +21,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -29,6 +31,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.UnreachableCodeException;
+import com.io7m.jaux.functional.Option;
+import com.io7m.jaux.functional.Option.Some;
 import com.io7m.jvvfs.FileReference.Type;
 
 /**
@@ -101,6 +106,46 @@ import com.io7m.jvvfs.FileReference.Type;
   @Override @Nonnull PathVirtual getMountPath()
   {
     return this.mount;
+  }
+
+  @Override @Nonnull Set<String> listDirectory(
+    final @Nonnull PathVirtual path)
+    throws FilesystemError,
+      ConstraintError
+  {
+    final Option<FileReference<ArchiveDirectoryKind>> r = this.lookup(path);
+    switch (r.type) {
+      case OPTION_NONE:
+      {
+        throw FilesystemError.fileNotFound(path.toString());
+      }
+      case OPTION_SOME:
+      {
+        final Some<FileReference<ArchiveDirectoryKind>> s =
+          (Option.Some<FileReference<ArchiveDirectoryKind>>) r;
+        final FileReference<ArchiveDirectoryKind> ar = s.value;
+        final ArchiveDirectoryReference ra = (ArchiveDirectoryReference) ar;
+
+        switch (s.value.type) {
+          case TYPE_DIRECTORY:
+          {
+            final String[] fs = ra.actual.list();
+            final TreeSet<String> ts = new TreeSet<String>();
+            for (final String f : fs) {
+              ts.add(f);
+            }
+            return ts;
+          }
+          case TYPE_FILE:
+          {
+            throw FilesystemError.notDirectory(path.toString());
+          }
+        }
+        break;
+      }
+    }
+
+    throw new UnreachableCodeException();
   }
 
   @Override @CheckForNull FileReference<ArchiveDirectoryKind> lookupActual(

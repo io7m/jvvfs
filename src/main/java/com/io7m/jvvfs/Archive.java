@@ -18,6 +18,7 @@ package com.io7m.jvvfs;
 
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.Set;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -182,6 +183,25 @@ abstract class Archive<T extends ArchiveKind>
    */
 
   abstract @Nonnull PathVirtual getMountPath();
+
+  /**
+   * <p>
+   * List the contents of the directory at <code>path</code>.
+   * </p>
+   * 
+   * @throws FilesystemError
+   *           If:
+   *           <ul>
+   *           <li>No object exists at <code>path</code>.</li>
+   *           <li>The object at <code>path</code> is not a directory</li>
+   *           <li>An I/O error occurs</li>
+   *           </ul>
+   */
+
+  abstract @Nonnull Set<String> listDirectory(
+    final @Nonnull PathVirtual path)
+    throws FilesystemError,
+      ConstraintError;
 
   /**
    * <p>
