@@ -535,4 +535,14 @@ public final class PathVirtualTest
         }
       });
   }
+
+  @SuppressWarnings("static-method") @Test public void testAncestorSpecific()
+    throws ConstraintError
+  {
+    final PathVirtual p = PathVirtual.ofString("/a");
+    final PathVirtual u = PathVirtual.ofString("/a/c");
+
+    Assert.assertFalse(u.isAncestorOf(p));
+    Assert.assertTrue(p.isAncestorOf(u));
+  }
 }

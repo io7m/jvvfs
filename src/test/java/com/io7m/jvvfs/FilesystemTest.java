@@ -772,4 +772,153 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
     Assert.assertFalse(fs.isFile(PathVirtual.ROOT));
   }
+
+  /**
+   * Mounting reveals filesystem objects, unmounting hides them again, and has
+   * stacking semantics.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testUnmountMountMultiple()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("files1-3.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file3.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file4.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file5.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file6.txt")));
+
+    fs.mountArchive("files4-6.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file3.txt")));
+    Assert.assertTrue(fs.exists(PathVirtual.ofString("/file4.txt")));
+    Assert.assertTrue(fs.exists(PathVirtual.ofString("/file5.txt")));
+    Assert.assertTrue(fs.exists(PathVirtual.ofString("/file6.txt")));
+
+    fs.unmount(PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file3.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file4.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file5.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file6.txt")));
+
+    fs.unmount(PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file1.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file2.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file3.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file4.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file5.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/file6.txt")));
+  }
+
+  /**
+   * Mounting reveals filesystem objects, unmounting hides them again.
+   */
+
+  @SuppressWarnings("static-method") @Test public void testUnmountMountOne()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("files1-3.zip", PathVirtual.ROOT);
+
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file3.txt")));
+
+    fs.unmount(PathVirtual.ROOT);
+
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/file1.txt")));
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/file2.txt")));
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/file3.txt")));
+  }
+
+  /**
+   * Unmounting the root directory does nothing.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testUnmountNotMounted()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.unmount(PathVirtual.ROOT);
+    fs.unmount(PathVirtual.ROOT);
+    fs.unmount(PathVirtual.ROOT);
+
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+  }
+
+  /**
+   * Mounting an archive B at a directory provided by another archive A, and
+   * then unmounting A, means B is still accessible.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testUnmountMountArchiveDirectoryAccessible()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("complex.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/b")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac3.txt")));
+
+    fs.mountArchive("complex.zip", PathVirtual.ofString("/a/c"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/b")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac3.txt")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a/c")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac3.txt")));
+
+    fs.unmount(PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a")));
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/b")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c")));
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/a/c/ac1.txt")));
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/a/c/ac2.txt")));
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/a/c/ac3.txt")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a/c")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac3.txt")));
+  }
 }

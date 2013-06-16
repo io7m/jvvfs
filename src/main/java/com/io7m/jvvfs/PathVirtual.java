@@ -313,21 +313,24 @@ import com.io7m.jaux.Constraints.ConstraintError;
 
     /**
      * Otherwise, the paths may share a common prefix.
+     * 
+     * If the current path has fewer components than the other, and the
+     * components in this path match the first components of the other path,
+     * then this path is an ancestor of the other.
      */
 
-    final int p0s = this.names.size();
-    final int p1s = p.names.size();
-    final int ms = Math.min(p0s, p1s);
-
-    for (int index = 0; index < ms; ++index) {
-      final String n0 = this.names.get(index);
-      final String n1 = p.names.get(index);
-      if (n0.equals(n1) == false) {
-        return false;
+    if (this.names.size() < p.names.size()) {
+      for (int index = 0; index < this.names.size(); ++index) {
+        final String n0 = this.names.get(index);
+        final String n1 = p.names.get(index);
+        if (n0.equals(n1) == false) {
+          return false;
+        }
       }
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   /**

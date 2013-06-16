@@ -52,7 +52,8 @@ public final class Filesystem implements
   FSCapabilityCreateDirectory,
   FSCapabilityRead,
   FSCapabilityMountDirectory,
-  FSCapabilityMountClasspath
+  FSCapabilityMountClasspath,
+  FSCapabilityUnmount
 {
   private static abstract class FSReference
   {
@@ -330,7 +331,7 @@ public final class Filesystem implements
   {
     Constraints.constrainNotNull(path, "Path");
 
-    this.log_directory.debug("create-directory: " + path.toString());
+    this.log_directory.info("create-directory: " + path.toString());
 
     final PathVirtualEnum e = new PathVirtualEnum(path);
     while (e.hasMoreElements()) {
@@ -591,7 +592,7 @@ public final class Filesystem implements
       Name.isValid(archive),
       "Archive name is valid");
 
-    this.log_mount.debug("mount-archive: " + archive + " - " + mount);
+    this.log_mount.info("mount-archive: " + archive + " - " + mount);
 
     switch (this.archives.type) {
       case OPTION_NONE:
@@ -621,7 +622,7 @@ public final class Filesystem implements
     Constraints.constrainNotNull(c, "Class");
     Constraints.constrainNotNull(mount, "Mount path");
 
-    this.log_mount.debug("mount-classpath-archive: " + c + " - " + mount);
+    this.log_mount.info("mount-classpath-archive: " + c + " - " + mount);
 
     Constraints.constrainNotNull(c, "Class");
     final String cname = c.getCanonicalName();
@@ -759,5 +760,30 @@ public final class Filesystem implements
     Constraints.constrainNotNull(path, "Path");
 
     throw new UnimplementedCodeException();
+  }
+
+  @Override public void unmount(
+    final @Nonnull PathVirtual mount)
+    throws ConstraintError,
+      FilesystemError
+  {
+    Constraints.constrainNotNull(mount, "Path");
+
+    this.log_mount.info("unmount: " + mount);
+
+    if (this.mounts.containsKey(mount)) {
+      final Stack<Archive<?>> stack = this.mounts.get(mount);
+      assert stack != null;
+      assert stack.size() > 0;
+
+      try {
+        final Archive<?> a = stack.pop();
+        a.close();
+      } finally {
+        if (stack.isEmpty()) {
+          this.mounts.remove(mount);
+        }
+      }
+    }
   }
 }
