@@ -53,6 +53,10 @@ public class FilesystemTest
     QuickCheck.forAll(new NameTest.ValidNameGenerator(), c);
   }
 
+  /**
+   * Creating otherwise nonexistent directories works.
+   */
+
   @SuppressWarnings("static-method") @Test public
     void
     testCreateDirectoryNonexistent()
@@ -75,6 +79,11 @@ public class FilesystemTest
     });
   }
 
+  /**
+   * Creating directories ensures that all ancestors exist and are
+   * directories.
+   */
+
   @SuppressWarnings("static-method") @Test public
     void
     testCreateDirectorySubdirectoriesNonexistent()
@@ -90,12 +99,25 @@ public class FilesystemTest
           throws Throwable
         {
           fs.createDirectory(path);
+
+          final PathVirtualEnum e = new PathVirtualEnum(path);
+          while (e.hasMoreElements()) {
+            final PathVirtual ancestor = e.nextElement();
+            Assert.assertTrue(fs.isDirectory(ancestor));
+            Assert.assertTrue(fs.exists(ancestor));
+            Assert.assertFalse(fs.isFile(ancestor));
+          }
+
           Assert.assertTrue(fs.isDirectory(path));
           Assert.assertTrue(fs.exists(path));
           Assert.assertFalse(fs.isFile(path));
         }
       });
   }
+
+  /**
+   * Nonexistent objects do not exist.
+   */
 
   @SuppressWarnings("static-method") @Test public
     void
@@ -114,6 +136,10 @@ public class FilesystemTest
       }
     });
   }
+
+  /**
+   * Nonexistent parents are signalled when checking existence.
+   */
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
@@ -137,6 +163,11 @@ public class FilesystemTest
     }
   }
 
+  /**
+   * Passing <code>null</code> to {@link Filesystem#exists(PathVirtual)}
+   * fails.
+   */
+
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
     testExistsNull()
@@ -147,6 +178,10 @@ public class FilesystemTest
     final Filesystem fs = FilesystemTest.makeFS();
     fs.exists(null);
   }
+
+  /**
+   * Nonexistent objects are not directories.
+   */
 
   @SuppressWarnings("static-method") @Test public
     void
@@ -165,6 +200,10 @@ public class FilesystemTest
       }
     });
   }
+
+  /**
+   * Nonexistent ancestors are signalled when checking directories.
+   */
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
@@ -188,6 +227,10 @@ public class FilesystemTest
     }
   }
 
+  /**
+   * Files are not directories.
+   */
+
   @SuppressWarnings("static-method") @Test public
     void
     testIsDirectoryNotDirectory()
@@ -200,6 +243,11 @@ public class FilesystemTest
     Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/file.txt")));
   }
 
+  /**
+   * Passing <code>null</code> to {@link Filesystem#isDirectory(PathVirtual)}
+   * fails.
+   */
+
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
     testIsDirectoryNull()
@@ -211,6 +259,10 @@ public class FilesystemTest
     fs.isDirectory(null);
   }
 
+  /**
+   * Files in archives are files.
+   */
+
   @SuppressWarnings("static-method") @Test public void testIsFileFile()
     throws IOException,
       ConstraintError,
@@ -220,6 +272,10 @@ public class FilesystemTest
     fs.mountArchive("single-file.zip", PathVirtual.ROOT);
     Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file.txt")));
   }
+
+  /**
+   * Nonexistent objects are not files.
+   */
 
   @SuppressWarnings("static-method") @Test public
     void
@@ -238,6 +294,10 @@ public class FilesystemTest
       }
     });
   }
+
+  /**
+   * Nonexistent ancestors are signalled when checking files.
+   */
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
@@ -261,6 +321,10 @@ public class FilesystemTest
     }
   }
 
+  /**
+   * Directories are not files.
+   */
+
   @SuppressWarnings("static-method") @Test public void testIsFileNotFile()
     throws IOException,
       ConstraintError,
@@ -270,6 +334,11 @@ public class FilesystemTest
     fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
     Assert.assertFalse(fs.isFile(PathVirtual.ofString("/subdir")));
   }
+
+  /**
+   * Passing <code>null</code> to {@link Filesystem#isFile(PathVirtual)}
+   * fails.
+   */
 
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
@@ -282,6 +351,10 @@ public class FilesystemTest
     fs.isFile(null);
   }
 
+  /**
+   * Passing <code>null</code> as an archive directory fails.
+   */
+
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
     testMakeWithArchivesNullDirectory()
@@ -291,6 +364,10 @@ public class FilesystemTest
     Filesystem.makeWithArchiveDirectory(TestData.getLog(), null);
   }
 
+  /**
+   * Passing <code>null</code> as a log interface fails.
+   */
+
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
     testMakeWithArchivesNullLog()
@@ -298,6 +375,11 @@ public class FilesystemTest
   {
     Filesystem.makeWithArchiveDirectory(null, new PathReal("nonexistent"));
   }
+
+  /**
+   * Mounted archives can be mounted at directories provided by other
+   * archives, and display their contents correctly.
+   */
 
   @SuppressWarnings("static-method") @Test public
     void
@@ -323,6 +405,10 @@ public class FilesystemTest
     Assert.assertTrue(fs.exists(PathVirtual.ofString("/subdir/file3.txt")));
   }
 
+  /**
+   * Attempting to mount an archive at a path that denotes a file, fails.
+   */
+
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
     testMountArchiveAtFile()
@@ -345,6 +431,11 @@ public class FilesystemTest
       throw e;
     }
   }
+
+  /**
+   * Attempting to mount an archive at a path that has an ancestor that is a
+   * file, fails.
+   */
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
@@ -371,6 +462,11 @@ public class FilesystemTest
     }
   }
 
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
+
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
     testMountArchiveClasspathNullArchive()
@@ -382,6 +478,11 @@ public class FilesystemTest
 
     fs.mountClasspathArchive(null, PathVirtual.ROOT);
   }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
 
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
@@ -395,6 +496,10 @@ public class FilesystemTest
     fs.mountClasspathArchive(FilesystemTest.class, null);
   }
 
+  /**
+   * Passing an invalid archive name fails.
+   */
+
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
     testMountArchiveInvalidArchiveName()
@@ -406,6 +511,10 @@ public class FilesystemTest
 
     fs.mountArchive("..", PathVirtual.ROOT);
   }
+
+  /**
+   * Trying to mount an archive of an unsupported type fails.
+   */
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
@@ -423,6 +532,10 @@ public class FilesystemTest
       throw e;
     }
   }
+
+  /**
+   * Trying to mount a nonexistent archive fails.
+   */
 
   @SuppressWarnings("static-method") @Test public
     void
@@ -446,6 +559,10 @@ public class FilesystemTest
     });
   }
 
+  /**
+   * Trying to mount an archive at a nonexistent directory fails.
+   */
+
   @SuppressWarnings("static-method") @Test public
     void
     testMountArchiveNonexistentDirectory()
@@ -468,6 +585,11 @@ public class FilesystemTest
     });
   }
 
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchive(String, PathVirtual)} fails.
+   */
+
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
     testMountArchiveNullArchive()
@@ -480,6 +602,11 @@ public class FilesystemTest
     fs.mountArchive(null, PathVirtual.ROOT);
   }
 
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchive(String, PathVirtual)} fails.
+   */
+
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
     testMountArchiveNullMount()
@@ -491,6 +618,10 @@ public class FilesystemTest
 
     fs.mountArchive("xyz", null);
   }
+
+  /**
+   * Trying to mount an archive twice at the same location fails.
+   */
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
@@ -514,6 +645,10 @@ public class FilesystemTest
       throw e;
     }
   }
+
+  /**
+   * Trying to mount different archives at the same location succeeds.
+   */
 
   @SuppressWarnings("static-method") @Test public
     void
@@ -543,6 +678,10 @@ public class FilesystemTest
     Assert.assertTrue(fs.exists(PathVirtual.ofString("/file6.txt")));
   }
 
+  /**
+   * Trying to any archive if a directory has not been specified fails.
+   */
+
   @SuppressWarnings("static-method") @Test public
     void
     testMountArchiveWithoutArchives()
@@ -566,6 +705,10 @@ public class FilesystemTest
     });
   }
 
+  /**
+   * Mounting an item on the classpath works.
+   */
+
   @SuppressWarnings("static-method") @Test public
     void
     testMountClasspathArchive()
@@ -580,6 +723,11 @@ public class FilesystemTest
       .ofString("/com/io7m/jvvfs/single-file.zip")));
   }
 
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
+
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
     testMountClasspathArchiveNullClass()
@@ -592,6 +740,11 @@ public class FilesystemTest
     fs.mountClasspathArchive(null, PathVirtual.ROOT);
   }
 
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
+
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
     testMountClasspathArchiveNullMount()
@@ -603,6 +756,10 @@ public class FilesystemTest
 
     fs.mountClasspathArchive(FilesystemTest.class, null);
   }
+
+  /**
+   * The root directory always exists and is a directory.
+   */
 
   @SuppressWarnings("static-method") @Test public void testRootExists()
     throws IOException,
