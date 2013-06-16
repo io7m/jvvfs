@@ -123,6 +123,7 @@ final class TestData
     TestData.zip_list.add("encrypted.zip");
     TestData.zip_list.add("files1-3.zip");
     TestData.zip_list.add("files4-6.zip");
+    TestData.zip_list.add("unknown.unknown");
 
     TestData.zip_unpack_map = new HashMap<String, String>();
     TestData.zip_unpack_map.put("single-file.zip", "single-file");

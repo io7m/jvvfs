@@ -77,6 +77,7 @@ import com.io7m.jvvfs.FileReference.Type;
 
   private final @Nonnull ZipFile     zip;
   private final @Nonnull PathVirtual mount;
+  private final @Nonnull PathReal    real;
 
   ArchiveZip(
     final @Nonnull PathReal base_path,
@@ -86,6 +87,7 @@ import com.io7m.jvvfs.FileReference.Type;
   {
     this.mount = Constraints.constrainNotNull(mount, "Mount path");
     this.zip = new ZipFile(base_path.toString());
+    this.real = new PathReal(base_path.toString());
   }
 
   @Override void close()
@@ -135,6 +137,11 @@ import com.io7m.jvvfs.FileReference.Type;
   @Override @Nonnull PathVirtual getMountPath()
   {
     return this.mount;
+  }
+
+  @Override @Nonnull PathReal getRealPath()
+  {
+    return this.real;
   }
 
   @Override @Nonnull Set<String> listDirectory(

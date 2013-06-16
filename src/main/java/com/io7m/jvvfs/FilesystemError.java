@@ -29,21 +29,31 @@ public final class FilesystemError extends Exception
   static enum Code
   {
     FS_ERROR_ARCHIVE_DAMAGED,
+    FS_ERROR_ARCHIVE_NO_DIRECTORY,
+    FS_ERROR_ARCHIVE_NONEXISTENT,
+    FS_ERROR_ARCHIVE_TYPE_UNSUPPORTED,
+    FS_ERROR_ARCHIVE_ALREADY_MOUNTED,
     FS_ERROR_CONSTRAINT_ERROR,
-    FS_ERROR_DUPLICATE_MOUNT,
     FS_ERROR_IO_ERROR,
     FS_ERROR_IS_A_DIRECTORY,
-    FS_ERROR_NONEXISTENT,
+    FS_ERROR_IS_A_FILE,
+    FS_ERROR_NOT_A_FILE,
     FS_ERROR_NOT_A_DIRECTORY,
-    FS_ERROR_UNHANDLED_TYPE,
-    FS_ERROR_BUSY,
-    FS_ERROR_NOT_MOUNTED,
-    FS_ERROR_NOT_A_FILE
+    FS_ERROR_NONEXISTENT
   }
 
   private static final long serialVersionUID = -2828062375812503115L;
 
-  static @Nonnull FilesystemError brokenArchive(
+  static @Nonnull FilesystemError archiveAlreadyMounted(
+    final String archive,
+    final String mount)
+  {
+    return new FilesystemError(
+      Code.FS_ERROR_ARCHIVE_ALREADY_MOUNTED,
+      "archive '" + archive + "' is already mounted at '" + mount + "'");
+  }
+
+  static @Nonnull FilesystemError archiveDamaged(
     final String archive,
     final String message)
   {
@@ -53,23 +63,30 @@ public final class FilesystemError extends Exception
       + message);
   }
 
-  static @Nonnull FilesystemError busy(
+  static @Nonnull FilesystemError archiveNoDirectory(
     final String file)
   {
-    return new FilesystemError(Code.FS_ERROR_BUSY, "could not unmount '"
-      + file
-      + "', filesystem is busy");
+    return new FilesystemError(
+      Code.FS_ERROR_ARCHIVE_NO_DIRECTORY,
+      "requested to load archive '"
+        + file
+        + "' but no archive directory was specified");
   }
 
-  static @Nonnull FilesystemError duplicateMount(
-    final String archive,
-    final String mount)
+  static @Nonnull FilesystemError archiveNonexistent(
+    final String file)
   {
-    return new FilesystemError(Code.FS_ERROR_DUPLICATE_MOUNT, "archive '"
-      + archive
-      + "' is already mounted at '"
-      + mount
-      + "'");
+    return new FilesystemError(Code.FS_ERROR_ARCHIVE_NONEXISTENT, "archive '"
+      + file
+      + "' does not exist");
+  }
+
+  static @Nonnull FilesystemError archiveTypeUnsupported(
+    final String file)
+  {
+    return new FilesystemError(
+      Code.FS_ERROR_ARCHIVE_TYPE_UNSUPPORTED,
+      "no handler for file '" + file + "'");
   }
 
   static @Nonnull FilesystemError fileNotFound(
@@ -94,6 +111,14 @@ public final class FilesystemError extends Exception
       + "' is a directory");
   }
 
+  static @Nonnull FilesystemError isFile(
+    final String path)
+  {
+    return new FilesystemError(Code.FS_ERROR_IS_A_FILE, "file '"
+      + path
+      + "' is a file");
+  }
+
   static @Nonnull FilesystemError notDirectory(
     final String path)
   {
@@ -108,22 +133,6 @@ public final class FilesystemError extends Exception
     return new FilesystemError(Code.FS_ERROR_NOT_A_FILE, "directory '"
       + path
       + "' is not a file");
-  }
-
-  static @Nonnull FilesystemError notMounted(
-    final String file)
-  {
-    return new FilesystemError(
-      Code.FS_ERROR_NOT_MOUNTED,
-      "no filesystem mounted at '" + file + "'");
-  }
-
-  static @Nonnull FilesystemError unhandledType(
-    final String file)
-  {
-    return new FilesystemError(
-      Code.FS_ERROR_UNHANDLED_TYPE,
-      "no handler for file '" + file + "'");
   }
 
   final @Nonnull Code code;

@@ -82,4 +82,10 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     // TODO Auto-generated method stub
     throw new UnimplementedCodeException();
   }
+
+  @Override @Nonnull PathReal getRealPath()
+  {
+    // TODO Auto-generated method stub
+    throw new UnimplementedCodeException();
+  }
 }

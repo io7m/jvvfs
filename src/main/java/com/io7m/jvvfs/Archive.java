@@ -186,6 +186,14 @@ abstract class Archive<T extends ArchiveKind>
 
   /**
    * <p>
+   * The real path of the archive.
+   * </p>
+   */
+
+  abstract @Nonnull PathReal getRealPath();
+
+  /**
+   * <p>
    * List the contents of the directory at <code>path</code>.
    * </p>
    * 

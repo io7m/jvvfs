@@ -69,6 +69,7 @@ import com.io7m.jvvfs.FileReference.Type;
 
   private final @Nonnull File        base;
   private final @Nonnull PathVirtual mount;
+  private final @Nonnull PathReal    real;
 
   ArchiveDirectory(
     final @Nonnull PathReal base_path,
@@ -77,6 +78,7 @@ import com.io7m.jvvfs.FileReference.Type;
   {
     this.mount = Constraints.constrainNotNull(mount, "Mount path");
     this.base = new File(base_path.toString());
+    this.real = new PathReal(this.base.toString());
   }
 
   @Override void close()
@@ -106,6 +108,11 @@ import com.io7m.jvvfs.FileReference.Type;
   @Override @Nonnull PathVirtual getMountPath()
   {
     return this.mount;
+  }
+
+  @Override @Nonnull PathReal getRealPath()
+  {
+    return this.real;
   }
 
   @Override @Nonnull Set<String> listDirectory(
