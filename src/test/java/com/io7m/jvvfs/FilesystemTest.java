@@ -301,7 +301,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test public
     void
-    testMountAtArchiveDirectory()
+    testMountArchiveAtArchiveDirectory()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -325,7 +325,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
-    testMountAtFile()
+    testMountArchiveAtFile()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -348,7 +348,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
-    testMountAtFileAncestor()
+    testMountArchiveAtFileAncestor()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -373,7 +373,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
-    testMountClasspathNullArchive()
+    testMountArchiveClasspathNullArchive()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -385,7 +385,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
-    testMountClasspathNullMount()
+    testMountArchiveClasspathNullMount()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -397,7 +397,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
-    testMountInvalidArchiveName()
+    testMountArchiveInvalidArchiveName()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -409,7 +409,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
-    testMountInvalidArchiveType()
+    testMountArchiveInvalidArchiveType()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -426,7 +426,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test public
     void
-    testMountNonexistentArchive()
+    testMountArchiveNonexistentArchive()
       throws IOException,
         ConstraintError
   {
@@ -448,7 +448,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test public
     void
-    testMountNonexistentDirectory()
+    testMountArchiveNonexistentDirectory()
       throws IOException,
         ConstraintError
   {
@@ -470,7 +470,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
-    testMountNullArchive()
+    testMountArchiveNullArchive()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -482,7 +482,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
     void
-    testMountNullMount()
+    testMountArchiveNullMount()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -494,7 +494,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
     void
-    testMountTwiceDuplicate()
+    testMountArchiveTwiceDuplicate()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -517,7 +517,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test public
     void
-    testMountTwiceNotDuplicate()
+    testMountArchiveTwiceNotDuplicate()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -545,7 +545,7 @@ public class FilesystemTest
 
   @SuppressWarnings("static-method") @Test public
     void
-    testMountWithoutArchives()
+    testMountArchiveWithoutArchives()
       throws IOException,
         ConstraintError
   {
@@ -564,6 +564,44 @@ public class FilesystemTest
         }
       }
     });
+  }
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testMountClasspathArchive()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountClasspathArchive(FilesystemTest.class, PathVirtual.ROOT);
+    Assert.assertTrue(fs.isFile(PathVirtual
+      .ofString("/com/io7m/jvvfs/single-file.zip")));
+  }
+
+  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
+    void
+    testMountClasspathArchiveNullClass()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountClasspathArchive(null, PathVirtual.ROOT);
+  }
+
+  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
+    void
+    testMountClasspathArchiveNullMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountClasspathArchive(FilesystemTest.class, null);
   }
 
   @SuppressWarnings("static-method") @Test public void testRootExists()

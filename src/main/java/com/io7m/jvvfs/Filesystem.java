@@ -18,6 +18,7 @@ package com.io7m.jvvfs;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -622,8 +623,22 @@ public final class Filesystem implements
 
     this.log_mount.debug("mount-classpath-archive: " + c + " - " + mount);
 
-    // TODO Auto-generated method stub
-    throw new UnimplementedCodeException();
+    Constraints.constrainNotNull(c, "Class");
+    final String cname = c.getCanonicalName();
+    Constraints.constrainNotNull(cname, "Class canonical name");
+
+    final String cname_s = cname.replace('.', '/');
+    final String cname_k = cname_s + ".class";
+
+    final ClassLoader loader = c.getClassLoader();
+    final URL url = loader.getResource(cname_k);
+
+    this.log_mount.debug("mount-classpath-archive: url " + url);
+    final String mount_path =
+      ClassURIHandling.getClassContainerPath(url, cname_k);
+    this.log_mount.debug("mount-classpath-archive: actual " + mount_path);
+
+    this.mountInternal(new PathReal(mount_path), mount);
   }
 
   private void mountInternal(

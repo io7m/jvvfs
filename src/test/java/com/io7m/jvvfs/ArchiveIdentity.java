@@ -57,6 +57,12 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     throw new UnimplementedCodeException();
   }
 
+  @Override @Nonnull PathReal getRealPath()
+  {
+    // TODO Auto-generated method stub
+    throw new UnimplementedCodeException();
+  }
+
   @Override @Nonnull Set<String> listDirectory(
     final PathVirtual path)
     throws FilesystemError,
@@ -78,12 +84,6 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     final FileReference<ArchiveKind> r)
     throws FilesystemError,
       ConstraintError
-  {
-    // TODO Auto-generated method stub
-    throw new UnimplementedCodeException();
-  }
-
-  @Override @Nonnull PathReal getRealPath()
   {
     // TODO Auto-generated method stub
     throw new UnimplementedCodeException();
