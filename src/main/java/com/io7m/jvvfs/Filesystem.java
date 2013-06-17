@@ -21,13 +21,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.Stack;
+import java.util.TreeMap;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -117,7 +116,13 @@ public final class Filesystem implements
    * <p>
    * The ancestors of <code>path</code> are not checked.
    * </p>
+   * <p>
+   * Note that the order that mounts are checked is dependent on the ordering
+   * relation for {@link PathVirtual}. This provides "bottom up" semantics,
+   * where mounts closest to the root are checked first.
+   * </p>
    * 
+   * @see PathVirtual#compareTo(PathVirtual)
    * @throws ConstraintError
    * @throws FilesystemError
    */
@@ -126,19 +131,15 @@ public final class Filesystem implements
     <T extends FSReference>
     Option<T>
     lookupDirectInMounts(
-      final @Nonnull Map<PathVirtual, Stack<Archive<?>>> mount_map,
+      final @Nonnull SortedMap<PathVirtual, Stack<Archive<?>>> mount_map,
       final @Nonnull PathVirtual path)
       throws FilesystemError,
         ConstraintError
   {
-    final Set<Entry<PathVirtual, Stack<Archive<?>>>> mount_entries =
-      mount_map.entrySet();
-
-    for (final Entry<PathVirtual, Stack<Archive<?>>> entry : mount_entries) {
-      final PathVirtual mount = entry.getKey();
-
+    final Set<PathVirtual> paths = mount_map.keySet();
+    for (final PathVirtual mount : paths) {
       if (mount.isAncestorOf(path) || mount.equals(path)) {
-        final Stack<Archive<?>> stack = entry.getValue();
+        final Stack<Archive<?>> stack = mount_map.get(mount);
         final Option<T> r =
           Filesystem.lookupDirectInStack(path, stack, mount);
         if (r.isSome()) {
@@ -248,14 +249,14 @@ public final class Filesystem implements
     return new Filesystem(log, null);
   }
 
-  private final @Nonnull Log                                 log;
-  private final @Nonnull Log                                 log_directory;
-  private final @Nonnull Log                                 log_mount;
+  private final @Nonnull Log                                       log;
+  private final @Nonnull Log                                       log_directory;
+  private final @Nonnull Log                                       log_mount;
 
-  private final @Nonnull Option<PathReal>                    archives;
-  private final @Nonnull List<ArchiveHandler<?>>             handlers;
-  private final @Nonnull Map<PathVirtual, Stack<Archive<?>>> mounts;
-  private final @Nonnull Set<PathVirtual>                    directories;
+  private final @Nonnull Option<PathReal>                          archives;
+  private final @Nonnull List<ArchiveHandler<?>>                   handlers;
+  private final @Nonnull SortedMap<PathVirtual, Stack<Archive<?>>> mounts;
+  private final @Nonnull Set<PathVirtual>                          directories;
 
   private Filesystem(
     final @Nonnull Log log,
@@ -278,7 +279,7 @@ public final class Filesystem implements
     this.handlers.add(new ArchiveDirectoryHandler());
     this.handlers.add(new ArchiveZipHandler());
 
-    this.mounts = new HashMap<PathVirtual, Stack<Archive<?>>>();
+    this.mounts = new TreeMap<PathVirtual, Stack<Archive<?>>>();
 
     this.directories = new HashSet<PathVirtual>();
     this.directories.add(PathVirtual.ROOT);
@@ -770,6 +771,21 @@ public final class Filesystem implements
     Constraints.constrainNotNull(mount, "Path");
 
     this.log_mount.info("unmount: " + mount);
+
+    /**
+     * Check to see if the mount point could possibly be mounted. It's
+     * possible for files from archives mounted below the mount point M to
+     * "shadow" M.
+     */
+
+    if (this.isDirectory(mount) == false) {
+      throw FilesystemError.notDirectory(mount.toString());
+    }
+
+    /**
+     * Pop an archive from the stack and close it, deleting the stack entirely
+     * if the stack is emptied by the pop.
+     */
 
     if (this.mounts.containsKey(mount)) {
       final Stack<Archive<?>> stack = this.mounts.get(mount);

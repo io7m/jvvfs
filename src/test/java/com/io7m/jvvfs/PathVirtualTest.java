@@ -545,4 +545,96 @@ public final class PathVirtualTest
     Assert.assertFalse(u.isAncestorOf(p));
     Assert.assertTrue(p.isAncestorOf(u));
   }
+
+  @SuppressWarnings("static-method") @Test public void testOrderingLesser()
+    throws ConstraintError
+  {
+    final PathVirtual p0 = PathVirtual.ofString("/");
+    final PathVirtual p1 = PathVirtual.ofString("/a");
+    final PathVirtual p2 = PathVirtual.ofString("/b");
+    final PathVirtual p3 = PathVirtual.ofString("/a/a");
+    final PathVirtual p4 = PathVirtual.ofString("/a/b");
+    final PathVirtual p5 = PathVirtual.ofString("/b/a");
+    final PathVirtual p6 = PathVirtual.ofString("/b/b");
+
+    Assert.assertTrue(p0.compareTo(p0) == 0);
+    Assert.assertTrue(p0.compareTo(p1) < 0);
+    Assert.assertTrue(p0.compareTo(p2) < 0);
+    Assert.assertTrue(p0.compareTo(p3) < 0);
+    Assert.assertTrue(p0.compareTo(p4) < 0);
+    Assert.assertTrue(p0.compareTo(p5) < 0);
+    Assert.assertTrue(p0.compareTo(p6) < 0);
+
+    Assert.assertTrue(p1.compareTo(p1) == 0);
+    Assert.assertTrue(p1.compareTo(p2) < 0);
+    Assert.assertTrue(p1.compareTo(p3) < 0);
+    Assert.assertTrue(p1.compareTo(p4) < 0);
+    Assert.assertTrue(p1.compareTo(p5) < 0);
+    Assert.assertTrue(p1.compareTo(p6) < 0);
+
+    Assert.assertTrue(p2.compareTo(p2) == 0);
+    Assert.assertTrue(p2.compareTo(p3) < 0);
+    Assert.assertTrue(p2.compareTo(p4) < 0);
+    Assert.assertTrue(p2.compareTo(p5) < 0);
+    Assert.assertTrue(p2.compareTo(p6) < 0);
+
+    Assert.assertTrue(p3.compareTo(p3) == 0);
+    Assert.assertTrue(p3.compareTo(p4) < 0);
+    Assert.assertTrue(p3.compareTo(p5) < 0);
+    Assert.assertTrue(p3.compareTo(p6) < 0);
+
+    Assert.assertTrue(p4.compareTo(p4) == 0);
+    Assert.assertTrue(p4.compareTo(p5) < 0);
+    Assert.assertTrue(p4.compareTo(p6) < 0);
+
+    Assert.assertTrue(p5.compareTo(p5) == 0);
+    Assert.assertTrue(p5.compareTo(p6) < 0);
+  }
+
+  @SuppressWarnings("static-method") @Test public void testOrderingGreater()
+    throws ConstraintError
+  {
+    final PathVirtual p0 = PathVirtual.ofString("/");
+    final PathVirtual p1 = PathVirtual.ofString("/a");
+    final PathVirtual p2 = PathVirtual.ofString("/b");
+    final PathVirtual p3 = PathVirtual.ofString("/a/a");
+    final PathVirtual p4 = PathVirtual.ofString("/a/b");
+    final PathVirtual p5 = PathVirtual.ofString("/b/a");
+    final PathVirtual p6 = PathVirtual.ofString("/b/b");
+
+    Assert.assertTrue(p6.compareTo(p0) > 0);
+    Assert.assertTrue(p6.compareTo(p1) > 0);
+    Assert.assertTrue(p6.compareTo(p2) > 0);
+    Assert.assertTrue(p6.compareTo(p3) > 0);
+    Assert.assertTrue(p6.compareTo(p4) > 0);
+    Assert.assertTrue(p6.compareTo(p5) > 0);
+    Assert.assertTrue(p6.compareTo(p6) == 0);
+
+    Assert.assertTrue(p5.compareTo(p0) > 0);
+    Assert.assertTrue(p5.compareTo(p1) > 0);
+    Assert.assertTrue(p5.compareTo(p2) > 0);
+    Assert.assertTrue(p5.compareTo(p3) > 0);
+    Assert.assertTrue(p5.compareTo(p4) > 0);
+    Assert.assertTrue(p5.compareTo(p5) == 0);
+
+    Assert.assertTrue(p4.compareTo(p0) > 0);
+    Assert.assertTrue(p4.compareTo(p1) > 0);
+    Assert.assertTrue(p4.compareTo(p2) > 0);
+    Assert.assertTrue(p4.compareTo(p3) > 0);
+    Assert.assertTrue(p4.compareTo(p4) == 0);
+
+    Assert.assertTrue(p3.compareTo(p0) > 0);
+    Assert.assertTrue(p3.compareTo(p1) > 0);
+    Assert.assertTrue(p3.compareTo(p2) > 0);
+    Assert.assertTrue(p3.compareTo(p3) == 0);
+
+    Assert.assertTrue(p2.compareTo(p0) > 0);
+    Assert.assertTrue(p2.compareTo(p1) > 0);
+    Assert.assertTrue(p2.compareTo(p2) == 0);
+
+    Assert.assertTrue(p1.compareTo(p0) > 0);
+    Assert.assertTrue(p1.compareTo(p1) == 0);
+
+    Assert.assertTrue(p0.compareTo(p0) == 0);
+  }
 }

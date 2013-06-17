@@ -182,4 +182,15 @@ import com.io7m.jvvfs.FileReference.Type;
       throw FilesystemError.fileNotFound(ra.path.toString());
     }
   }
+
+  @Override public String toString()
+  {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("[ArchiveDirectory ");
+    builder.append(this.base);
+    builder.append(" ");
+    builder.append(this.mount);
+    builder.append("]");
+    return builder.toString();
+  }
 }

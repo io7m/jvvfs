@@ -30,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.UnreachableCodeException;
 import com.io7m.jvvfs.FilesystemError.Code;
 
 public class FilesystemTest
@@ -374,6 +375,83 @@ public class FilesystemTest
       throws ConstraintError
   {
     Filesystem.makeWithArchiveDirectory(null, new PathReal("nonexistent"));
+  }
+
+  /**
+   * Mounting an archive that hides an existing directory with a file, makes
+   * the hidden directory inaccessible.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testMountArchiveFileShadows()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir")));
+
+    try {
+      fs.exists(PathVirtual.ofString("/subdir/file.txt"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+    }
+  }
+
+  /**
+   * Mounting an archive that hides an existing directory with a file, makes
+   * mounted archives inaccessible.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testMountArchiveFileShadowsMounts()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+
+    fs.mountArchive(
+      "single-file-and-subdir.zip",
+      PathVirtual.ofString("/subdir"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual
+      .ofString("/subdir/subdir/file.txt")));
+
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir")));
+
+    try {
+      fs.exists(PathVirtual.ofString("/subdir/file.txt"));
+      throw new UnreachableCodeException();
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+    }
+
+    try {
+      fs.unmount(PathVirtual.ofString("/subdir"));
+      throw new UnreachableCodeException();
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+    }
   }
 
   /**

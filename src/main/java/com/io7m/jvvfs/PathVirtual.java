@@ -225,16 +225,46 @@ import com.io7m.jaux.Constraints.ConstraintError;
 
   /**
    * <p>
-   * Compare the image of this path with the image of the given path using
-   * {@link String#compareTo(String)}. Solely included to allow paths to be
-   * placed into ordered sets.
+   * The ordering relation for virtual paths.
+   * </p>
+   * <p>
+   * <ul>
+   * <li>If <code>p0.size() &lt; p1.size()</code>, then
+   * <code>p0 &lt; p1</code></li>
+   * <li>If <code>p0.size() &gt; p1.size()</code>, then
+   * <code>p0 &gt; p1</code></li>
+   * <li>If <code>p0.size() == p1.size()</code>, then:
+   * <ul>
+   * <li><code>∃i. p0[i] &lt; p1[i] → p0 &lt; p1</code></li>
+   * <li><code>∃i. p0[i] &gt; p1[i] → p0 &gt; p1</code></li>
+   * <li>Otherwise, <code>p0 == p1</code>.</li>
+   * </ul>
+   * </li>
+   * </ul>
    * </p>
    */
 
   @Override public int compareTo(
     final PathVirtual o)
   {
-    return this.toString().compareTo(o.toString());
+    if (this.names.size() < o.names.size()) {
+      return -1;
+    }
+    if (this.names.size() > o.names.size()) {
+      return 1;
+    }
+
+    for (int index = 0; index < this.names.size(); ++index) {
+      final String s0 = this.names.get(index);
+      final String s1 = o.names.get(index);
+
+      final int r = s0.compareTo(s1);
+      if (r != 0) {
+        return r;
+      }
+    }
+
+    return 0;
   }
 
   @Override public boolean equals(

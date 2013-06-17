@@ -261,4 +261,15 @@ import com.io7m.jvvfs.FileReference.Type;
       throw FilesystemError.ioError(e);
     }
   }
+
+  @Override public String toString()
+  {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("[ArchiveZip ");
+    builder.append(this.real);
+    builder.append(" ");
+    builder.append(this.mount);
+    builder.append("]");
+    return builder.toString();
+  }
 }
