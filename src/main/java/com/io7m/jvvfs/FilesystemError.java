@@ -26,19 +26,89 @@ import javax.annotation.Nonnull;
 
 public final class FilesystemError extends Exception
 {
-  static enum Code
+  /**
+   * The set of possible error codes reported by the filesystem.
+   */
+
+  public static enum Code
   {
+    /**
+     * An archive appeared to be corrupt and could not be loaded.
+     */
+
     FS_ERROR_ARCHIVE_DAMAGED,
+
+    /**
+     * The user tried to load an archive, but no archive directory was
+     * specified.
+     */
+
     FS_ERROR_ARCHIVE_NO_DIRECTORY,
+
+    /**
+     * The user tried to load a nonexistent archive.
+     */
+
     FS_ERROR_ARCHIVE_NONEXISTENT,
+
+    /**
+     * The user tried to load an archive of a type not supported by the
+     * implementation.
+     */
+
     FS_ERROR_ARCHIVE_TYPE_UNSUPPORTED,
+
+    /**
+     * The user tried to load an archive twice at the same location.
+     */
+
     FS_ERROR_ARCHIVE_ALREADY_MOUNTED,
+
+    /**
+     * An internal constraint error occurred; this indicates a bug in
+     * <code>jvvfs</code>.
+     */
+
     FS_ERROR_CONSTRAINT_ERROR,
+
+    /**
+     * An operating system I/O error occurred.
+     */
+
     FS_ERROR_IO_ERROR,
+
+    /**
+     * The object in question was expected to be a file, but was a directory
+     * instead.
+     */
+
     FS_ERROR_IS_A_DIRECTORY,
+
+    /**
+     * The object in question was expected to be a directory, but was a file
+     * instead.
+     */
+
     FS_ERROR_IS_A_FILE,
+
+    /**
+     * The object in question was expected to be a file, but was a something
+     * else instead.
+     */
+
     FS_ERROR_NOT_A_FILE,
+
+    /**
+     * The object in question was expected to be a directory, but was a
+     * something else instead.
+     */
+
     FS_ERROR_NOT_A_DIRECTORY,
+
+    /**
+     * The object in question does not exist.
+     */
+
     FS_ERROR_NONEXISTENT
   }
 
@@ -136,6 +206,15 @@ public final class FilesystemError extends Exception
   }
 
   final @Nonnull Code code;
+
+  /**
+   * Retrieve the error code associated with the exception.
+   */
+
+  public @Nonnull Code getCode()
+  {
+    return this.code;
+  }
 
   FilesystemError(
     final @Nonnull Code code,
