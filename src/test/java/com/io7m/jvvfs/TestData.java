@@ -116,6 +116,7 @@ final class TestData
   static {
     TestData.zip_list = new HashSet<String>();
     TestData.zip_list.add("single-file.zip");
+    TestData.zip_list.add("single-file.jar");
     TestData.zip_list.add("single-file-and-subdir.zip");
     TestData.zip_list.add("single-file-and-subdir-implicit.zip");
     TestData.zip_list.add("complex.zip");
