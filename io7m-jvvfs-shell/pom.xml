@@ -4,12 +4,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.io7m.jvvfs.core</groupId>
-  <artifactId>io7m-jvvfs-core</artifactId>
-  <name>io7m-jvvfs-core</name>
+  <groupId>com.io7m.jvvfs.shell</groupId>
+  <artifactId>io7m-jvvfs-shell</artifactId>
+  <name>io7m-jvvfs-shell</name>
   <version>3.0.0-SNAPSHOT</version>
-  <description>Virtual filesystem abstraction (Core API)</description>
-  <url>http://mvn.io7m.com/jvvfs-core/</url>
+  <description>The jvvfs shell</description>
+  <url>http://mvn.io7m.com/jvvfs-shell/</url>
 
   <licenses>
     <license>
@@ -34,7 +34,7 @@
   </developers>
 
   <issueManagement>
-    <url>http://fossil.io7m.com/repo.cgi/io7m-jvvfs-core</url>
+    <url>http://fossil.io7m.com/repo.cgi/io7m-jvvfs-shell</url>
     <system>Fossil</system>
   </issueManagement>
 
@@ -56,6 +56,11 @@
   </prerequisites>
 
   <dependencies>
+    <dependency>
+      <groupId>com.io7m.jvvfs.core</groupId>
+      <artifactId>io7m-jvvfs-core</artifactId>
+      <version>3.0.0-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>com.io7m.jaux</groupId>
       <artifactId>io7m-jaux</artifactId>
@@ -177,7 +182,7 @@
                   <Built-By>io7m</Built-By>
                 </manifestEntries>
                 <manifestSection>
-                  <name>com/io7m/jvvfs</name>
+                  <name>com/io7m/jvvfs/shell</name>
                   <manifestEntries>
                     <Sealed>true</Sealed>
                   </manifestEntries>

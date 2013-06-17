@@ -10,6 +10,7 @@
 
   <modules>
     <module>io7m-jvvfs-core</module>
+    <module>io7m-jvvfs-shell</module>
   </modules>
 
   <licenses>
