@@ -48,7 +48,6 @@ import com.io7m.jvvfs.FileReference.Type;
  */
 
 public final class Filesystem implements
-  FSCapabilityCreateDirectory,
   FSCapabilityRead,
   FSCapabilityMountDirectory,
   FSCapabilityMountClasspath,

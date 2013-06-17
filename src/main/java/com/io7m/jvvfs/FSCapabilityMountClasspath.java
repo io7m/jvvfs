@@ -27,7 +27,8 @@ import com.io7m.jaux.Constraints.ConstraintError;
  * </p>
  */
 
-public interface FSCapabilityMountClasspath
+public interface FSCapabilityMountClasspath extends
+  FSCapabilityCreateDirectory
 {
   /**
    * <p>
@@ -37,12 +38,10 @@ public interface FSCapabilityMountClasspath
    * </p>
    * <p>
    * If the directory at <code>mount</code> exists but was not explicitly
-   * created with
-   * {@link FSCapabilityCreateDirectory#createDirectory(PathVirtual)}, then
-   * the <code>mountArchive</code> function first calls
-   * {@link FSCapabilityCreateDirectory#createDirectory(PathVirtual)} to mark
-   * <code>mount</code> as explicitly created, and then attempts to mount the
-   * archive as normal.
+   * created with {@link #createDirectory(PathVirtual)}, then the
+   * <code>mountArchive</code> function first calls
+   * {@link #createDirectory(PathVirtual)} to mark <code>mount</code> as
+   * explicitly created, and then attempts to mount the archive as normal.
    * </p>
    * 
    * @param c
