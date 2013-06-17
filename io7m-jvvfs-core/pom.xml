@@ -1,16 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.io7m.jvvfs</groupId>
-  <artifactId>io7m-jvvfs</artifactId>
-  <version>3.0.0-SNAPSHOT</version>
-  <name>io7m-jvvfs</name>
-  <description>Virtual filesystem abstraction</description>
-  <url>http://mvn.io7m.com/jvvfs/</url>
-  <packaging>pom</packaging>
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modules>
-    <module>io7m-jvvfs-core</module>
-  </modules>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.io7m.jvvfs.core</groupId>
+  <artifactId>io7m-jvvfs-core</artifactId>
+  <name>io7m-jvvfs-core</name>
+  <version>3.0.0-SNAPSHOT</version>
+  <description>Virtual filesystem abstraction (Core API)</description>
+  <url>http://mvn.io7m.com/jvvfs-core/</url>
 
   <licenses>
     <license>
@@ -35,7 +34,7 @@
   </developers>
 
   <issueManagement>
-    <url>http://fossil.io7m.com/repo.cgi/io7m-jvvfs</url>
+    <url>http://fossil.io7m.com/repo.cgi/io7m-jvvfs-core</url>
     <system>Fossil</system>
   </issueManagement>
 
@@ -55,6 +54,36 @@
   <prerequisites>
     <maven>2.2.1</maven>
   </prerequisites>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.io7m.jaux</groupId>
+      <artifactId>io7m-jaux</artifactId>
+      <version>[2.3.0, 3.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.jlog</groupId>
+      <artifactId>io7m-jlog</artifactId>
+      <version>[2.3.0, 3.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+      <version>4.11</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>2.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java</groupId>
+      <artifactId>quickcheck</artifactId>
+      <version>0.6</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <reporting>
     <plugins>
@@ -103,81 +132,97 @@
         <version>2.6</version>
       </plugin>
 
-      <!-- Produce aggregate javadoc for all subprojects -->
+      <!-- Require JDK >= 1.6 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.0</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+
+      <!-- Tell the surefire plugin to fork only once per set of unit tests, -->
+      <!-- and redirect test output -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.13</version>
+        <configuration>
+          <forkMode>once</forkMode>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+        </configuration>
+      </plugin>
+
+      <!-- Produce custom manifest in jar files -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Specification-Title>${project.name}</Specification-Title>
+              <Specification-Version>${project.version}</Specification-Version>
+              <Specification-Vendor>io7m.com</Specification-Vendor>
+              <Implementation-Title>${project.name}</Implementation-Title>
+              <Implementation-Version>${project.version}</Implementation-Version>
+              <Implementation-Vendor>io7m.com</Implementation-Vendor>
+              <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
+              <Built-By>io7m</Built-By>
+            </manifestEntries>
+            <manifestSection>
+              <name>com/io7m/jvvfs</name>
+              <manifestEntries>
+                <Sealed>true</Sealed>
+              </manifestEntries>
+            </manifestSection>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Create source jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+               <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Create javadoc jar -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9</version>
         <executions>
           <execution>
-            <id>aggregate</id>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <phase>package</phase>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- Transform XML documentation with Saxon -->
-      <plugin>
-        <groupId>com.io7m.saxon-plugin</groupId>
-        <artifactId>io7m-saxon-plugin</artifactId>
-        <version>1.1.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>transform</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <transformation>
-            <stylesheetFile>src/main/xsl/structural-1_0_0-standalone-x20.xsl</stylesheetFile>
-            <documentFile>src/main/xml/documentation.xml</documentFile>
-            <outputDirectory>${project.build.directory}/xhtml</outputDirectory>
-            <outputDirectoryParameterName>io7m.structural-1_0_0.output_directory</outputDirectoryParameterName>
-            <outputFile>out.txt</outputFile>
-          </transformation>
-        </configuration>
-      </plugin>
-
-      <!-- Validate XML documentation -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>xml-maven-plugin</artifactId>
-        <version>1.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>validate</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <validationSets>
-            <validationSet>
-              <dir>src/main/xml</dir>
-            </validationSet>
-          </validationSets>
-        </configuration>
-      </plugin>
-
-      <!-- Produce documentation archive -->
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <descriptors>
-            <descriptor>assembly-doc.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
+            <id>attach-javadocs</id>
             <phase>package</phase>
             <goals>
-              <goal>single</goal>
+               <goal>jar</goal>
+            </goals>
+         </execution>
+        </executions>
+      </plugin>
+
+      <!-- Enable code coverage for unit tests -->
+      <plugin>
+        <groupId>org.sonatype.maven.plugin</groupId>
+        <artifactId>emma-maven-plugin</artifactId>
+        <version>1.2</version>
+        <executions>
+          <execution>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>instrument</goal>
             </goals>
           </execution>
         </executions>
