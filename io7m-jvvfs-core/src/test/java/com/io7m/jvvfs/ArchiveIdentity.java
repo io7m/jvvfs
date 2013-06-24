@@ -24,15 +24,14 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnimplementedCodeException;
+import com.io7m.jaux.UnreachableCodeException;
 
 final class ArchiveIdentity extends Archive<ArchiveKind>
 {
   @Override void close()
     throws FilesystemError
   {
-    // TODO Auto-generated method stub
-    throw new UnimplementedCodeException();
+    throw new UnreachableCodeException();
   }
 
   @Override long getFileSizeActual(
@@ -40,27 +39,23 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     throws FilesystemError,
       ConstraintError
   {
-    // TODO Auto-generated method stub
-    throw new UnimplementedCodeException();
+    throw new UnreachableCodeException();
   }
 
   @Override @Nonnull Calendar getModificationTimeActual(
     final FileReference<ArchiveKind> r)
   {
-    // TODO Auto-generated method stub
-    throw new UnimplementedCodeException();
+    throw new UnreachableCodeException();
   }
 
   @Override @Nonnull PathVirtual getMountPath()
   {
-    // TODO Auto-generated method stub
-    throw new UnimplementedCodeException();
+    throw new UnreachableCodeException();
   }
 
   @Override @Nonnull PathReal getRealPath()
   {
-    // TODO Auto-generated method stub
-    throw new UnimplementedCodeException();
+    throw new UnreachableCodeException();
   }
 
   @Override @Nonnull Set<String> listDirectory(
@@ -68,16 +63,14 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     throws FilesystemError,
       ConstraintError
   {
-    // TODO Auto-generated method stub
-    throw new UnimplementedCodeException();
+    throw new UnreachableCodeException();
   }
 
   @Override @CheckForNull FileReference<ArchiveKind> lookupActual(
     final @Nonnull PathVirtual path)
     throws ConstraintError
   {
-    // TODO Auto-generated method stub
-    throw new UnimplementedCodeException();
+    throw new UnreachableCodeException();
   }
 
   @Override @Nonnull InputStream openFileActual(
@@ -85,7 +78,6 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     throws FilesystemError,
       ConstraintError
   {
-    // TODO Auto-generated method stub
-    throw new UnimplementedCodeException();
+    throw new UnreachableCodeException();
   }
 }
