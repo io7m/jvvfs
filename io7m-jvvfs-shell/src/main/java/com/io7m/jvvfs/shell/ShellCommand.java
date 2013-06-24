@@ -17,6 +17,7 @@
 package com.io7m.jvvfs.shell;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -164,7 +165,10 @@ abstract class ShellCommand
     {
       final PathReal dir = config.getArchiveDirectory();
       final File file = new File(dir.toString());
-      for (final String archive : file.list()) {
+      final String[] archives = file.list();
+      Arrays.sort(archives);
+
+      for (final String archive : archives) {
         log.info("archive: " + archive);
       }
     }

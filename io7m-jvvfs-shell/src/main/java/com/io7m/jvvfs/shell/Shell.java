@@ -81,6 +81,11 @@ public final class Shell implements Runnable
     for (;;) {
       try {
         final String line = this.reader.readLine();
+        if (line == null) {
+          this.cleanup();
+          break;
+        }
+
         final ShellCommand cmd = ShellCommand.parseCommand(line);
         cmd.run(this.log, this.config, this.filesystem);
       } catch (final IOException e) {
@@ -110,5 +115,10 @@ public final class Shell implements Runnable
         }
       }
     }
+  }
+
+  private void cleanup()
+  {
+
   }
 }
