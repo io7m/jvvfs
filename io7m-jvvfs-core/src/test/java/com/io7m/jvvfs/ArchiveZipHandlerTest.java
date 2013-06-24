@@ -25,17 +25,6 @@ import org.junit.Test;
 
 public final class ArchiveZipHandlerTest
 {
-  @SuppressWarnings("static-method") @Test public void testHandleZip()
-    throws FileNotFoundException,
-      IOException
-  {
-    final ArchiveZipHandler h = new ArchiveZipHandler();
-    final File tempdir = TestData.getTestDataDirectory();
-
-    final File file = new File(tempdir, "single-file.zip");
-    Assert.assertTrue(h.canHandle(new PathReal(file.toString())));
-  }
-
   @SuppressWarnings("static-method") @Test public void testHandleJar()
     throws FileNotFoundException,
       IOException
@@ -56,5 +45,16 @@ public final class ArchiveZipHandlerTest
 
     final File file = new File(tempdir, "unknown.unknown");
     Assert.assertFalse(h.canHandle(new PathReal(file.toString())));
+  }
+
+  @SuppressWarnings("static-method") @Test public void testHandleZip()
+    throws FileNotFoundException,
+      IOException
+  {
+    final ArchiveZipHandler h = new ArchiveZipHandler();
+    final File tempdir = TestData.getTestDataDirectory();
+
+    final File file = new File(tempdir, "single-file.zip");
+    Assert.assertTrue(h.canHandle(new PathReal(file.toString())));
   }
 }

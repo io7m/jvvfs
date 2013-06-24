@@ -21,11 +21,13 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.Stack;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.annotation.CheckForNull;
@@ -33,7 +35,6 @@ import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnimplementedCodeException;
 import com.io7m.jaux.UnreachableCodeException;
 import com.io7m.jaux.functional.Option;
 import com.io7m.jaux.functional.Option.Some;
@@ -85,13 +86,21 @@ public final class Filesystem implements
   private static final class FSReferenceVirtualDirectory extends FSReference
   {
     final @Nonnull PathVirtual path;
+    final @Nonnull Calendar    mtime;
 
     FSReferenceVirtualDirectory(
-      final @Nonnull PathVirtual path)
+      final @Nonnull PathVirtual path,
+      final @Nonnull Calendar mtime)
     {
       super(FSReferenceType.FS_REF_VIRTUAL_DIRECTORY);
       this.path = path;
+      this.mtime = mtime;
     }
+  }
+
+  private static @Nonnull Calendar getUTCTimeNow()
+  {
+    return Calendar.getInstance(TimeZone.getTimeZone("UTC"));
   }
 
   @SuppressWarnings("unchecked") private static @Nonnull
@@ -250,12 +259,12 @@ public final class Filesystem implements
 
   private final @Nonnull Log                                       log;
   private final @Nonnull Log                                       log_directory;
-  private final @Nonnull Log                                       log_mount;
 
+  private final @Nonnull Log                                       log_mount;
   private final @Nonnull Option<PathReal>                          archives;
   private final @Nonnull List<ArchiveHandler<?>>                   handlers;
   private final @Nonnull SortedMap<PathVirtual, Stack<Archive<?>>> mounts;
-  private final @Nonnull Set<PathVirtual>                          directories;
+  private final @Nonnull Map<PathVirtual, Calendar>                directories;
 
   private Filesystem(
     final @Nonnull Log log,
@@ -280,8 +289,8 @@ public final class Filesystem implements
 
     this.mounts = new TreeMap<PathVirtual, Stack<Archive<?>>>();
 
-    this.directories = new HashSet<PathVirtual>();
-    this.directories.add(PathVirtual.ROOT);
+    this.directories = new HashMap<PathVirtual, Calendar>();
+    this.directories.put(PathVirtual.ROOT, Filesystem.getUTCTimeNow());
   }
 
   /**
@@ -356,7 +365,7 @@ public final class Filesystem implements
     switch (r.type) {
       case OPTION_NONE:
       {
-        this.directories.add(path);
+        this.directories.put(path, Filesystem.getUTCTimeNow());
         break;
       }
       case OPTION_SOME:
@@ -371,7 +380,7 @@ public final class Filesystem implements
             switch (ra.ref.type) {
               case TYPE_DIRECTORY:
               {
-                this.directories.add(path);
+                this.directories.put(path, Filesystem.getUTCTimeNow());
                 return;
               }
               case TYPE_FILE:
@@ -405,7 +414,46 @@ public final class Filesystem implements
     throws FilesystemError,
       ConstraintError
   {
-    throw new UnimplementedCodeException();
+    Constraints.constrainNotNull(path, "Path");
+
+    final Option<? extends FSReference> r = this.lookup(path);
+    switch (r.type) {
+      case OPTION_NONE:
+      {
+        throw FilesystemError.fileNotFound(path.toString());
+      }
+      case OPTION_SOME:
+      {
+        final Some<? extends FSReference> s =
+          (Option.Some<? extends FSReference>) r;
+
+        switch (s.value.type) {
+          case FS_REF_ARCHIVE:
+          {
+            final FSReferenceArchive ra = (FSReferenceArchive) s.value;
+            switch (ra.ref.type) {
+              case TYPE_DIRECTORY:
+              {
+                throw FilesystemError.notFile(path.toString());
+              }
+              case TYPE_FILE:
+              {
+                final Archive<?> a = ra.ref.archive;
+                return a.getFileSize(path.subtract(a.getMountPath()));
+              }
+            }
+
+            throw new UnreachableCodeException();
+          }
+          case FS_REF_VIRTUAL_DIRECTORY:
+          {
+            throw FilesystemError.notFile(path.toString());
+          }
+        }
+      }
+    }
+
+    throw new UnreachableCodeException();
   }
 
   @Override public @Nonnull Calendar getModificationTime(
@@ -413,7 +461,37 @@ public final class Filesystem implements
     throws FilesystemError,
       ConstraintError
   {
-    throw new UnimplementedCodeException();
+    Constraints.constrainNotNull(path, "Path");
+
+    final Option<? extends FSReference> r = this.lookup(path);
+    switch (r.type) {
+      case OPTION_NONE:
+      {
+        throw FilesystemError.fileNotFound(path.toString());
+      }
+      case OPTION_SOME:
+      {
+        final Some<? extends FSReference> s =
+          (Option.Some<? extends FSReference>) r;
+
+        switch (s.value.type) {
+          case FS_REF_ARCHIVE:
+          {
+            final FSReferenceArchive ra = (FSReferenceArchive) s.value;
+            final Archive<?> a = ra.ref.archive;
+            return a.getModificationTime(path.subtract(a.getMountPath()));
+          }
+          case FS_REF_VIRTUAL_DIRECTORY:
+          {
+            final FSReferenceVirtualDirectory rvd =
+              (FSReferenceVirtualDirectory) s.value;
+            return rvd.mtime;
+          }
+        }
+      }
+    }
+
+    throw new UnreachableCodeException();
   }
 
   @Override public boolean isDirectory(
@@ -564,9 +642,10 @@ public final class Filesystem implements
          * created directories.
          */
 
-        if (this.directories.contains(path)) {
+        if (this.directories.containsKey(path)) {
+          final Calendar mtime = this.directories.get(path);
           @SuppressWarnings("unchecked") final T f =
-            (T) new FSReferenceVirtualDirectory(path);
+            (T) new FSReferenceVirtualDirectory(path, mtime);
           return new Option.Some<T>(f);
         }
         return new Option.None<T>();
@@ -759,7 +838,44 @@ public final class Filesystem implements
   {
     Constraints.constrainNotNull(path, "Path");
 
-    throw new UnimplementedCodeException();
+    final Option<? extends FSReference> r = this.lookup(path);
+    switch (r.type) {
+      case OPTION_NONE:
+      {
+        throw FilesystemError.fileNotFound(path.toString());
+      }
+      case OPTION_SOME:
+      {
+        final Some<? extends FSReference> s =
+          (Option.Some<? extends FSReference>) r;
+
+        switch (s.value.type) {
+          case FS_REF_ARCHIVE:
+          {
+            final FSReferenceArchive ra = (FSReferenceArchive) s.value;
+            switch (ra.ref.type) {
+              case TYPE_DIRECTORY:
+              {
+                throw FilesystemError.notFile(path.toString());
+              }
+              case TYPE_FILE:
+              {
+                final Archive<?> a = ra.ref.archive;
+                return a.openFile(path.subtract(a.getMountPath()));
+              }
+            }
+
+            throw new UnreachableCodeException();
+          }
+          case FS_REF_VIRTUAL_DIRECTORY:
+          {
+            throw FilesystemError.notFile(path.toString());
+          }
+        }
+      }
+    }
+
+    throw new UnreachableCodeException();
   }
 
   @Override public void unmount(

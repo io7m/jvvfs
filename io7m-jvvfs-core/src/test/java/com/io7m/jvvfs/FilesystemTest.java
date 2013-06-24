@@ -16,9 +16,14 @@
 
 package com.io7m.jvvfs;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import javax.annotation.Nonnull;
 
@@ -178,6 +183,199 @@ public class FilesystemTest
   {
     final Filesystem fs = FilesystemTest.makeFS();
     fs.exists(null);
+  }
+
+  /**
+   * Opening a file works.
+   */
+
+  @SuppressWarnings("static-method") @Test public void testFileOpenCorrect()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("single-file.zip", PathVirtual.ROOT);
+
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file.txt")));
+
+    final InputStream s = fs.openFile(PathVirtual.ofString("/file.txt"));
+    final BufferedReader b = new BufferedReader(new InputStreamReader(s));
+
+    final String l = b.readLine();
+    Assert.assertEquals("Hello zip.", l);
+    s.close();
+  }
+
+  /**
+   * Opening a directory fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testFileOpenDirectory()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      fs.openFile(PathVirtual.ofString("/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      throw e;
+    }
+  }
+
+  /**
+   * Opening a virtual directory fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testFileOpenDirectoryVirtual()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.createDirectory(PathVirtual.ofString("/bin"));
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      fs.openFile(PathVirtual.ofString("/bin"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      throw e;
+    }
+  }
+
+  /**
+   * Opening a nonexistent file fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testFileOpenNonexistent()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.openFile(PathVirtual.ofString("/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    }
+  }
+
+  /**
+   * Retrieving the size of a file works.
+   */
+
+  @SuppressWarnings("static-method") @Test public void testFileSizeCorrect()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("single-file.zip", PathVirtual.ROOT);
+
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file.txt")));
+    Assert
+      .assertEquals(11, fs.getFileSize(PathVirtual.ofString("/file.txt")));
+  }
+
+  /**
+   * Retrieving the size of a directory fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testFileSizeDirectory()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      fs.getFileSize(PathVirtual.ofString("/subdir"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      throw e;
+    }
+  }
+
+  /**
+   * Retrieving the size of a virtual directory fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testFileSizeDirectoryVirtual()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.createDirectory(PathVirtual.ofString("/bin"));
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      fs.getFileSize(PathVirtual.ofString("/bin"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      throw e;
+    }
+  }
+
+  /**
+   * Retrieving the size of a nonexistent file fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testFileSizeNonexistent()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.getFileSize(PathVirtual.ofString("/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
+    }
   }
 
   /**
@@ -378,13 +576,12 @@ public class FilesystemTest
   }
 
   /**
-   * Mounting an archive that hides an existing directory with a file, makes
-   * the hidden directory inaccessible.
+   * Retrieving the modification time of a directory works.
    */
 
   @SuppressWarnings("static-method") @Test public
     void
-    testMountArchiveFileShadows()
+    testModificationTimeDirectoryCorrect()
       throws IOException,
         ConstraintError,
         FilesystemError
@@ -393,64 +590,88 @@ public class FilesystemTest
 
     fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
 
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
-
-    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
-
-    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir")));
-
-    try {
-      fs.exists(PathVirtual.ofString("/subdir/file.txt"));
-    } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
-    }
+    final Calendar ct =
+      fs.getModificationTime(PathVirtual.ofString("/subdir"));
+    Assert.assertEquals(ct.get(Calendar.YEAR), 2012);
+    Assert.assertEquals(ct.get(Calendar.MONTH), 0);
+    Assert.assertEquals(ct.get(Calendar.DAY_OF_MONTH), 23);
+    Assert.assertEquals(ct.get(Calendar.HOUR_OF_DAY), 21);
+    Assert.assertEquals(ct.get(Calendar.MINUTE), 50);
   }
 
   /**
-   * Mounting an archive that hides an existing directory with a file, makes
-   * mounted archives inaccessible.
+   * Retrieving the modification time of a created directory works.
    */
 
   @SuppressWarnings("static-method") @Test public
     void
-    testMountArchiveFileShadowsMounts()
+    testModificationTimeDirectoryVirtualCorrect()
       throws IOException,
         ConstraintError,
         FilesystemError
   {
     final Filesystem fs = FilesystemTest.makeFS();
 
-    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+    final Calendar cnow = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    final long cnow_t = cnow.getTime().getTime();
+    fs.createDirectory(PathVirtual.ofString("/bin"));
 
-    fs.mountArchive(
-      "single-file-and-subdir.zip",
-      PathVirtual.ofString("/subdir"));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir/subdir")));
-    Assert.assertTrue(fs.isFile(PathVirtual
-      .ofString("/subdir/subdir/file.txt")));
+    final Calendar cdir =
+      fs.getModificationTime(PathVirtual.ofString("/bin"));
+    final long cdir_t = cdir.getTime().getTime();
 
-    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
-    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir")));
+    final long diff = Math.abs(cdir_t - cnow_t);
+    Assert.assertTrue(diff < 2);
+  }
+
+  /**
+   * Retrieving the modification time of a file works.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testModificationTimeFileCorrect()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("single-file.zip", PathVirtual.ROOT);
+
+    final Calendar ct =
+      fs.getModificationTime(PathVirtual.ofString("/file.txt"));
+    Assert.assertEquals(ct.get(Calendar.YEAR), 2012);
+    Assert.assertEquals(ct.get(Calendar.MONTH), 0);
+    Assert.assertEquals(ct.get(Calendar.DAY_OF_MONTH), 20);
+    Assert.assertEquals(ct.get(Calendar.HOUR_OF_DAY), 21);
+    Assert.assertEquals(ct.get(Calendar.MINUTE), 47);
+  }
+
+  /**
+   * Retrieving the modification time of a nonexistent file fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testModificationTimeNonexistent()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
 
     try {
-      fs.exists(PathVirtual.ofString("/subdir/file.txt"));
-      throw new UnreachableCodeException();
+      fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      Assert.fail();
     }
 
     try {
-      fs.unmount(PathVirtual.ofString("/subdir"));
-      throw new UnreachableCodeException();
+      fs.getModificationTime(PathVirtual.ofString("/nonexistent"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      throw e;
     }
   }
 
@@ -572,6 +793,83 @@ public class FilesystemTest
     final Filesystem fs = FilesystemTest.makeFS();
 
     fs.mountClasspathArchive(FilesystemTest.class, null);
+  }
+
+  /**
+   * Mounting an archive that hides an existing directory with a file, makes
+   * the hidden directory inaccessible.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testMountArchiveFileShadows()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir")));
+
+    try {
+      fs.exists(PathVirtual.ofString("/subdir/file.txt"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+    }
+  }
+
+  /**
+   * Mounting an archive that hides an existing directory with a file, makes
+   * mounted archives inaccessible.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testMountArchiveFileShadowsMounts()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+
+    fs.mountArchive(
+      "single-file-and-subdir.zip",
+      PathVirtual.ofString("/subdir"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual
+      .ofString("/subdir/subdir/file.txt")));
+
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir")));
+
+    try {
+      fs.exists(PathVirtual.ofString("/subdir/file.txt"));
+      throw new UnreachableCodeException();
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+    }
+
+    try {
+      fs.unmount(PathVirtual.ofString("/subdir"));
+      throw new UnreachableCodeException();
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+    }
   }
 
   /**
@@ -852,6 +1150,58 @@ public class FilesystemTest
   }
 
   /**
+   * Mounting an archive B at a directory provided by another archive A, and
+   * then unmounting A, means B is still accessible.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testUnmountMountArchiveDirectoryAccessible()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("complex.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/b")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac3.txt")));
+
+    fs.mountArchive("complex.zip", PathVirtual.ofString("/a/c"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/b")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac3.txt")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a/c")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac3.txt")));
+
+    fs.unmount(PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a")));
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/b")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c")));
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/a/c/ac1.txt")));
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/a/c/ac2.txt")));
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/a/c/ac3.txt")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a/c")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac3.txt")));
+  }
+
+  /**
    * Mounting reveals filesystem objects, unmounting hides them again, and has
    * stacking semantics.
    */
@@ -948,55 +1298,4 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
   }
 
-  /**
-   * Mounting an archive B at a directory provided by another archive A, and
-   * then unmounting A, means B is still accessible.
-   */
-
-  @SuppressWarnings("static-method") @Test public
-    void
-    testUnmountMountArchiveDirectoryAccessible()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountArchive("complex.zip", PathVirtual.ROOT);
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a")));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/b")));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac1.txt")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac2.txt")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac3.txt")));
-
-    fs.mountArchive("complex.zip", PathVirtual.ofString("/a/c"));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a")));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/b")));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac1.txt")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac2.txt")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/ac3.txt")));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a")));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a/c")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac1.txt")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac2.txt")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac3.txt")));
-
-    fs.unmount(PathVirtual.ROOT);
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a")));
-    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/b")));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c")));
-    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/a/c/ac1.txt")));
-    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/a/c/ac2.txt")));
-    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/a/c/ac3.txt")));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a")));
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a/c/a/c")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac1.txt")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac2.txt")));
-    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/a/c/a/c/ac3.txt")));
-  }
 }

@@ -207,15 +207,6 @@ public final class FilesystemError extends Exception
 
   final @Nonnull Code code;
 
-  /**
-   * Retrieve the error code associated with the exception.
-   */
-
-  public @Nonnull Code getCode()
-  {
-    return this.code;
-  }
-
   FilesystemError(
     final @Nonnull Code code,
     final @Nonnull String message)
@@ -229,5 +220,14 @@ public final class FilesystemError extends Exception
   {
     super(cause);
     this.code = Code.FS_ERROR_IO_ERROR;
+  }
+
+  /**
+   * Retrieve the error code associated with the exception.
+   */
+
+  public @Nonnull Code getCode()
+  {
+    return this.code;
   }
 }
