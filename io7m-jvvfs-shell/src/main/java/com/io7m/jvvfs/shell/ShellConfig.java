@@ -38,4 +38,9 @@ final class ShellConfig
   {
     return new ShellConfig(archive_directory);
   }
+
+  @Nonnull PathReal getArchiveDirectory()
+  {
+    return this.archive_directory;
+  }
 }

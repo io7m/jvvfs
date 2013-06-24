@@ -17,18 +17,25 @@
 package com.io7m.jvvfs.shell;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import javax.annotation.Nonnull;
 
+import jline.console.ConsoleReader;
+
 import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.PropertyUtils;
 import com.io7m.jlog.Log;
+import com.io7m.jvvfs.Filesystem;
+import com.io7m.jvvfs.FilesystemError;
 import com.io7m.jvvfs.PathReal;
 
-final class Shell implements Runnable
+public final class Shell implements Runnable
 {
+  /**
+   * Run the shell.
+   */
+
   public static void main(
     final String args[])
     throws IOException,
@@ -50,41 +57,58 @@ final class Shell implements Runnable
 
   private final @Nonnull ShellConfig   config;
   private final @Nonnull Log           log;
-  private final @Nonnull StringBuilder line;
+  private final @Nonnull ConsoleReader reader;
+  private final @Nonnull Filesystem    filesystem;
 
   private Shell(
     final @Nonnull ShellConfig config,
     final @Nonnull Log log)
+    throws IOException,
+      ConstraintError
   {
     this.config = config;
     this.log = log;
-    this.line = new StringBuilder();
-  }
+    this.filesystem =
+      Filesystem.makeWithArchiveDirectory(log, config.getArchiveDirectory());
 
-  private static void readLine(
-    final @Nonnull InputStream input,
-    final @Nonnull StringBuilder buffer)
-    throws IOException
-  {
-    for (;;) {
-      final int c = input.read();
-      if (c == '\n') {
-        break;
-      }
-      buffer.append(c);
-    }
+    this.reader = new ConsoleReader();
+    this.reader.addCompleter(ShellCommand.commandCompleter());
+    this.reader.setPrompt("jvvfs> ");
   }
 
   @Override public void run()
   {
-    try {
-      for (;;) {
-        this.line.setLength(0);
-        Shell.readLine(System.in, this.line);
-        this.log.debug(this.line.toString());
+    for (;;) {
+      try {
+        final String line = this.reader.readLine();
+        final ShellCommand cmd = ShellCommand.parseCommand(line);
+        cmd.run(this.log, this.config, this.filesystem);
+      } catch (final IOException e) {
+        this.log.error("i/o error: " + e.getMessage());
+      } catch (final ConstraintError e) {
+        this.log.error("constraint error: " + e.getMessage());
+      } catch (final FilesystemError e) {
+        this.log.error("filesystem error: " + e.getMessage());
+      } catch (final ShellCommandError e) {
+        switch (e.getType()) {
+          case SHELL_COMMAND_CONSTRAINT_ERROR:
+          {
+            this.log.error("constraint error: " + e.getMessage());
+            break;
+          }
+          case SHELL_COMMAND_PARSE_ERROR:
+          {
+            this.log.error("parse error");
+            this.log.error("usage: " + e.getMessage());
+            break;
+          }
+          case SHELL_COMMAND_UNKNOWN:
+          {
+            this.log.error("unknown command: " + e.getMessage());
+            break;
+          }
+        }
       }
-    } catch (final IOException e) {
-      e.printStackTrace();
     }
   }
 }
