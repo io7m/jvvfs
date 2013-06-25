@@ -17,6 +17,7 @@
 package com.io7m.jvvfs.shell;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,28 @@ import com.io7m.jvvfs.PathVirtual;
 
 abstract class ShellCommand
 {
+  static final class ShellCommandFileSize extends ShellCommand
+  {
+    private final @Nonnull PathVirtual path;
+
+    ShellCommandFileSize(
+      final @Nonnull PathVirtual path)
+    {
+      this.path = path;
+    }
+
+    @Override void run(
+      final @Nonnull Log log,
+      final @Nonnull PrintStream out,
+      final @Nonnull ShellConfig config,
+      final @Nonnull Filesystem fs)
+      throws FilesystemError,
+        ConstraintError
+    {
+      out.println(Long.toString(fs.getFileSize(this.path)));
+    }
+  }
+
   static final class ShellCommandHelp extends ShellCommand
   {
     private final @Nonnull String command;
@@ -48,6 +71,7 @@ abstract class ShellCommand
 
     @SuppressWarnings("synthetic-access") @Override void run(
       final @Nonnull Log log,
+      final @Nonnull PrintStream out,
       final @Nonnull ShellConfig config,
       final @Nonnull Filesystem fs)
       throws FilesystemError,
@@ -65,6 +89,7 @@ abstract class ShellCommand
   {
     @Override void run(
       final @Nonnull Log log,
+      final @Nonnull PrintStream out,
       final @Nonnull ShellConfig config,
       final @Nonnull Filesystem fs)
       throws FilesystemError,
@@ -78,6 +103,7 @@ abstract class ShellCommand
 
   abstract void run(
     final @Nonnull Log log,
+    final @Nonnull PrintStream out,
     final @Nonnull ShellConfig config,
     final @Nonnull Filesystem fs)
     throws FilesystemError,
@@ -95,6 +121,7 @@ abstract class ShellCommand
 
     @Override void run(
       final @Nonnull Log log,
+      final @Nonnull PrintStream out,
       final @Nonnull ShellConfig config,
       final @Nonnull Filesystem fs)
       throws FilesystemError,
@@ -119,6 +146,7 @@ abstract class ShellCommand
 
     @Override void run(
       final @Nonnull Log log,
+      final @Nonnull PrintStream out,
       final @Nonnull ShellConfig config,
       final @Nonnull Filesystem fs)
       throws FilesystemError,
@@ -140,6 +168,7 @@ abstract class ShellCommand
 
     @Override void run(
       final @Nonnull Log log,
+      final @Nonnull PrintStream out,
       final @Nonnull ShellConfig config,
       final @Nonnull Filesystem fs)
       throws FilesystemError,
@@ -158,6 +187,7 @@ abstract class ShellCommand
 
     @Override void run(
       final @Nonnull Log log,
+      final @Nonnull PrintStream out,
       final @Nonnull ShellConfig config,
       final @Nonnull Filesystem fs)
       throws FilesystemError,
@@ -169,7 +199,7 @@ abstract class ShellCommand
       Arrays.sort(archives);
 
       for (final String archive : archives) {
-        log.info("archive: " + archive);
+        out.println(archive);
       }
     }
   }
@@ -187,6 +217,65 @@ abstract class ShellCommand
 
   static {
     commands = new HashMap<String, ShellCommandDefinition>();
+
+    ShellCommand.commands.put("archives", new ShellCommandDefinition() {
+      @Override @Nonnull String helpText()
+      {
+        final StringBuilder b = new StringBuilder();
+        b.append("syntax: archives");
+        b.append(System.lineSeparator());
+        b.append("  List all available archive files");
+        return b.toString();
+      }
+
+      @Override @Nonnull
+        PartialFunction<String[], ShellCommand, ShellCommandError>
+        getParser()
+      {
+        return new PartialFunction<String[], ShellCommand, ShellCommandError>() {
+          @Override public ShellCommand call(
+            final @Nonnull String[] arguments)
+            throws ShellCommandError
+          {
+            return new ShellCommandArchives();
+          }
+        };
+      }
+    });
+
+    ShellCommand.commands.put("file-size", new ShellCommandDefinition() {
+      @Override @Nonnull String helpText()
+      {
+        final StringBuilder b = new StringBuilder();
+        b.append("syntax: file-size <path>");
+        b.append(System.lineSeparator());
+        b.append("  Retrieve the size of the file at <path>");
+        return b.toString();
+      }
+
+      @Override @Nonnull
+        PartialFunction<String[], ShellCommand, ShellCommandError>
+        getParser()
+      {
+        return new PartialFunction<String[], ShellCommand, ShellCommandError>() {
+          @Override public ShellCommand call(
+            final @Nonnull String[] arguments)
+            throws ShellCommandError
+          {
+            try {
+              if (arguments.length < 2) {
+                throw new ShellCommandError.ShellCommandParseError(
+                  "file-size <path>");
+              }
+              return new ShellCommandFileSize(PathVirtual
+                .ofString(arguments[1]));
+            } catch (final ConstraintError e) {
+              throw new ShellCommandError.ShellCommandConstraintError(e);
+            }
+          }
+        };
+      }
+    });
 
     ShellCommand.commands.put("mkdir", new ShellCommandDefinition() {
       @Override @Nonnull String helpText()
@@ -289,35 +378,10 @@ abstract class ShellCommand
       }
     });
 
-    ShellCommand.commands.put("archives", new ShellCommandDefinition() {
-      @Override @Nonnull String helpText()
-      {
-        final StringBuilder b = new StringBuilder();
-        b.append("syntax: archives");
-        b.append(System.lineSeparator());
-        b.append("  List all available archive files");
-        return b.toString();
-      }
-
-      @Override @Nonnull
-        PartialFunction<String[], ShellCommand, ShellCommandError>
-        getParser()
-      {
-        return new PartialFunction<String[], ShellCommand, ShellCommandError>() {
-          @Override public ShellCommand call(
-            final @Nonnull String[] arguments)
-            throws ShellCommandError
-          {
-            return new ShellCommandArchives();
-          }
-        };
-      }
-    });
-
     ShellCommand.commands.put("help", new ShellCommandDefinition() {
       @Override @Nonnull String helpText()
       {
-        return ShellCommand.HELP_TEXT;
+        return ShellCommand.makeHelpText().toString();
       }
 
       @Override @Nonnull
@@ -337,11 +401,9 @@ abstract class ShellCommand
         };
       }
     });
-
-    ShellCommand.HELP_TEXT = ShellCommand.makeHelpText().toString();
   }
 
-  private static StringBuilder makeHelpText()
+  static StringBuilder makeHelpText()
   {
     final StringBuilder b = new StringBuilder();
     b.append("syntax: help [");

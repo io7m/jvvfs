@@ -87,7 +87,7 @@ public final class Shell implements Runnable
         }
 
         final ShellCommand cmd = ShellCommand.parseCommand(line);
-        cmd.run(this.log, this.config, this.filesystem);
+        cmd.run(this.log, System.out, this.config, this.filesystem);
       } catch (final IOException e) {
         this.log.error("i/o error: " + e.getMessage());
       } catch (final ConstraintError e) {
