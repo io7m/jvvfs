@@ -65,7 +65,7 @@ public final class ArchiveDirectoryTest extends
 
       a.openFileActual(r);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     } finally {
       a.close();

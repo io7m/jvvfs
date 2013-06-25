@@ -45,6 +45,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
    * @throws IOException
    * @throws FileNotFoundException
    * @throws ConstraintError
+   * @throws FilesystemError
    */
 
   abstract @Nonnull Archive<T> getArchive(
@@ -52,7 +53,8 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     final @Nonnull PathVirtual mount)
     throws FileNotFoundException,
       IOException,
-      ConstraintError;
+      ConstraintError,
+      FilesystemError;
 
   @Test public void testFileSizeFile()
     throws FileNotFoundException,
@@ -84,7 +86,9 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/nonexistent");
       a.getFileSize(p);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(FilesystemError.Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(
+        FilesystemError.Code.FS_ERROR_NONEXISTENT,
+        e.getCode());
       throw e;
     } finally {
       a.close();
@@ -104,7 +108,9 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/nonexistent/file.txt");
       a.getFileSize(p);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(FilesystemError.Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(
+        FilesystemError.Code.FS_ERROR_NONEXISTENT,
+        e.getCode());
       throw e;
     } finally {
       a.close();
@@ -123,7 +129,9 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/subdir");
       a.getFileSize(p);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(FilesystemError.Code.FS_ERROR_NOT_A_FILE, e.code);
+      Assert.assertEquals(
+        FilesystemError.Code.FS_ERROR_NOT_A_FILE,
+        e.getCode());
       throw e;
     } finally {
       a.close();
@@ -145,7 +153,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     } catch (final FilesystemError e) {
       Assert.assertEquals(
         FilesystemError.Code.FS_ERROR_NOT_A_DIRECTORY,
-        e.code);
+        e.getCode());
       throw e;
     } finally {
       a.close();
@@ -212,7 +220,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/nonexistent");
       a.getModificationTime(p);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     } finally {
       a.close();
@@ -348,7 +356,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/file.txt");
       a.listDirectory(p);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
       throw e;
     } finally {
       a.close();
@@ -369,7 +377,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/nonexistent");
       a.listDirectory(p);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     } finally {
       a.close();
@@ -390,7 +398,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/file.txt/file.txt");
       a.listDirectory(p);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
       throw e;
     } finally {
       a.close();
@@ -491,7 +499,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     } catch (final FilesystemError e) {
       Assert.assertEquals(
         FilesystemError.Code.FS_ERROR_NOT_A_DIRECTORY,
-        e.code);
+        e.getCode());
       throw e;
     } finally {
       a.close();
@@ -549,7 +557,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/nonexistent");
       a.openFile(p);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     } finally {
       a.close();
@@ -569,7 +577,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/subdir");
       a.openFile(p);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.getCode());
       throw e;
     } finally {
       a.close();
@@ -591,7 +599,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/file.txt/file.txt");
       a.openFile(p);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
       throw e;
     } finally {
       a.close();
@@ -640,7 +648,8 @@ public abstract class ArchiveContract<T extends ArchiveKind>
   @Test public void testString()
     throws FileNotFoundException,
       IOException,
-      ConstraintError
+      ConstraintError,
+      FilesystemError
   {
     final Archive<T> a =
       this.getArchive("single-file-and-subdir", PathVirtual.ROOT);

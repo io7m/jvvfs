@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import javax.annotation.CheckForNull;
@@ -85,11 +86,18 @@ import com.io7m.jvvfs.FileReference.Type;
     final @Nonnull PathReal base_path,
     final @Nonnull PathVirtual mount)
     throws ConstraintError,
-      IOException
+      IOException,
+      FilesystemError
   {
-    this.mount = Constraints.constrainNotNull(mount, "Mount path");
-    this.zip = new ZipFile(base_path.toString());
-    this.real = new PathReal(base_path.toString());
+    try {
+      this.mount = Constraints.constrainNotNull(mount, "Mount path");
+      this.zip = new ZipFile(base_path.toString());
+      this.real = new PathReal(base_path.toString());
+    } catch (final ZipException e) {
+      throw FilesystemError.archiveDamaged(
+        base_path.toFile().getName(),
+        e.getMessage());
+    }
   }
 
   @Override void close()

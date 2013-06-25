@@ -30,6 +30,7 @@ import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.functional.Option;
 import com.io7m.jaux.functional.Option.Some;
 import com.io7m.jvvfs.FileReference.Type;
+import com.io7m.jvvfs.FilesystemError.Code;
 
 public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
 {
@@ -38,12 +39,27 @@ public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
     final @Nonnull PathVirtual mount)
     throws FileNotFoundException,
       IOException,
-      ConstraintError
+      ConstraintError,
+      FilesystemError
   {
     final File tempdir = TestData.getTestDataDirectory();
     final PathReal r =
       new PathReal(new File(tempdir, basename).toString() + ".zip");
     return new ArchiveZip(r, mount);
+  }
+
+  @Test(expected = FilesystemError.class) public void testCorrupt()
+    throws ConstraintError,
+      FileNotFoundException,
+      IOException,
+      FilesystemError
+  {
+    try {
+      this.getArchive("encrypted", PathVirtual.ROOT);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_ARCHIVE_DAMAGED, e.getCode());
+      throw e;
+    }
   }
 
   @Test public void testListDirectoryImplicit()

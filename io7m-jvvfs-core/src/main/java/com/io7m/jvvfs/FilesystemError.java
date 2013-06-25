@@ -175,7 +175,7 @@ public final class FilesystemError extends Exception
       + "' is not a file");
   }
 
-  final @Nonnull Code code;
+  private final @Nonnull Code code;
 
   FilesystemError(
     final @Nonnull Code code,

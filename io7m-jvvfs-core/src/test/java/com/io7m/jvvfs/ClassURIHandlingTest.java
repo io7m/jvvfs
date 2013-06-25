@@ -202,7 +202,8 @@ public class ClassURIHandlingTest
       final String path = "/x/y/z/C.class";
       ClassURIHandling.getClassContainerPath(url, path);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_ARCHIVE_TYPE_UNSUPPORTED, e.code);
+      Assert
+        .assertEquals(Code.FS_ERROR_ARCHIVE_TYPE_UNSUPPORTED, e.getCode());
       throw e;
     }
   }

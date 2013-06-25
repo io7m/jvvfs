@@ -254,7 +254,7 @@ public class FilesystemTest
     try {
       fs.exists(PathVirtual.ofString("/subdir/nonexistent/file.txt"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     }
   }
@@ -321,7 +321,7 @@ public class FilesystemTest
     try {
       fs.openFile(PathVirtual.ofString("/subdir"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.getCode());
       throw e;
     }
   }
@@ -348,7 +348,7 @@ public class FilesystemTest
     try {
       fs.openFile(PathVirtual.ofString("/bin"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.getCode());
       throw e;
     }
   }
@@ -369,7 +369,7 @@ public class FilesystemTest
     try {
       fs.openFile(PathVirtual.ofString("/nonexistent"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     }
   }
@@ -396,7 +396,7 @@ public class FilesystemTest
     try {
       fs.openFile(PathVirtual.ROOT);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.getCode());
       throw e;
     }
   }
@@ -442,7 +442,7 @@ public class FilesystemTest
     try {
       fs.getFileSize(PathVirtual.ofString("/subdir"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.getCode());
       throw e;
     }
   }
@@ -469,7 +469,7 @@ public class FilesystemTest
     try {
       fs.getFileSize(PathVirtual.ofString("/bin"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.getCode());
       throw e;
     }
   }
@@ -490,7 +490,7 @@ public class FilesystemTest
     try {
       fs.getFileSize(PathVirtual.ofString("/nonexistent"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     }
   }
@@ -538,7 +538,7 @@ public class FilesystemTest
     try {
       fs.isDirectory(PathVirtual.ofString("/subdir/nonexistent/file.txt"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     }
   }
@@ -632,7 +632,7 @@ public class FilesystemTest
     try {
       fs.isFile(PathVirtual.ofString("/subdir/nonexistent/file.txt"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     }
   }
@@ -787,7 +787,7 @@ public class FilesystemTest
     try {
       fs.getModificationTime(PathVirtual.ofString("/nonexistent"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     }
   }
@@ -869,7 +869,7 @@ public class FilesystemTest
     try {
       fs.mountArchive("files1-3.zip", PathVirtual.ofString("/file.txt"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
       throw e;
     }
   }
@@ -899,7 +899,7 @@ public class FilesystemTest
         "files1-3.zip",
         PathVirtual.ofString("/file.txt/file.txt"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
       throw e;
     }
   }
@@ -965,7 +965,7 @@ public class FilesystemTest
     try {
       fs.exists(PathVirtual.ofString("/subdir/file.txt"));
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
     }
   }
 
@@ -1004,14 +1004,14 @@ public class FilesystemTest
       fs.exists(PathVirtual.ofString("/subdir/file.txt"));
       throw new UnreachableCodeException();
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
     }
 
     try {
       fs.unmount(PathVirtual.ofString("/subdir"));
       throw new UnreachableCodeException();
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.code);
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
     }
   }
 
@@ -1047,7 +1047,8 @@ public class FilesystemTest
     try {
       fs.mountArchive("unknown.unknown", PathVirtual.ROOT);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_ARCHIVE_TYPE_UNSUPPORTED, e.code);
+      Assert
+        .assertEquals(Code.FS_ERROR_ARCHIVE_TYPE_UNSUPPORTED, e.getCode());
       throw e;
     }
   }
@@ -1072,7 +1073,7 @@ public class FilesystemTest
         try {
           fs.mountArchive(a, PathVirtual.ROOT);
         } catch (final FilesystemError e) {
-          Assert.assertEquals(Code.FS_ERROR_ARCHIVE_NONEXISTENT, e.code);
+          Assert.assertEquals(Code.FS_ERROR_ARCHIVE_NONEXISTENT, e.getCode());
         }
       }
     });
@@ -1098,7 +1099,7 @@ public class FilesystemTest
         try {
           fs.mountArchive("single-file.zip", PathVirtual.ofString("/" + name));
         } catch (final FilesystemError e) {
-          Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
+          Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
         }
       }
     });
@@ -1160,7 +1161,7 @@ public class FilesystemTest
     try {
       fs.mountArchive("single-file.zip", PathVirtual.ROOT);
     } catch (final FilesystemError e) {
-      Assert.assertEquals(Code.FS_ERROR_ARCHIVE_ALREADY_MOUNTED, e.code);
+      Assert.assertEquals(Code.FS_ERROR_ARCHIVE_ALREADY_MOUNTED, e.getCode());
       throw e;
     }
   }
@@ -1218,7 +1219,7 @@ public class FilesystemTest
         try {
           fs.mountArchive(a, PathVirtual.ROOT);
         } catch (final FilesystemError e) {
-          Assert.assertEquals(Code.FS_ERROR_ARCHIVE_NO_DIRECTORY, e.code);
+          Assert.assertEquals(Code.FS_ERROR_ARCHIVE_NO_DIRECTORY, e.getCode());
         }
       }
     });
