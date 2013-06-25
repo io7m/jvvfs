@@ -78,20 +78,6 @@ public final class FilesystemError extends Exception
     FS_ERROR_IO_ERROR,
 
     /**
-     * The object in question was expected to be a file, but was a directory
-     * instead.
-     */
-
-    FS_ERROR_IS_A_DIRECTORY,
-
-    /**
-     * The object in question was expected to be a directory, but was a file
-     * instead.
-     */
-
-    FS_ERROR_IS_A_FILE,
-
-    /**
      * The object in question was expected to be a file, but was a something
      * else instead.
      */
@@ -171,22 +157,6 @@ public final class FilesystemError extends Exception
     final @Nonnull Exception e)
   {
     return new FilesystemError(e);
-  }
-
-  static @Nonnull FilesystemError isDirectory(
-    final String path)
-  {
-    return new FilesystemError(Code.FS_ERROR_IS_A_DIRECTORY, "file '"
-      + path
-      + "' is a directory");
-  }
-
-  static @Nonnull FilesystemError isFile(
-    final String path)
-  {
-    return new FilesystemError(Code.FS_ERROR_IS_A_FILE, "file '"
-      + path
-      + "' is a file");
   }
 
   static @Nonnull FilesystemError notDirectory(
