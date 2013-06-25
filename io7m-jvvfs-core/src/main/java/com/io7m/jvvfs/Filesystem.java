@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
@@ -38,6 +39,7 @@ import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.UnimplementedCodeException;
 import com.io7m.jaux.UnreachableCodeException;
 import com.io7m.jaux.functional.Option;
 import com.io7m.jaux.functional.Option.Some;
@@ -617,6 +619,14 @@ public final class Filesystem implements
     }
 
     throw new UnreachableCodeException();
+  }
+
+  @Override public @Nonnull SortedSet<String> listDirectory(
+    final @Nonnull PathVirtual path)
+    throws FilesystemError,
+      ConstraintError
+  {
+    throw new UnimplementedCodeException();
   }
 
   /**

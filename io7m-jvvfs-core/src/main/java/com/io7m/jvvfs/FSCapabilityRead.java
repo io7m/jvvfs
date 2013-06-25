@@ -18,6 +18,7 @@ package com.io7m.jvvfs;
 
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.SortedSet;
 
 import javax.annotation.Nonnull;
 
@@ -129,6 +130,29 @@ public interface FSCapabilityRead
     final @Nonnull PathVirtual path)
     throws ConstraintError,
       FilesystemError;
+
+  /**
+   * <p>
+   * List the contents of the directory at <code>path</code>.
+   * </p>
+   * 
+   * @param path
+   *          The path.
+   * @throws FilesystemError
+   *           If:
+   *           <ul>
+   *           <li>No object exists at <code>path</code>.</li>
+   *           <li>The object at <code>path</code> is not a directory</li>
+   *           <li>An I/O error occurs</li>
+   *           </ul>
+   * @throws ConstraintError
+   *           Iff <code>path == null</code>.
+   */
+
+  public @Nonnull SortedSet<String> listDirectory(
+    final @Nonnull PathVirtual path)
+    throws FilesystemError,
+      ConstraintError;
 
   /**
    * <p>
