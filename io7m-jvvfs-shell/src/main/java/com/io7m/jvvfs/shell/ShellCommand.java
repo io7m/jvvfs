@@ -17,6 +17,8 @@
 package com.io7m.jvvfs.shell;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -58,6 +60,47 @@ abstract class ShellCommand
         ConstraintError
     {
       out.println(Long.toString(fs.getFileSize(this.path)));
+    }
+  }
+
+  static final class ShellCommandFileRead extends ShellCommand
+  {
+    private final @Nonnull PathVirtual path;
+
+    ShellCommandFileRead(
+      final @Nonnull PathVirtual path)
+    {
+      this.path = path;
+    }
+
+    @Override void run(
+      final @Nonnull Log log,
+      final @Nonnull PrintStream out,
+      final @Nonnull ShellConfig config,
+      final @Nonnull Filesystem fs)
+      throws FilesystemError,
+        ConstraintError
+    {
+      final InputStream s = fs.openFile(this.path);
+
+      try {
+        final byte[] buffer = new byte[8192];
+        for (;;) {
+          final int r = s.read(buffer);
+          if (r == -1) {
+            break;
+          }
+          out.write(buffer, 0, r);
+        }
+      } catch (final IOException e) {
+        log.error("i/o error: " + e.getMessage());
+      } finally {
+        try {
+          s.close();
+        } catch (final IOException e) {
+          log.error("i/o error: " + e.getMessage());
+        }
+      }
     }
   }
 
@@ -329,6 +372,40 @@ abstract class ShellCommand
                   "file-time <path>");
               }
               return new ShellCommandFileModificationTime(PathVirtual
+                .ofString(arguments[1]));
+            } catch (final ConstraintError e) {
+              throw new ShellCommandError.ShellCommandConstraintError(e);
+            }
+          }
+        };
+      }
+    });
+
+    ShellCommand.commands.put("file-read", new ShellCommandDefinition() {
+      @Override @Nonnull String helpText()
+      {
+        final StringBuilder b = new StringBuilder();
+        b.append("syntax: file-read <path>");
+        b.append(System.lineSeparator());
+        b.append("  Display the contents of the file at <path>");
+        return b.toString();
+      }
+
+      @Override @Nonnull
+        PartialFunction<String[], ShellCommand, ShellCommandError>
+        getParser()
+      {
+        return new PartialFunction<String[], ShellCommand, ShellCommandError>() {
+          @Override public ShellCommand call(
+            final @Nonnull String[] arguments)
+            throws ShellCommandError
+          {
+            try {
+              if (arguments.length < 2) {
+                throw new ShellCommandError.ShellCommandParseError(
+                  "file-read <path>");
+              }
+              return new ShellCommandFileRead(PathVirtual
                 .ofString(arguments[1]));
             } catch (final ConstraintError e) {
               throw new ShellCommandError.ShellCommandConstraintError(e);
