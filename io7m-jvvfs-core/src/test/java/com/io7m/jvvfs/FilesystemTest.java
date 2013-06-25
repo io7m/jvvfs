@@ -815,7 +815,7 @@ public class FilesystemTest
     final long diff = Math.abs(cdir_t - cnow_t);
     System.out.println("diff: " + diff);
 
-    Assert.assertTrue(diff < 1000);
+    Assert.assertTrue(diff < 2000);
   }
 
   /**
