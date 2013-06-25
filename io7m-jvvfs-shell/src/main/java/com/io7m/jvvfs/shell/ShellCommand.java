@@ -41,11 +41,65 @@ import com.io7m.jvvfs.PathVirtual;
 
 abstract class ShellCommand
 {
-  static final class ShellCommandFileSize extends ShellCommand
+  static final class ShellCommandArchives extends ShellCommand
+  {
+    ShellCommandArchives()
+    {
+
+    }
+
+    @Override void run(
+      final @Nonnull Log log,
+      final @Nonnull PrintStream out,
+      final @Nonnull ShellConfig config,
+      final @Nonnull Filesystem fs)
+      throws FilesystemError,
+        ConstraintError
+    {
+      final PathReal dir = config.getArchiveDirectory();
+      final File file = new File(dir.toString());
+      final String[] archives = file.list();
+      Arrays.sort(archives);
+
+      for (final String archive : archives) {
+        out.println(archive);
+      }
+    }
+  }
+
+  static final class ShellCommandClose extends ShellCommand
+  {
+    ShellCommandClose()
+    {
+
+    }
+
+    @Override void run(
+      final @Nonnull Log log,
+      final @Nonnull PrintStream out,
+      final @Nonnull ShellConfig config,
+      final @Nonnull Filesystem fs)
+      throws FilesystemError,
+        ConstraintError
+    {
+      fs.close();
+    }
+  }
+
+  abstract static class ShellCommandDefinition
+  {
+    abstract @Nonnull
+      PartialFunction<String[], ShellCommand, ShellCommandError>
+      getParser();
+
+    abstract @Nonnull String helpText();
+  }
+
+  static final class ShellCommandFileModificationTime extends ShellCommand
   {
     private final @Nonnull PathVirtual path;
 
-    ShellCommandFileSize(
+    ShellCommandFileModificationTime(
       final @Nonnull PathVirtual path)
     {
       this.path = path;
@@ -59,7 +113,10 @@ abstract class ShellCommand
       throws FilesystemError,
         ConstraintError
     {
-      out.println(Long.toString(fs.getFileSize(this.path)));
+      final Calendar c = fs.getModificationTime(this.path);
+      final SimpleDateFormat df =
+        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+      out.println(df.format(c.getTime()));
     }
   }
 
@@ -104,11 +161,11 @@ abstract class ShellCommand
     }
   }
 
-  static final class ShellCommandFileModificationTime extends ShellCommand
+  static final class ShellCommandFileSize extends ShellCommand
   {
     private final @Nonnull PathVirtual path;
 
-    ShellCommandFileModificationTime(
+    ShellCommandFileSize(
       final @Nonnull PathVirtual path)
     {
       this.path = path;
@@ -122,10 +179,7 @@ abstract class ShellCommand
       throws FilesystemError,
         ConstraintError
     {
-      final Calendar c = fs.getModificationTime(this.path);
-      final SimpleDateFormat df =
-        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-      out.println(df.format(c.getTime()));
+      out.println(Long.toString(fs.getFileSize(this.path)));
     }
   }
 
@@ -165,19 +219,9 @@ abstract class ShellCommand
       throws FilesystemError,
         ConstraintError
     {
-      log.info("help: " + ShellCommand.HELP_TEXT);
+      log.info("help: " + ShellCommand.makeHelpText());
     }
   }
-
-  static @Nonnull String HELP_TEXT;
-
-  abstract void run(
-    final @Nonnull Log log,
-    final @Nonnull PrintStream out,
-    final @Nonnull ShellConfig config,
-    final @Nonnull Filesystem fs)
-    throws FilesystemError,
-      ConstraintError;
 
   static final class ShellCommandMkdir extends ShellCommand
   {
@@ -248,56 +292,12 @@ abstract class ShellCommand
     }
   }
 
-  static final class ShellCommandArchives extends ShellCommand
-  {
-    ShellCommandArchives()
-    {
-
-    }
-
-    @Override void run(
-      final @Nonnull Log log,
-      final @Nonnull PrintStream out,
-      final @Nonnull ShellConfig config,
-      final @Nonnull Filesystem fs)
-      throws FilesystemError,
-        ConstraintError
-    {
-      final PathReal dir = config.getArchiveDirectory();
-      final File file = new File(dir.toString());
-      final String[] archives = file.list();
-      Arrays.sort(archives);
-
-      for (final String archive : archives) {
-        out.println(archive);
-      }
-    }
-  }
-
-  abstract static class ShellCommandDefinition
-  {
-    abstract @Nonnull
-      PartialFunction<String[], ShellCommand, ShellCommandError>
-      getParser();
-
-    abstract @Nonnull String helpText();
-  }
-
   private static final @Nonnull Map<String, ShellCommandDefinition> commands;
 
   static {
     commands = new HashMap<String, ShellCommandDefinition>();
 
     ShellCommand.commands.put("archives", new ShellCommandDefinition() {
-      @Override @Nonnull String helpText()
-      {
-        final StringBuilder b = new StringBuilder();
-        b.append("syntax: archives");
-        b.append(System.lineSeparator());
-        b.append("  List all available archive files");
-        return b.toString();
-      }
-
       @Override @Nonnull
         PartialFunction<String[], ShellCommand, ShellCommandError>
         getParser()
@@ -311,18 +311,43 @@ abstract class ShellCommand
           }
         };
       }
-    });
 
-    ShellCommand.commands.put("file-size", new ShellCommandDefinition() {
       @Override @Nonnull String helpText()
       {
         final StringBuilder b = new StringBuilder();
-        b.append("syntax: file-size <path>");
+        b.append("syntax: archives");
         b.append(System.lineSeparator());
-        b.append("  Retrieve the size of the file at <path>");
+        b.append("  List all available archive files");
         return b.toString();
       }
+    });
 
+    ShellCommand.commands.put("close", new ShellCommandDefinition() {
+      @Override @Nonnull
+        PartialFunction<String[], ShellCommand, ShellCommandError>
+        getParser()
+      {
+        return new PartialFunction<String[], ShellCommand, ShellCommandError>() {
+          @Override public ShellCommand call(
+            final @Nonnull String[] arguments)
+            throws ShellCommandError
+          {
+            return new ShellCommandClose();
+          }
+        };
+      }
+
+      @Override @Nonnull String helpText()
+      {
+        final StringBuilder b = new StringBuilder();
+        b.append("syntax: close");
+        b.append(System.lineSeparator());
+        b.append("  Close (reset) the current filesystem");
+        return b.toString();
+      }
+    });
+
+    ShellCommand.commands.put("file-size", new ShellCommandDefinition() {
       @Override @Nonnull
         PartialFunction<String[], ShellCommand, ShellCommandError>
         getParser()
@@ -345,18 +370,18 @@ abstract class ShellCommand
           }
         };
       }
-    });
 
-    ShellCommand.commands.put("file-time", new ShellCommandDefinition() {
       @Override @Nonnull String helpText()
       {
         final StringBuilder b = new StringBuilder();
-        b.append("syntax: file-time <path>");
+        b.append("syntax: file-size <path>");
         b.append(System.lineSeparator());
-        b.append("  Retrieve the modification time of the file at <path>");
+        b.append("  Retrieve the size of the file at <path>");
         return b.toString();
       }
+    });
 
+    ShellCommand.commands.put("file-time", new ShellCommandDefinition() {
       @Override @Nonnull
         PartialFunction<String[], ShellCommand, ShellCommandError>
         getParser()
@@ -379,18 +404,18 @@ abstract class ShellCommand
           }
         };
       }
-    });
 
-    ShellCommand.commands.put("file-read", new ShellCommandDefinition() {
       @Override @Nonnull String helpText()
       {
         final StringBuilder b = new StringBuilder();
-        b.append("syntax: file-read <path>");
+        b.append("syntax: file-time <path>");
         b.append(System.lineSeparator());
-        b.append("  Display the contents of the file at <path>");
+        b.append("  Retrieve the modification time of the file at <path>");
         return b.toString();
       }
+    });
 
+    ShellCommand.commands.put("file-read", new ShellCommandDefinition() {
       @Override @Nonnull
         PartialFunction<String[], ShellCommand, ShellCommandError>
         getParser()
@@ -413,18 +438,18 @@ abstract class ShellCommand
           }
         };
       }
-    });
 
-    ShellCommand.commands.put("mkdir", new ShellCommandDefinition() {
       @Override @Nonnull String helpText()
       {
         final StringBuilder b = new StringBuilder();
-        b.append("syntax: mkdir <path>");
+        b.append("syntax: file-read <path>");
         b.append(System.lineSeparator());
-        b.append("  Create a directory at <path>");
+        b.append("  Display the contents of the file at <path>");
         return b.toString();
       }
+    });
 
+    ShellCommand.commands.put("mkdir", new ShellCommandDefinition() {
       @Override @Nonnull
         PartialFunction<String[], ShellCommand, ShellCommandError>
         getParser()
@@ -446,18 +471,18 @@ abstract class ShellCommand
           }
         };
       }
-    });
 
-    ShellCommand.commands.put("mount", new ShellCommandDefinition() {
       @Override @Nonnull String helpText()
       {
         final StringBuilder b = new StringBuilder();
-        b.append("syntax: mount <archive> <path>");
+        b.append("syntax: mkdir <path>");
         b.append(System.lineSeparator());
-        b.append("  Mount the archive <archive> at <path>");
+        b.append("  Create a directory at <path>");
         return b.toString();
       }
+    });
 
+    ShellCommand.commands.put("mount", new ShellCommandDefinition() {
       @Override @Nonnull
         PartialFunction<String[], ShellCommand, ShellCommandError>
         getParser()
@@ -480,18 +505,18 @@ abstract class ShellCommand
           }
         };
       }
-    });
 
-    ShellCommand.commands.put("unmount", new ShellCommandDefinition() {
       @Override @Nonnull String helpText()
       {
         final StringBuilder b = new StringBuilder();
-        b.append("syntax: unmount <path>");
+        b.append("syntax: mount <archive> <path>");
         b.append(System.lineSeparator());
-        b.append("  Unmount the topmost archive mounted at <path>");
+        b.append("  Mount the archive <archive> at <path>");
         return b.toString();
       }
+    });
 
+    ShellCommand.commands.put("unmount", new ShellCommandDefinition() {
       @Override @Nonnull
         PartialFunction<String[], ShellCommand, ShellCommandError>
         getParser()
@@ -514,14 +539,18 @@ abstract class ShellCommand
           }
         };
       }
+
+      @Override @Nonnull String helpText()
+      {
+        final StringBuilder b = new StringBuilder();
+        b.append("syntax: unmount <path>");
+        b.append(System.lineSeparator());
+        b.append("  Unmount the topmost archive mounted at <path>");
+        return b.toString();
+      }
     });
 
     ShellCommand.commands.put("help", new ShellCommandDefinition() {
-      @Override @Nonnull String helpText()
-      {
-        return ShellCommand.makeHelpText().toString();
-      }
-
       @Override @Nonnull
         PartialFunction<String[], ShellCommand, ShellCommandError>
         getParser()
@@ -538,7 +567,17 @@ abstract class ShellCommand
           }
         };
       }
+
+      @Override @Nonnull String helpText()
+      {
+        return ShellCommand.makeHelpText().toString();
+      }
     });
+  }
+
+  static @Nonnull Completer commandCompleter()
+  {
+    return new StringsCompleter(ShellCommand.commands.keySet());
   }
 
   static StringBuilder makeHelpText()
@@ -555,11 +594,6 @@ abstract class ShellCommand
     return b;
   }
 
-  static @Nonnull Completer commandCompleter()
-  {
-    return new StringsCompleter(ShellCommand.commands.keySet());
-  }
-
   static @Nonnull ShellCommand parseCommand(
     final @Nonnull String text)
     throws ShellCommandError
@@ -572,4 +606,12 @@ abstract class ShellCommand
 
     throw new ShellCommandError.ShellCommandUnknown(segments[0]);
   }
+
+  abstract void run(
+    final @Nonnull Log log,
+    final @Nonnull PrintStream out,
+    final @Nonnull ShellConfig config,
+    final @Nonnull Filesystem fs)
+    throws FilesystemError,
+      ConstraintError;
 }

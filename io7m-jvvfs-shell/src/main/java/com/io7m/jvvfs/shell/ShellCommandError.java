@@ -22,36 +22,15 @@ import com.io7m.jaux.Constraints.ConstraintError;
 
 abstract class ShellCommandError extends Exception
 {
-  private static final long serialVersionUID = -6668513869286909183L;
-
-  static enum Type
+  static final class ShellCommandConstraintError extends ShellCommandError
   {
-    SHELL_COMMAND_PARSE_ERROR,
-    SHELL_COMMAND_CONSTRAINT_ERROR,
-    SHELL_COMMAND_UNKNOWN
-  }
+    private static final long serialVersionUID = -6219730618277127807L;
 
-  private final @Nonnull Type type;
-
-  protected ShellCommandError(
-    final @Nonnull Type type,
-    final @Nonnull String message)
-  {
-    super(message);
-    this.type = type;
-  }
-
-  @Nonnull Type getType()
-  {
-    return this.type;
-  }
-
-  protected ShellCommandError(
-    final @Nonnull Type type,
-    final @Nonnull Throwable error)
-  {
-    super(error);
-    this.type = type;
+    ShellCommandConstraintError(
+      final @Nonnull ConstraintError error)
+    {
+      super(Type.SHELL_COMMAND_CONSTRAINT_ERROR, error);
+    }
   }
 
   static final class ShellCommandParseError extends ShellCommandError
@@ -76,14 +55,35 @@ abstract class ShellCommandError extends Exception
     }
   }
 
-  static final class ShellCommandConstraintError extends ShellCommandError
+  static enum Type
   {
-    private static final long serialVersionUID = -6219730618277127807L;
+    SHELL_COMMAND_PARSE_ERROR,
+    SHELL_COMMAND_CONSTRAINT_ERROR,
+    SHELL_COMMAND_UNKNOWN
+  }
 
-    ShellCommandConstraintError(
-      final @Nonnull ConstraintError error)
-    {
-      super(Type.SHELL_COMMAND_CONSTRAINT_ERROR, error);
-    }
+  private static final long   serialVersionUID = -6668513869286909183L;
+
+  private final @Nonnull Type type;
+
+  protected ShellCommandError(
+    final @Nonnull Type type,
+    final @Nonnull String message)
+  {
+    super(message);
+    this.type = type;
+  }
+
+  protected ShellCommandError(
+    final @Nonnull Type type,
+    final @Nonnull Throwable error)
+  {
+    super(error);
+    this.type = type;
+  }
+
+  @Nonnull Type getType()
+  {
+    return this.type;
   }
 }

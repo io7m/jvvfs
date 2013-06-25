@@ -76,6 +76,11 @@ public final class Shell implements Runnable
     this.reader.setPrompt("jvvfs> ");
   }
 
+  private void cleanup()
+  {
+
+  }
+
   @Override public void run()
   {
     for (;;) {
@@ -115,10 +120,5 @@ public final class Shell implements Runnable
         }
       }
     }
-  }
-
-  private void cleanup()
-  {
-
   }
 }

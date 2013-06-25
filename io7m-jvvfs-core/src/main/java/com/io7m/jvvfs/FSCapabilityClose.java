@@ -14,33 +14,38 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.jvvfs.shell;
+package com.io7m.jvvfs;
 
-import java.util.Properties;
+import com.io7m.jaux.Constraints.ConstraintError;
 
-import javax.annotation.Nonnull;
+/**
+ * <p>
+ * The interface exposed by filesystem implementations that have the
+ * capability to be closed.
+ * </p>
+ */
 
-import com.io7m.jvvfs.PathReal;
-
-final class ShellConfig
+public interface FSCapabilityClose
 {
-  static @Nonnull ShellConfig loadFromProperties(
-    final @Nonnull Properties p,
-    final @Nonnull PathReal archive_directory)
-  {
-    return new ShellConfig(archive_directory);
-  }
+  /**
+   * <p>
+   * Close the given filesystem. This:
+   * <ul>
+   * <li>Unmounts and closes all archives</li>
+   * <li>Removes all virtual directories</li>
+   * </ul>
+   * </p>
+   * 
+   * 
+   * <p>
+   * Due to archives being closed, the state of any streams associated with
+   * files in the filesystem will become undefined.
+   * </p>
+   * 
+   * @throws FilesystemError
+   */
 
-  private final @Nonnull PathReal archive_directory;
-
-  private ShellConfig(
-    final @Nonnull PathReal archive_directory)
-  {
-    this.archive_directory = archive_directory;
-  }
-
-  @Nonnull PathReal getArchiveDirectory()
-  {
-    return this.archive_directory;
-  }
+  public void close()
+    throws ConstraintError,
+      FilesystemError;
 }

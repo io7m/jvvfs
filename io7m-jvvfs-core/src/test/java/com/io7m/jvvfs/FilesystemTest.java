@@ -60,6 +60,94 @@ public class FilesystemTest
   }
 
   /**
+   * Closing a filesystem with directories removes the directories.
+   */
+
+  @SuppressWarnings("static-method") @Test public void testCloseDirectories()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.createDirectory(PathVirtual.ofString("/a"));
+    fs.createDirectory(PathVirtual.ofString("/b"));
+    fs.createDirectory(PathVirtual.ofString("/c"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/a")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/b")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/c")));
+
+    fs.close();
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/a")));
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/b")));
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/c")));
+  }
+
+  /**
+   * Closing an empty filesystem has no observable effect.
+   */
+
+  @SuppressWarnings("static-method") @Test public void testCloseEmpty()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+    fs.close();
+  }
+
+  /**
+   * Closing a filesystem with mounted archives removes the mounts.
+   */
+
+  @SuppressWarnings("static-method") @Test public void testCloseMounted()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("files1-3.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file3.txt")));
+
+    fs.close();
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/file1.txt")));
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/file2.txt")));
+    Assert.assertFalse(fs.isFile(PathVirtual.ofString("/file3.txt")));
+  }
+
+  /**
+   * Closing a filesystem with mounted archives removes the mounts.
+   * 
+   * (This test checks for concurrent modifications to the internal mount
+   * map).
+   */
+
+  @SuppressWarnings("static-method") @Test public void testCloseMountedMap()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.createDirectory(PathVirtual.ofString("/a"));
+    fs.createDirectory(PathVirtual.ofString("/b"));
+    fs.createDirectory(PathVirtual.ofString("/c"));
+
+    fs.mountArchive("single-file.zip", PathVirtual.ofString("/a"));
+    fs.mountArchive("single-file.zip", PathVirtual.ofString("/b"));
+    fs.mountArchive("single-file.zip", PathVirtual.ofString("/c"));
+    fs.close();
+
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/a")));
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/b")));
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/c")));
+  }
+
+  /**
    * Creating otherwise nonexistent directories works.
    */
 
@@ -676,32 +764,6 @@ public class FilesystemTest
   }
 
   /**
-   * Retrieving the modification time of root within an archive, works.
-   */
-
-  @SuppressWarnings("static-method") @Test public
-    void
-    testModificationTimeRootZip()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountArchive("complex.zip", PathVirtual.ROOT);
-
-    final Calendar cnow = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-    final long cnow_t = cnow.getTime().getTime();
-    final Calendar cdir = fs.getModificationTime(PathVirtual.ROOT);
-    final long cdir_t = cdir.getTime().getTime();
-
-    final long diff = Math.abs(cdir_t - cnow_t);
-    System.out.println("diff: " + diff);
-
-    Assert.assertTrue(diff < 1000);
-  }
-
-  /**
    * Retrieving the modification time of a nonexistent file fails.
    */
 
@@ -726,6 +788,32 @@ public class FilesystemTest
       Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.code);
       throw e;
     }
+  }
+
+  /**
+   * Retrieving the modification time of root within an archive, works.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testModificationTimeRootZip()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("complex.zip", PathVirtual.ROOT);
+
+    final Calendar cnow = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    final long cnow_t = cnow.getTime().getTime();
+    final Calendar cdir = fs.getModificationTime(PathVirtual.ROOT);
+    final long cdir_t = cdir.getTime().getTime();
+
+    final long diff = Math.abs(cdir_t - cnow_t);
+    System.out.println("diff: " + diff);
+
+    Assert.assertTrue(diff < 1000);
   }
 
   /**
@@ -1350,5 +1438,4 @@ public class FilesystemTest
 
     Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
   }
-
 }

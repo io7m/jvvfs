@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +53,8 @@ public final class Filesystem implements
   FSCapabilityRead,
   FSCapabilityMountDirectory,
   FSCapabilityMountClasspath,
-  FSCapabilityUnmount
+  FSCapabilityUnmount,
+  FSCapabilityClose
 {
   private static abstract class FSReference
   {
@@ -259,7 +261,6 @@ public final class Filesystem implements
 
   private final @Nonnull Log                                       log;
   private final @Nonnull Log                                       log_directory;
-
   private final @Nonnull Log                                       log_mount;
   private final @Nonnull Option<PathReal>                          archives;
   private final @Nonnull List<ArchiveHandler<?>>                   handlers;
@@ -331,6 +332,36 @@ public final class Filesystem implements
     return new Pair<Option<Stack<Archive<?>>>, Boolean>(
       new Option.None<Stack<Archive<?>>>(),
       Boolean.FALSE);
+  }
+
+  @Override public void close()
+    throws ConstraintError,
+      FilesystemError
+  {
+    FilesystemError saved_e = null;
+
+    final LinkedList<PathVirtual> mount_snapshot =
+      new LinkedList<PathVirtual>(this.mounts.keySet());
+
+    for (final PathVirtual mount : mount_snapshot) {
+      final Stack<Archive<?>> stack = this.mounts.get(mount);
+      final int size = stack.size();
+      for (int index = 0; index < size; ++index) {
+        try {
+          this.unmount(mount);
+        } catch (final FilesystemError e) {
+          saved_e = e;
+        }
+      }
+    }
+
+    assert this.mounts.size() == 0;
+    this.directories.clear();
+    this.directories.put(PathVirtual.ROOT, Filesystem.getUTCTimeNow());
+
+    if (saved_e != null) {
+      throw saved_e;
+    }
   }
 
   @Override public void createDirectory(
