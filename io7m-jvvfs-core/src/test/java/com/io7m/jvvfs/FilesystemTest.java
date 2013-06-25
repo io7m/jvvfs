@@ -1016,6 +1016,31 @@ public class FilesystemTest
   }
 
   /**
+   * Mounting an archive that hides an existing file with a directory, makes
+   * the hidden file inaccessible.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testMountArchiveFileShadowsReverse()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir")));
+
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+  }
+
+  /**
    * Passing an invalid archive name fails.
    */
 
