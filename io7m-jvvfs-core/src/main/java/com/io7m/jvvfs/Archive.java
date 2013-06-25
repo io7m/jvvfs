@@ -119,7 +119,7 @@ abstract class Archive<T extends ArchiveKind>
    *           </ul>
    */
 
-  abstract long getFileSizeActual(
+  abstract protected long getFileSizeActual(
     final @Nonnull FileReference<T> r)
     throws FilesystemError,
       ConstraintError;
@@ -173,7 +173,7 @@ abstract class Archive<T extends ArchiveKind>
    *           </ul>
    */
 
-  abstract @Nonnull Calendar getModificationTimeActual(
+  abstract protected @Nonnull Calendar getModificationTimeActual(
     final @Nonnull FileReference<T> r);
 
   /**
@@ -266,7 +266,7 @@ abstract class Archive<T extends ArchiveKind>
    *           If <code>path == null</code>.
    */
 
-  abstract @CheckForNull FileReference<T> lookupActual(
+  abstract protected @CheckForNull FileReference<T> lookupActual(
     final @Nonnull PathVirtual path)
     throws ConstraintError;
 
@@ -331,7 +331,7 @@ abstract class Archive<T extends ArchiveKind>
    *           </ul>
    */
 
-  abstract @Nonnull InputStream openFileActual(
+  abstract protected @Nonnull InputStream openFileActual(
     final @Nonnull FileReference<T> r)
     throws FilesystemError,
       ConstraintError;

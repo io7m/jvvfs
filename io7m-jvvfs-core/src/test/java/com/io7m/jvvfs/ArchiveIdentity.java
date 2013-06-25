@@ -34,7 +34,7 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     throw new UnreachableCodeException();
   }
 
-  @Override long getFileSizeActual(
+  @Override protected long getFileSizeActual(
     final @Nonnull FileReference<ArchiveKind> r)
     throws FilesystemError,
       ConstraintError
@@ -42,7 +42,7 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     throw new UnreachableCodeException();
   }
 
-  @Override @Nonnull Calendar getModificationTimeActual(
+  @Override protected @Nonnull Calendar getModificationTimeActual(
     final FileReference<ArchiveKind> r)
   {
     throw new UnreachableCodeException();
@@ -66,14 +66,14 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     throw new UnreachableCodeException();
   }
 
-  @Override @CheckForNull FileReference<ArchiveKind> lookupActual(
+  @Override protected @CheckForNull FileReference<ArchiveKind> lookupActual(
     final @Nonnull PathVirtual path)
     throws ConstraintError
   {
     throw new UnreachableCodeException();
   }
 
-  @Override @Nonnull InputStream openFileActual(
+  @Override protected @Nonnull InputStream openFileActual(
     final FileReference<ArchiveKind> r)
     throws FilesystemError,
       ConstraintError

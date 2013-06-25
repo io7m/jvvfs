@@ -18,7 +18,9 @@ package com.io7m.jvvfs.shell;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,6 +58,31 @@ abstract class ShellCommand
         ConstraintError
     {
       out.println(Long.toString(fs.getFileSize(this.path)));
+    }
+  }
+
+  static final class ShellCommandFileModificationTime extends ShellCommand
+  {
+    private final @Nonnull PathVirtual path;
+
+    ShellCommandFileModificationTime(
+      final @Nonnull PathVirtual path)
+    {
+      this.path = path;
+    }
+
+    @Override void run(
+      final @Nonnull Log log,
+      final @Nonnull PrintStream out,
+      final @Nonnull ShellConfig config,
+      final @Nonnull Filesystem fs)
+      throws FilesystemError,
+        ConstraintError
+    {
+      final Calendar c = fs.getModificationTime(this.path);
+      final SimpleDateFormat df =
+        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+      out.println(df.format(c.getTime()));
     }
   }
 
@@ -268,6 +295,40 @@ abstract class ShellCommand
                   "file-size <path>");
               }
               return new ShellCommandFileSize(PathVirtual
+                .ofString(arguments[1]));
+            } catch (final ConstraintError e) {
+              throw new ShellCommandError.ShellCommandConstraintError(e);
+            }
+          }
+        };
+      }
+    });
+
+    ShellCommand.commands.put("file-time", new ShellCommandDefinition() {
+      @Override @Nonnull String helpText()
+      {
+        final StringBuilder b = new StringBuilder();
+        b.append("syntax: file-time <path>");
+        b.append(System.lineSeparator());
+        b.append("  Retrieve the modification time of the file at <path>");
+        return b.toString();
+      }
+
+      @Override @Nonnull
+        PartialFunction<String[], ShellCommand, ShellCommandError>
+        getParser()
+      {
+        return new PartialFunction<String[], ShellCommand, ShellCommandError>() {
+          @Override public ShellCommand call(
+            final @Nonnull String[] arguments)
+            throws ShellCommandError
+          {
+            try {
+              if (arguments.length < 2) {
+                throw new ShellCommandError.ShellCommandParseError(
+                  "file-time <path>");
+              }
+              return new ShellCommandFileModificationTime(PathVirtual
                 .ofString(arguments[1]));
             } catch (final ConstraintError e) {
               throw new ShellCommandError.ShellCommandConstraintError(e);

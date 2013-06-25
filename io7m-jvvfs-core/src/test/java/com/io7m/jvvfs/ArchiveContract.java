@@ -636,4 +636,17 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     Assert.assertTrue(s.value.path.equals(PathVirtual.ROOT));
     Assert.assertTrue(s.value.archive == a);
   }
+
+  @Test public void testString()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    final Archive<T> b = this.getArchive("single-file", PathVirtual.ROOT);
+
+    Assert.assertTrue(a.toString().equals(a.toString()));
+    Assert.assertFalse(a.toString().equals(b.toString()));
+  }
 }

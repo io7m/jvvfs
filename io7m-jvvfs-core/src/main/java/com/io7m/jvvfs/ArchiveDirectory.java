@@ -87,7 +87,7 @@ import com.io7m.jvvfs.FileReference.Type;
     // Nothing required
   }
 
-  @Override long getFileSizeActual(
+  @Override protected long getFileSizeActual(
     final @Nonnull FileReference<ArchiveDirectoryKind> r)
     throws FilesystemError,
       ConstraintError
@@ -96,7 +96,7 @@ import com.io7m.jvvfs.FileReference.Type;
     return ra.actual.length();
   }
 
-  @Override @Nonnull Calendar getModificationTimeActual(
+  @Override protected @Nonnull Calendar getModificationTimeActual(
     final @Nonnull FileReference<ArchiveDirectoryKind> r)
   {
     final ArchiveDirectoryReference ra = (ArchiveDirectoryReference) r;
@@ -148,16 +148,17 @@ import com.io7m.jvvfs.FileReference.Type;
             throw FilesystemError.notDirectory(path.toString());
           }
         }
-        break;
       }
     }
 
     throw new UnreachableCodeException();
   }
 
-  @Override @CheckForNull FileReference<ArchiveDirectoryKind> lookupActual(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError
+  @Override protected @CheckForNull
+    FileReference<ArchiveDirectoryKind>
+    lookupActual(
+      final @Nonnull PathVirtual path)
+      throws ConstraintError
   {
     final File f = new File(this.base, path.toString());
     if (f.exists()) {
@@ -170,7 +171,7 @@ import com.io7m.jvvfs.FileReference.Type;
     return null;
   }
 
-  @Override @Nonnull InputStream openFileActual(
+  @Override protected @Nonnull InputStream openFileActual(
     final @Nonnull FileReference<ArchiveDirectoryKind> r)
     throws FilesystemError,
       ConstraintError

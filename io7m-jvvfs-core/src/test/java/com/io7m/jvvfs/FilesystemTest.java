@@ -285,6 +285,33 @@ public class FilesystemTest
   }
 
   /**
+   * Opening root within an archive, fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testFileOpenRootZip()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.mountArchive("complex.zip", PathVirtual.ROOT);
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      fs.openFile(PathVirtual.ROOT);
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_FILE, e.code);
+      throw e;
+    }
+  }
+
+  /**
    * Retrieving the size of a file works.
    */
 
@@ -646,6 +673,32 @@ public class FilesystemTest
     Assert.assertEquals(ct.get(Calendar.DAY_OF_MONTH), 20);
     Assert.assertEquals(ct.get(Calendar.HOUR_OF_DAY), 21);
     Assert.assertEquals(ct.get(Calendar.MINUTE), 47);
+  }
+
+  /**
+   * Retrieving the modification time of root within an archive, works.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testModificationTimeRootZip()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("complex.zip", PathVirtual.ROOT);
+
+    final Calendar cnow = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    final long cnow_t = cnow.getTime().getTime();
+    final Calendar cdir = fs.getModificationTime(PathVirtual.ROOT);
+    final long cdir_t = cdir.getTime().getTime();
+
+    final long diff = Math.abs(cdir_t - cnow_t);
+    System.out.println("diff: " + diff);
+
+    Assert.assertTrue(diff < 1000);
   }
 
   /**

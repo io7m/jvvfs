@@ -16,6 +16,7 @@
 
 package com.io7m.jvvfs;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
@@ -53,8 +54,8 @@ import com.io7m.jvvfs.FileReference.Type;
   static final class ArchiveZipReference extends
     FileReference<ArchiveZipKind>
   {
-    /** <code>null</code> iff <code>path.isRoot()</code>. */
-    final @CheckForNull ZipEntry actual;
+    /** <code>None</code> iff <code>path.isRoot()</code>. */
+    final @Nonnull Option<ZipEntry> zip_entry_opt;
 
     ArchiveZipReference(
       final @Nonnull Archive<ArchiveZipKind> archive,
@@ -69,9 +70,10 @@ import com.io7m.jvvfs.FileReference.Type;
         Constraints.constrainArbitrary(
           path.isRoot(),
           "Path must be root for null zip entry");
+        this.zip_entry_opt = new Option.None<ZipEntry>();
+      } else {
+        this.zip_entry_opt = new Option.Some<ZipEntry>(actual);
       }
-
-      this.actual = actual;
     }
   }
 
@@ -116,22 +118,59 @@ import com.io7m.jvvfs.FileReference.Type;
     return null;
   }
 
-  @Override long getFileSizeActual(
+  @Override protected long getFileSizeActual(
     final @Nonnull FileReference<ArchiveZipKind> r)
     throws FilesystemError,
       ConstraintError
   {
     final ArchiveZipReference ra = (ArchiveZipReference) r;
-    return ra.actual.getSize();
+    assert ra.type == Type.TYPE_FILE;
+
+    switch (ra.zip_entry_opt.type) {
+      case OPTION_NONE:
+      {
+        /**
+         * The zip entry can only be <code>None</code> if the given path was
+         * root. If the given path is root, it must be a directory, and
+         * <code>getFileSizeActual</code> will never be called by
+         * <code>Archive#getFileSize(PathVirtual)</code> with a reference to a
+         * directory.
+         */
+
+        throw new UnreachableCodeException();
+      }
+      case OPTION_SOME:
+      {
+        final ZipEntry ze = ((Option.Some<ZipEntry>) ra.zip_entry_opt).value;
+        return ze.getSize();
+      }
+    }
+
+    throw new UnreachableCodeException();
   }
 
-  @Override @Nonnull Calendar getModificationTimeActual(
-    final FileReference<ArchiveZipKind> r)
+  @Override protected @Nonnull Calendar getModificationTimeActual(
+    final @Nonnull FileReference<ArchiveZipKind> r)
   {
     final ArchiveZipReference ra = (ArchiveZipReference) r;
     final Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-    c.setTimeInMillis(ra.actual.getTime());
-    return c;
+
+    switch (ra.zip_entry_opt.type) {
+      case OPTION_NONE:
+      {
+        final File file = new File(this.real.toString());
+        c.setTimeInMillis(file.lastModified());
+        return c;
+      }
+      case OPTION_SOME:
+      {
+        final ZipEntry ze = ((Option.Some<ZipEntry>) ra.zip_entry_opt).value;
+        c.setTimeInMillis(ze.getTime());
+        return c;
+      }
+    }
+
+    throw new UnreachableCodeException();
   }
 
   @Override @Nonnull PathVirtual getMountPath()
@@ -172,7 +211,6 @@ import com.io7m.jvvfs.FileReference.Type;
             throw FilesystemError.notDirectory(path.toString());
           }
         }
-        break;
       }
     }
 
@@ -210,9 +248,11 @@ import com.io7m.jvvfs.FileReference.Type;
     return items;
   }
 
-  @Override @CheckForNull FileReference<ArchiveZipKind> lookupActual(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError
+  @Override protected @CheckForNull
+    FileReference<ArchiveZipKind>
+    lookupActual(
+      final @Nonnull PathVirtual path)
+      throws ConstraintError
   {
     if (path.isRoot()) {
       return new ArchiveZipReference(this, path, Type.TYPE_DIRECTORY, null);
@@ -249,17 +289,40 @@ import com.io7m.jvvfs.FileReference.Type;
     return null;
   }
 
-  @Override @Nonnull InputStream openFileActual(
+  @Override protected @Nonnull InputStream openFileActual(
     final @Nonnull FileReference<ArchiveZipKind> r)
     throws FilesystemError,
       ConstraintError
   {
     final ArchiveZipReference ra = (ArchiveZipReference) r;
+    assert ra.type == Type.TYPE_FILE;
+
     try {
-      return this.zip.getInputStream(ra.actual);
+      switch (ra.zip_entry_opt.type) {
+        case OPTION_NONE:
+        {
+          /**
+           * The zip entry can only be <code>None</code> if the given path was
+           * root. If the given path is root, it must be a directory, and
+           * <code>openFileActual</code> will never be called by
+           * <code>Archive#openFile(PathVirtual)</code> with a reference to a
+           * directory.
+           */
+
+          throw new UnreachableCodeException();
+        }
+        case OPTION_SOME:
+        {
+          final ZipEntry ze =
+            ((Option.Some<ZipEntry>) ra.zip_entry_opt).value;
+          return this.zip.getInputStream(ze);
+        }
+      }
     } catch (final IOException e) {
       throw FilesystemError.ioError(e);
     }
+
+    throw new UnreachableCodeException();
   }
 
   @Override public String toString()
