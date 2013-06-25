@@ -19,15 +19,17 @@ package com.io7m.jvvfs;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.Stack;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
@@ -53,6 +55,7 @@ public final class Filesystem implements
   FSCapabilityRead,
   FSCapabilityMountDirectory,
   FSCapabilityMountClasspath,
+  FSCapabilityMountSnapshot,
   FSCapabilityUnmount,
   FSCapabilityClose
 {
@@ -141,7 +144,7 @@ public final class Filesystem implements
     <T extends FSReference>
     Option<T>
     lookupDirectInMounts(
-      final @Nonnull SortedMap<PathVirtual, Stack<Archive<?>>> mount_map,
+      final @Nonnull SortedMap<PathVirtual, Deque<Archive<?>>> mount_map,
       final @Nonnull PathVirtual path)
       throws FilesystemError,
         ConstraintError
@@ -149,7 +152,7 @@ public final class Filesystem implements
     final Set<PathVirtual> paths = mount_map.keySet();
     for (final PathVirtual mount : paths) {
       if (mount.isAncestorOf(path) || mount.equals(path)) {
-        final Stack<Archive<?>> stack = mount_map.get(mount);
+        final Deque<Archive<?>> stack = mount_map.get(mount);
         final Option<T> r =
           Filesystem.lookupDirectInStack(path, stack, mount);
         if (r.isSome()) {
@@ -179,7 +182,7 @@ public final class Filesystem implements
     Option<T>
     lookupDirectInStack(
       final @Nonnull PathVirtual path,
-      final @Nonnull Stack<Archive<?>> stack,
+      final @Nonnull Deque<Archive<?>> stack,
       final @Nonnull PathVirtual mount)
       throws FilesystemError,
         ConstraintError
@@ -192,10 +195,9 @@ public final class Filesystem implements
      * bottom.
      */
 
-    final int size = stack.size();
-    for (int index = size - 1; index >= 0; --index) {
-      final Archive<?> a = stack.get(index);
-
+    final Iterator<Archive<?>> stack_iter = stack.iterator();
+    while (stack_iter.hasNext()) {
+      final Archive<?> a = stack_iter.next();
       final Option<FileReference<?>> r =
         Filesystem.lookupDirectInArchive(a, path.subtract(mount));
       switch (r.type) {
@@ -264,7 +266,7 @@ public final class Filesystem implements
   private final @Nonnull Log                                       log_mount;
   private final @Nonnull Option<PathReal>                          archives;
   private final @Nonnull List<ArchiveHandler<?>>                   handlers;
-  private final @Nonnull SortedMap<PathVirtual, Stack<Archive<?>>> mounts;
+  private final @Nonnull SortedMap<PathVirtual, Deque<Archive<?>>> mounts;
   private final @Nonnull Map<PathVirtual, Calendar>                directories;
 
   private Filesystem(
@@ -288,7 +290,7 @@ public final class Filesystem implements
     this.handlers.add(new ArchiveDirectoryHandler());
     this.handlers.add(new ArchiveZipHandler());
 
-    this.mounts = new TreeMap<PathVirtual, Stack<Archive<?>>>();
+    this.mounts = new TreeMap<PathVirtual, Deque<Archive<?>>>();
 
     this.directories = new HashMap<PathVirtual, Calendar>();
     this.directories.put(PathVirtual.ROOT, Filesystem.getUTCTimeNow());
@@ -310,27 +312,27 @@ public final class Filesystem implements
    * </p>
    */
 
-  private @Nonnull Pair<Option<Stack<Archive<?>>>, Boolean> archiveMountedAt(
+  private @Nonnull Pair<Option<Deque<Archive<?>>>, Boolean> archiveMountedAt(
     final @Nonnull PathReal archive_name,
     final @Nonnull PathVirtual mount)
   {
     if (this.mounts.containsKey(mount)) {
-      final Stack<Archive<?>> stack = this.mounts.get(mount);
-      final Option<Stack<Archive<?>>> ss =
-        new Option.Some<Stack<Archive<?>>>(stack);
+      final Deque<Archive<?>> stack = this.mounts.get(mount);
+      final Option<Deque<Archive<?>>> ss =
+        new Option.Some<Deque<Archive<?>>>(stack);
 
       for (final Archive<?> archive : stack) {
         if (archive.getRealPath().equals(archive_name)) {
-          return new Pair<Option<Stack<Archive<?>>>, Boolean>(
+          return new Pair<Option<Deque<Archive<?>>>, Boolean>(
             ss,
             Boolean.TRUE);
         }
       }
-      return new Pair<Option<Stack<Archive<?>>>, Boolean>(ss, Boolean.FALSE);
+      return new Pair<Option<Deque<Archive<?>>>, Boolean>(ss, Boolean.FALSE);
     }
 
-    return new Pair<Option<Stack<Archive<?>>>, Boolean>(
-      new Option.None<Stack<Archive<?>>>(),
+    return new Pair<Option<Deque<Archive<?>>>, Boolean>(
+      new Option.None<Deque<Archive<?>>>(),
       Boolean.FALSE);
   }
 
@@ -344,7 +346,7 @@ public final class Filesystem implements
       new LinkedList<PathVirtual>(this.mounts.keySet());
 
     for (final PathVirtual mount : mount_snapshot) {
-      final Stack<Archive<?>> stack = this.mounts.get(mount);
+      final Deque<Archive<?>> stack = this.mounts.get(mount);
       final int size = stack.size();
       for (int index = 0; index < size; ++index) {
         try {
@@ -523,6 +525,28 @@ public final class Filesystem implements
     }
 
     throw new UnreachableCodeException();
+  }
+
+  @Override public @Nonnull
+    SortedMap<PathVirtual, Deque<PathReal>>
+    getMountedArchives()
+  {
+    final TreeMap<PathVirtual, Deque<PathReal>> snap =
+      new TreeMap<PathVirtual, Deque<PathReal>>();
+
+    for (final PathVirtual mount : this.mounts.keySet()) {
+      final Deque<PathReal> rstack = new ArrayDeque<PathReal>();
+      final Deque<Archive<?>> stack = this.mounts.get(mount);
+
+      final Iterator<Archive<?>> stack_iter = stack.descendingIterator();
+      while (stack_iter.hasNext()) {
+        final Archive<?> a = stack_iter.next();
+        rstack.push(a.getRealPath());
+      }
+      snap.put(mount, rstack);
+    }
+
+    return snap;
   }
 
   @Override public boolean isDirectory(
@@ -801,7 +825,7 @@ public final class Filesystem implements
     throws FilesystemError,
       ConstraintError
   {
-    final Stack<Archive<?>> stack =
+    final Deque<Archive<?>> stack =
       this.mountInternalGetStack(archive_name, mount);
 
     final Archive<?> archive = handler.load(archive_name, mount);
@@ -839,12 +863,12 @@ public final class Filesystem implements
    * </p>
    */
 
-  private @Nonnull Stack<Archive<?>> mountInternalGetStack(
+  private @Nonnull Deque<Archive<?>> mountInternalGetStack(
     final PathReal archive_name,
     final PathVirtual mount)
     throws FilesystemError
   {
-    final Pair<Option<Stack<Archive<?>>>, Boolean> r =
+    final Pair<Option<Deque<Archive<?>>>, Boolean> r =
       this.archiveMountedAt(archive_name, mount);
 
     if (r.first.isSome()) {
@@ -854,12 +878,12 @@ public final class Filesystem implements
           mount.toString());
       }
 
-      final Stack<Archive<?>> stack =
-        ((Option.Some<Stack<Archive<?>>>) r.first).value;
+      final Deque<Archive<?>> stack =
+        ((Option.Some<Deque<Archive<?>>>) r.first).value;
       return stack;
     }
 
-    return new Stack<Archive<?>>();
+    return new ArrayDeque<Archive<?>>();
   }
 
   @Override public @Nonnull InputStream openFile(
@@ -934,7 +958,7 @@ public final class Filesystem implements
      */
 
     if (this.mounts.containsKey(mount)) {
-      final Stack<Archive<?>> stack = this.mounts.get(mount);
+      final Deque<Archive<?>> stack = this.mounts.get(mount);
       assert stack != null;
       assert stack.size() > 0;
 

@@ -23,8 +23,10 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
 
 import javax.annotation.Nonnull;
 
@@ -220,6 +222,44 @@ abstract class ShellCommand
         ConstraintError
     {
       log.info("help: " + ShellCommand.makeHelpText());
+    }
+  }
+
+  static final class ShellCommandListMounts extends ShellCommand
+  {
+    ShellCommandListMounts()
+    {
+
+    }
+
+    @Override void run(
+      final @Nonnull Log log,
+      final @Nonnull PrintStream out,
+      final @Nonnull ShellConfig config,
+      final @Nonnull Filesystem fs)
+      throws FilesystemError,
+        ConstraintError
+    {
+      final SortedMap<PathVirtual, Deque<PathReal>> mounts =
+        fs.getMountedArchives();
+
+      int longest = 0;
+      for (final PathVirtual mount : mounts.keySet()) {
+        longest = Math.max(longest, mount.toString().length());
+      }
+      longest += 2;
+
+      for (final PathVirtual mount : mounts.keySet()) {
+        final Deque<PathReal> stack = mounts.get(mount);
+        for (final PathReal p : stack) {
+          out.print(mount.toString());
+          final int pad = longest - mount.toString().length();
+          for (int index = 0; index < pad; ++index) {
+            out.append(' ');
+          }
+          out.println(p.toFile().getName());
+        }
+      }
     }
   }
 
@@ -445,6 +485,33 @@ abstract class ShellCommand
         b.append("syntax: file-read <path>");
         b.append(System.lineSeparator());
         b.append("  Display the contents of the file at <path>");
+        return b.toString();
+      }
+    });
+
+    ShellCommand.commands.put("list-mounts", new ShellCommandDefinition() {
+      @Override @Nonnull
+        PartialFunction<String[], ShellCommand, ShellCommandError>
+        getParser()
+      {
+        return new PartialFunction<String[], ShellCommand, ShellCommandError>() {
+          @Override public ShellCommand call(
+            final @Nonnull String[] arguments)
+            throws ShellCommandError
+          {
+            return new ShellCommandListMounts();
+          }
+        };
+      }
+
+      @Override @Nonnull String helpText()
+      {
+        final StringBuilder b = new StringBuilder();
+        b.append("syntax: list-mounts");
+        b.append(System.lineSeparator());
+        b.append("  List all currently mounted archives.");
+        b
+          .append("For each mount point, most recently mounted archives are listed first.");
         return b.toString();
       }
     });

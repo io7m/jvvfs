@@ -16,8 +16,13 @@
 
 package com.io7m.jvvfs;
 
+import java.io.File;
+
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
+
+import com.io7m.jaux.Constraints;
+import com.io7m.jaux.Constraints.ConstraintError;
 
 /**
  * A path in the operating system's filesystem, in OS-specific syntax.
@@ -31,12 +36,22 @@ import javax.annotation.concurrent.Immutable;
 
 @Immutable public final class PathReal
 {
-  private final @Nonnull String actual;
+  private final @Nonnull File actual;
+
+  public PathReal(
+    final @Nonnull File actual)
+    throws ConstraintError
+  {
+    Constraints.constrainNotNull(actual, "Path");
+    this.actual = actual;
+  }
 
   public PathReal(
     final @Nonnull String actual)
+    throws ConstraintError
   {
-    this.actual = actual;
+    Constraints.constrainNotNull(actual, "Path");
+    this.actual = new File(actual);
   }
 
   @Override public boolean equals(
@@ -60,8 +75,13 @@ import javax.annotation.concurrent.Immutable;
     return this.actual.hashCode();
   }
 
-  @Override public String toString()
+  public @Nonnull File toFile()
   {
     return this.actual;
+  }
+
+  @Override public String toString()
+  {
+    return this.actual.toString();
   }
 }

@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Calendar;
+import java.util.Deque;
+import java.util.SortedMap;
 import java.util.TimeZone;
 
 import javax.annotation.Nonnull;
@@ -1272,6 +1274,78 @@ public class FilesystemTest
     final Filesystem fs = FilesystemTest.makeFS();
 
     fs.mountClasspathArchive(FilesystemTest.class, null);
+  }
+
+  /**
+   * Asking for a snapshot of the mounts of an empty filesystem results in an
+   * empty list.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testMountSnapshotEmpty()
+      throws IOException,
+        ConstraintError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+    Assert.assertTrue(fs.getMountedArchives().isEmpty());
+  }
+
+  /**
+   * Asking for a snapshot of the mounts of filesystem works.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testMountSnapshotMounts()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.createDirectory(PathVirtual.ofString("/a"));
+    fs.createDirectory(PathVirtual.ofString("/b"));
+    fs.createDirectory(PathVirtual.ofString("/c"));
+
+    fs.mountArchive("single-file.zip", PathVirtual.ofString("/a"));
+    fs.mountArchive("complex.zip", PathVirtual.ofString("/a"));
+    fs.mountArchive("single-file.zip", PathVirtual.ofString("/b"));
+    fs.mountArchive("single-file.zip", PathVirtual.ofString("/c"));
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ofString("/c"));
+
+    final SortedMap<PathVirtual, Deque<PathReal>> mounts =
+      fs.getMountedArchives();
+
+    Assert.assertTrue(mounts.containsKey(PathVirtual.ofString("/a")));
+    Assert.assertTrue(mounts.containsKey(PathVirtual.ofString("/b")));
+    Assert.assertTrue(mounts.containsKey(PathVirtual.ofString("/c")));
+
+    {
+      final Deque<PathReal> s = mounts.get(PathVirtual.ofString("/c"));
+      final PathReal a0 = s.pop();
+      Assert
+        .assertEquals("single-file-and-subdir.zip", a0.toFile().getName());
+      final PathReal a1 = s.pop();
+      Assert.assertEquals("single-file.zip", a1.toFile().getName());
+      Assert.assertTrue(s.isEmpty());
+    }
+
+    {
+      final Deque<PathReal> s = mounts.get(PathVirtual.ofString("/b"));
+      final PathReal a0 = s.pop();
+      Assert.assertEquals("single-file.zip", a0.toFile().getName());
+      Assert.assertTrue(s.isEmpty());
+    }
+
+    {
+      final Deque<PathReal> s = mounts.get(PathVirtual.ofString("/a"));
+      final PathReal a0 = s.pop();
+      Assert.assertEquals("complex.zip", a0.toFile().getName());
+      final PathReal a1 = s.pop();
+      Assert.assertEquals("single-file.zip", a1.toFile().getName());
+      Assert.assertTrue(s.isEmpty());
+    }
   }
 
   /**

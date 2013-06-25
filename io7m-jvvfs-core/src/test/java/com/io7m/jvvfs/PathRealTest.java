@@ -1,5 +1,7 @@
 package com.io7m.jvvfs;
 
+import java.io.File;
+
 import javax.annotation.Nonnull;
 
 import net.java.quickcheck.Generator;
@@ -109,6 +111,25 @@ public class PathRealTest
       {
         final PathReal p = new PathReal(s);
         Assert.assertEquals(p, p);
+      }
+    });
+  }
+
+  @SuppressWarnings("static-method") @Test public void testFileIdentity()
+  {
+    final StringGenerator gen =
+      new StringGenerator(
+        new IntegerGenerator(1, 16),
+        new CharacterGenerator());
+
+    QuickCheck.forAll(gen, new AbstractCharacteristic<String>() {
+      @Override protected void doSpecify(
+        final String s)
+        throws Throwable
+      {
+        final File f = new File(s);
+        final PathReal p = new PathReal(f);
+        Assert.assertEquals(f, p.toFile());
       }
     });
   }

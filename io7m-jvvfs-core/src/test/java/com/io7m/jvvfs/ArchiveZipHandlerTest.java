@@ -23,38 +23,43 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.io7m.jaux.Constraints.ConstraintError;
+
 public final class ArchiveZipHandlerTest
 {
   @SuppressWarnings("static-method") @Test public void testHandleJar()
     throws FileNotFoundException,
-      IOException
+      IOException,
+      ConstraintError
   {
     final ArchiveZipHandler h = new ArchiveZipHandler();
     final File tempdir = TestData.getTestDataDirectory();
 
     final File file = new File(tempdir, "single-file.jar");
-    Assert.assertTrue(h.canHandle(new PathReal(file.toString())));
+    Assert.assertTrue(h.canHandle(new PathReal(file)));
   }
 
   @SuppressWarnings("static-method") @Test public void testHandleUnknown()
     throws FileNotFoundException,
-      IOException
+      IOException,
+      ConstraintError
   {
     final ArchiveZipHandler h = new ArchiveZipHandler();
     final File tempdir = TestData.getTestDataDirectory();
 
     final File file = new File(tempdir, "unknown.unknown");
-    Assert.assertFalse(h.canHandle(new PathReal(file.toString())));
+    Assert.assertFalse(h.canHandle(new PathReal(file)));
   }
 
   @SuppressWarnings("static-method") @Test public void testHandleZip()
     throws FileNotFoundException,
-      IOException
+      IOException,
+      ConstraintError
   {
     final ArchiveZipHandler h = new ArchiveZipHandler();
     final File tempdir = TestData.getTestDataDirectory();
 
     final File file = new File(tempdir, "single-file.zip");
-    Assert.assertTrue(h.canHandle(new PathReal(file.toString())));
+    Assert.assertTrue(h.canHandle(new PathReal(file)));
   }
 }
