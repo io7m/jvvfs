@@ -21,6 +21,7 @@ import java.io.File;
 import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jlog.Log;
 
 /**
  * The handler responsible for loading directory archives.
@@ -36,11 +37,12 @@ final class ArchiveDirectoryHandler extends
   }
 
   @Override @Nonnull Archive<ArchiveDirectoryKind> load(
+    final @Nonnull Log log,
     final @Nonnull PathReal name,
     final @Nonnull PathVirtual mount)
     throws ConstraintError,
       FilesystemError
   {
-    return new ArchiveDirectory(name, mount);
+    return new ArchiveDirectory(log, name, mount);
   }
 }

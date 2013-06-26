@@ -33,13 +33,13 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnimplementedCodeException;
 import com.io7m.jaux.UnreachableCodeException;
 import com.io7m.jaux.functional.Option;
 import com.io7m.jaux.functional.Option.Some;
@@ -82,6 +82,15 @@ public final class Filesystem implements
       super(FSReferenceType.FS_REF_ARCHIVE);
       this.ref = ref;
     }
+
+    @Override public String toString()
+    {
+      final StringBuilder builder = new StringBuilder();
+      builder.append("[FSReferenceArchive ");
+      builder.append(this.ref);
+      builder.append("]");
+      return builder.toString();
+    }
   }
 
   private static enum FSReferenceType
@@ -103,11 +112,55 @@ public final class Filesystem implements
       this.path = path;
       this.mtime = mtime;
     }
+
+    @Override public String toString()
+    {
+      final StringBuilder builder = new StringBuilder();
+      builder.append("[FSReferenceVirtualDirectory ");
+      builder.append(this.path);
+      builder.append(" ");
+      builder.append(this.mtime);
+      builder.append("]");
+      return builder.toString();
+    }
   }
 
   private static @Nonnull Calendar getUTCTimeNow()
   {
     return Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+  }
+
+  /**
+   * List directories assuming at least one mount contains a directory at
+   * <code>path</code>.
+   * 
+   * @throws ConstraintError
+   * @throws FilesystemError
+   */
+
+  private static @Nonnull SortedSet<String> listDirectoryInMounts(
+    final @Nonnull Map<PathVirtual, Deque<Archive<?>>> mount_map,
+    final @Nonnull PathVirtual path)
+    throws FilesystemError,
+      ConstraintError
+  {
+    final TreeSet<String> items = new TreeSet<String>();
+
+    for (final PathVirtual mount : mount_map.keySet()) {
+      if (mount.isAncestorOf(path) || mount.equals(path)) {
+        final PathVirtual inner_path = path.subtract(mount);
+        final Deque<Archive<?>> stack = mount_map.get(mount);
+        for (final Archive<?> a : stack) {
+          if (a.isFile(inner_path)) {
+            break;
+          }
+          final Set<String> a_items = a.listDirectory(inner_path);
+          items.addAll(a_items);
+        }
+      }
+    }
+
+    return items;
   }
 
   @SuppressWarnings("unchecked") private static @Nonnull
@@ -200,8 +253,10 @@ public final class Filesystem implements
     final Iterator<Archive<?>> stack_iter = stack.iterator();
     while (stack_iter.hasNext()) {
       final Archive<?> a = stack_iter.next();
+      final PathVirtual inner_path = path.subtract(mount);
+
       final Option<FileReference<?>> r =
-        Filesystem.lookupDirectInArchive(a, path.subtract(mount));
+        Filesystem.lookupDirectInArchive(a, inner_path);
       switch (r.type) {
         case OPTION_NONE:
         {
@@ -266,9 +321,11 @@ public final class Filesystem implements
   private final @Nonnull Log                                       log;
   private final @Nonnull Log                                       log_directory;
   private final @Nonnull Log                                       log_mount;
+  private final @Nonnull Log                                       log_lookup;
   private final @Nonnull Option<PathReal>                          archives;
   private final @Nonnull List<ArchiveHandler<?>>                   handlers;
   private final @Nonnull SortedMap<PathVirtual, Deque<Archive<?>>> mounts;
+
   private final @Nonnull Map<PathVirtual, Calendar>                directories;
 
   private Filesystem(
@@ -282,6 +339,7 @@ public final class Filesystem implements
         "filesystem");
     this.log_directory = new Log(this.log, "directory");
     this.log_mount = new Log(this.log, "mount");
+    this.log_lookup = new Log(this.log, "lookup");
 
     this.archives =
       archives == null
@@ -593,6 +651,8 @@ public final class Filesystem implements
   {
     Constraints.constrainNotNull(path, "Path");
 
+    this.log_lookup.info("is-file: " + path);
+
     final Option<? extends FSReference> r = this.lookup(path);
     switch (r.type) {
       case OPTION_NONE:
@@ -626,7 +686,37 @@ public final class Filesystem implements
     throws FilesystemError,
       ConstraintError
   {
-    throw new UnimplementedCodeException();
+    Constraints.constrainNotNull(path, "Path");
+
+    this.log_lookup.info("is-directory: " + path);
+
+    final Option<FSReference> ro = this.lookup(path);
+    switch (ro.type) {
+      case OPTION_NONE:
+      {
+        throw FilesystemError.fileNotFound(path.toString());
+      }
+      case OPTION_SOME:
+      {
+        final FSReference ref = ((Option.Some<FSReference>) ro).value;
+        switch (ref.type) {
+          case FS_REF_ARCHIVE:
+          {
+            final FSReferenceArchive ra = (FSReferenceArchive) ref;
+            if (ra.ref.type != Type.TYPE_DIRECTORY) {
+              throw FilesystemError.notDirectory(path.toString());
+            }
+            return Filesystem.listDirectoryInMounts(this.mounts, path);
+          }
+          case FS_REF_VIRTUAL_DIRECTORY:
+          {
+            return new TreeSet<String>();
+          }
+        }
+      }
+    }
+
+    throw new UnreachableCodeException();
   }
 
   /**
@@ -644,6 +734,8 @@ public final class Filesystem implements
     throws ConstraintError,
       FilesystemError
   {
+    this.log_lookup.debug(path.toString());
+
     /**
      * Check that all ancestors of <code>path</code> exist and are
      * directories.
@@ -652,33 +744,7 @@ public final class Filesystem implements
     final PathVirtualEnum e = new PathVirtualEnum(path);
     while (e.hasMoreElements()) {
       final PathVirtual ancestor = e.nextElement();
-      final Option<T> r = this.lookupDirect(ancestor);
-      switch (r.type) {
-        case OPTION_NONE:
-        {
-          throw FilesystemError.fileNotFound(ancestor.toString());
-        }
-        case OPTION_SOME:
-        {
-          final Some<? extends FSReference> s =
-            (Option.Some<? extends FSReference>) r;
-
-          switch (s.value.type) {
-            case FS_REF_ARCHIVE:
-            {
-              final FSReferenceArchive ra = (FSReferenceArchive) s.value;
-              if (ra.ref.type != Type.TYPE_DIRECTORY) {
-                throw FilesystemError.notDirectory(ancestor.toString());
-              }
-              break;
-            }
-            case FS_REF_VIRTUAL_DIRECTORY:
-            {
-              break;
-            }
-          }
-        }
-      }
+      this.lookupDirectAssertIsDirectory(ancestor);
     }
 
     /**
@@ -688,40 +754,93 @@ public final class Filesystem implements
     return this.lookupDirect(path);
   }
 
+  /**
+   * Look up <code>path</code> directly. That is, do not check the ancestors
+   * of <code>path</code>, simply look for <code>path</code> in all relevant
+   * archives and the list of virtual directories.
+   */
+
   private <T extends FSReference> Option<T> lookupDirect(
     final @Nonnull PathVirtual path)
     throws FilesystemError,
       ConstraintError
   {
+    this.log_lookup.debug("direct: " + path.toString());
+
     /**
      * Check mounts for path.
      */
 
     final Option<T> r = Filesystem.lookupDirectInMounts(this.mounts, path);
+    if (r.isSome()) {
+      return r;
+    }
 
+    /**
+     * No mounts contained <code>path</code>, check the list of virtual
+     * directories.
+     */
+
+    if (this.directories.containsKey(path)) {
+      final Calendar mtime = this.directories.get(path);
+      @SuppressWarnings("unchecked") final T f =
+        (T) new FSReferenceVirtualDirectory(path, mtime);
+      return new Option.Some<T>(f);
+    }
+
+    /**
+     * <code>path</code> does not exist.
+     */
+
+    return new Option.None<T>();
+  }
+
+  /**
+   * Assert that <code>path</code> is a directory. The ancestors of
+   * <code>path</code> are not checked.
+   * 
+   * @param path
+   *          The path to check.
+   * @throws FilesystemError
+   *           If:
+   *           <ul>
+   *           <li><code>path</code> does not exist</li>
+   *           <li><code>path</code> is not a directory</li>
+   *           </ul>
+   */
+
+  private <T extends FSReference> void lookupDirectAssertIsDirectory(
+    final PathVirtual path)
+    throws FilesystemError,
+      ConstraintError
+  {
+    final Option<T> r = this.lookupDirect(path);
     switch (r.type) {
       case OPTION_NONE:
       {
-        /**
-         * If no mount contains <code>path</code>, check the set of explicitly
-         * created directories.
-         */
-
-        if (this.directories.containsKey(path)) {
-          final Calendar mtime = this.directories.get(path);
-          @SuppressWarnings("unchecked") final T f =
-            (T) new FSReferenceVirtualDirectory(path, mtime);
-          return new Option.Some<T>(f);
-        }
-        return new Option.None<T>();
+        throw FilesystemError.fileNotFound(path.toString());
       }
       case OPTION_SOME:
       {
-        return r;
+        final Some<? extends FSReference> s =
+          (Option.Some<? extends FSReference>) r;
+
+        switch (s.value.type) {
+          case FS_REF_ARCHIVE:
+          {
+            final FSReferenceArchive ra = (FSReferenceArchive) s.value;
+            if (ra.ref.type != Type.TYPE_DIRECTORY) {
+              throw FilesystemError.notDirectory(path.toString());
+            }
+            break;
+          }
+          case FS_REF_VIRTUAL_DIRECTORY:
+          {
+            break;
+          }
+        }
       }
     }
-
-    throw new UnreachableCodeException();
   }
 
   @Override public void mountArchive(
@@ -838,7 +957,7 @@ public final class Filesystem implements
     final Deque<Archive<?>> stack =
       this.mountInternalGetStack(archive_name, mount);
 
-    final Archive<?> archive = handler.load(archive_name, mount);
+    final Archive<?> archive = handler.load(this.log, archive_name, mount);
     stack.push(archive);
     this.mounts.put(mount, stack);
   }

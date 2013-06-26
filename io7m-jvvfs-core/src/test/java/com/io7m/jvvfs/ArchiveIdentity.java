@@ -25,6 +25,7 @@ import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.UnreachableCodeException;
+import com.io7m.jlog.Log;
 
 final class ArchiveIdentity extends Archive<ArchiveKind>
 {
@@ -38,6 +39,11 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
     final @Nonnull FileReference<ArchiveKind> r)
     throws FilesystemError,
       ConstraintError
+  {
+    throw new UnreachableCodeException();
+  }
+
+  @Override protected @Nonnull Log getLogLookup()
   {
     throw new UnreachableCodeException();
   }

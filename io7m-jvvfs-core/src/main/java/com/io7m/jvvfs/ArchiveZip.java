@@ -37,6 +37,7 @@ import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.UnreachableCodeException;
 import com.io7m.jaux.functional.Option;
 import com.io7m.jaux.functional.Option.Some;
+import com.io7m.jlog.Log;
 import com.io7m.jvvfs.FileReference.Type;
 
 /**
@@ -81,8 +82,11 @@ import com.io7m.jvvfs.FileReference.Type;
   private final @Nonnull ZipFile     zip;
   private final @Nonnull PathVirtual mount;
   private final @Nonnull PathReal    real;
+  private final @Nonnull Log         log;
+  private final @Nonnull Log         log_lookup;
 
   ArchiveZip(
+    final @Nonnull Log log,
     final @Nonnull PathReal base_path,
     final @Nonnull PathVirtual mount)
     throws ConstraintError,
@@ -90,6 +94,9 @@ import com.io7m.jvvfs.FileReference.Type;
       FilesystemError
   {
     try {
+      this.log = new Log(log, "zip");
+      this.log_lookup = new Log(this.log, "lookup");
+
       this.mount = Constraints.constrainNotNull(mount, "Mount path");
       this.zip = new ZipFile(base_path.toString());
       this.real = new PathReal(base_path.toString());
@@ -155,6 +162,11 @@ import com.io7m.jvvfs.FileReference.Type;
     }
 
     throw new UnreachableCodeException();
+  }
+
+  @Override protected @Nonnull Log getLogLookup()
+  {
+    return this.log_lookup;
   }
 
   @Override protected @Nonnull Calendar getModificationTimeActual(
@@ -262,6 +274,12 @@ import com.io7m.jvvfs.FileReference.Type;
       final @Nonnull PathVirtual path)
       throws ConstraintError
   {
+    if (this.log_lookup.enabledByConfiguration()) {
+      this.log_lookup.debug(this.real.toFile().getName()
+        + ": "
+        + path.toString());
+    }
+
     if (path.isRoot()) {
       return new ArchiveZipReference(this, path, Type.TYPE_DIRECTORY, null);
     }
@@ -294,6 +312,12 @@ import com.io7m.jvvfs.FileReference.Type;
       }
     }
 
+    if (this.log_lookup.enabledByConfiguration()) {
+      this.log_lookup.debug(this.real.toFile().getName()
+        + ": "
+        + path.toString()
+        + " is nonexistent");
+    }
     return null;
   }
 

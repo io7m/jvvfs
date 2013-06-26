@@ -22,6 +22,7 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jlog.Log;
 
 /**
  * The handler responsible for loading zip/jar archives.
@@ -45,13 +46,14 @@ final class ArchiveZipHandler extends ArchiveHandler<ArchiveZipKind>
   }
 
   @Override @Nonnull Archive<ArchiveZipKind> load(
+    final @Nonnull Log log,
     final @Nonnull PathReal name,
     final @Nonnull PathVirtual mount)
     throws ConstraintError,
       FilesystemError
   {
     try {
-      return new ArchiveZip(name, mount);
+      return new ArchiveZip(log, name, mount);
     } catch (final IOException e) {
       throw FilesystemError.ioError(e);
     }

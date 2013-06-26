@@ -506,6 +506,29 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     }
   }
 
+  @Test public void testLookupSingleFileSubdirectory()
+    throws FilesystemError,
+      ConstraintError,
+      FileNotFoundException,
+      IOException
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+
+    try {
+      final PathVirtual p = PathVirtual.ofString("/subdir/file.txt");
+      final Option<FileReference<T>> r = a.lookup(p);
+
+      Assert.assertTrue(r.isSome());
+      final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) r;
+      Assert.assertTrue(s.value.type == Type.TYPE_FILE);
+      Assert.assertTrue(s.value.path.equals(p));
+      Assert.assertTrue(s.value.archive == a);
+    } finally {
+      a.close();
+    }
+  }
+
   @Test public void testMountPath()
     throws ConstraintError,
       FileNotFoundException,

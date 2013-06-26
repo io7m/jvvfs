@@ -42,7 +42,7 @@ public final class ArchiveDirectoryTest extends
   {
     final File tempdir = TestData.getTestDataDirectory();
     final PathReal r = new PathReal(new File(tempdir, basename).toString());
-    return new ArchiveDirectory(r, mount);
+    return new ArchiveDirectory(TestData.getLog(), r, mount);
   }
 
   @Test(expected = FilesystemError.class) public void testFileVanished()

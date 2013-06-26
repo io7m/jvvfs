@@ -45,7 +45,7 @@ public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
     final File tempdir = TestData.getTestDataDirectory();
     final PathReal r =
       new PathReal(new File(tempdir, basename).toString() + ".zip");
-    return new ArchiveZip(r, mount);
+    return new ArchiveZip(TestData.getLog(), r, mount);
   }
 
   @Test(expected = FilesystemError.class) public void testCorrupt()

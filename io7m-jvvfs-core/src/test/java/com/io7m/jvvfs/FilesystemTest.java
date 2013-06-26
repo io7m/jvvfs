@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Deque;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TimeZone;
 
 import javax.annotation.Nonnull;
@@ -209,6 +210,29 @@ public class FilesystemTest
           Assert.assertFalse(fs.isFile(path));
         }
       });
+  }
+
+  /**
+   * If a directory in an archive shadows a file, then searching for any
+   * object in that archive does not cause an error to be raised due to the
+   * original file appearing to be an ancestor.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testExistsFileShadowEdgeCase()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert
+      .assertFalse(fs.exists(PathVirtual.ofString("/subdir/nonexistent")));
   }
 
   /**
@@ -665,6 +689,249 @@ public class FilesystemTest
   {
     final Filesystem fs = FilesystemTest.makeFS();
     fs.isFile(null);
+  }
+
+  /**
+   * Listing a created directory returns nothing.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testListCreatedDirectory()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.createDirectory(PathVirtual.ofString("/a"));
+
+    {
+      final SortedSet<String> items =
+        fs.listDirectory(PathVirtual.ofString("/a"));
+      Assert.assertEquals(0, items.size());
+    }
+
+    fs.mountArchive("files1-3.zip", PathVirtual.ofString("/a"));
+
+    {
+      final SortedSet<String> items =
+        fs.listDirectory(PathVirtual.ofString("/a"));
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("file1.txt"));
+      Assert.assertTrue(items.contains("file2.txt"));
+      Assert.assertTrue(items.contains("file3.txt"));
+    }
+
+    fs.unmount(PathVirtual.ofString("/a"));
+
+    {
+      final SortedSet<String> items =
+        fs.listDirectory(PathVirtual.ofString("/a"));
+      Assert.assertEquals(0, items.size());
+    }
+  }
+
+  /**
+   * Listing a file fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testListFile()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+    try {
+      fs.mountArchive("single-file.zip", PathVirtual.ROOT);
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      fs.listDirectory(PathVirtual.ofString("/file.txt"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
+      throw e;
+    }
+  }
+
+  /**
+   * Listing a nonexistent object fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testListNonexistent()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.listDirectory(PathVirtual.ofString("/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
+      throw e;
+    }
+  }
+
+  /**
+   * Listing null fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
+    void
+    testListNull()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+    fs.listDirectory(null);
+  }
+
+  /**
+   * Listing the root directory with a mounted archive works.
+   */
+
+  @SuppressWarnings("static-method") @Test public void testListRootBase()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("complex.zip", PathVirtual.ROOT);
+
+    final SortedSet<String> items = fs.listDirectory(PathVirtual.ROOT);
+    Assert.assertTrue(items.contains("a"));
+    Assert.assertTrue(items.contains("b"));
+    Assert.assertEquals(2, items.size());
+  }
+
+  /**
+   * Listing the root directory of an empty filesystem returns nothing.
+   */
+
+  @SuppressWarnings("static-method") @Test public void testListRootEmpty()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    final SortedSet<String> items = fs.listDirectory(PathVirtual.ROOT);
+    Assert.assertTrue(items.isEmpty());
+  }
+
+  /**
+   * Complicated shadowing is respected.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testListShadowComplex0()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    /**
+     * <ol>
+     * <li>Create /subdir</li>
+     * <li>Mount an archive into /subdir</li>
+     * <li>Shadow /subdir with a file</li>
+     * <li>Shadow the /subdir file with a directory</li>
+     * <li>Check that /subdir is now empty</li>
+     * <li>Mount an archive into /subdir</li>
+     * <li>Check that /subdir contains only the new files</li>
+     * </ol>
+     */
+
+    fs.createDirectory(PathVirtual.ofString("/subdir"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+
+    fs.mountArchive("files1-3.zip", PathVirtual.ofString("/subdir"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file3.txt")));
+
+    {
+      final SortedSet<String> items =
+        fs.listDirectory(PathVirtual.ofString("/subdir"));
+      Assert.assertEquals(3, items.size());
+      Assert.assertTrue(items.contains("file1.txt"));
+      Assert.assertTrue(items.contains("file2.txt"));
+      Assert.assertTrue(items.contains("file3.txt"));
+    }
+
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
+
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file1.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file2.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file3.txt")));
+
+    {
+      final SortedSet<String> items =
+        fs.listDirectory(PathVirtual.ofString("/subdir"));
+      Assert.assertEquals(1, items.size());
+      Assert.assertTrue(items.contains("file.txt"));
+    }
+
+    fs.mountArchive("files4-6.zip", PathVirtual.ofString("/subdir"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file1.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file2.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file3.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file4.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file5.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file6.txt")));
+
+    {
+      final SortedSet<String> items =
+        fs.listDirectory(PathVirtual.ofString("/subdir"));
+      Assert.assertEquals(4, items.size());
+      Assert.assertTrue(items.contains("file.txt"));
+      Assert.assertTrue(items.contains("file4.txt"));
+      Assert.assertTrue(items.contains("file5.txt"));
+      Assert.assertTrue(items.contains("file6.txt"));
+    }
+  }
+
+  /**
+   * Listing a directory takes the union of the directory contents with
+   * respect to mounted archives.
+   */
+
+  @SuppressWarnings("static-method") @Test public void testListUnion()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("files1-3.zip", PathVirtual.ROOT);
+    fs.mountArchive("files4-6.zip", PathVirtual.ROOT);
+
+    final SortedSet<String> items = fs.listDirectory(PathVirtual.ROOT);
+    Assert.assertEquals(6, items.size());
+    Assert.assertTrue(items.contains("file1.txt"));
+    Assert.assertTrue(items.contains("file2.txt"));
+    Assert.assertTrue(items.contains("file3.txt"));
+    Assert.assertTrue(items.contains("file4.txt"));
+    Assert.assertTrue(items.contains("file5.txt"));
+    Assert.assertTrue(items.contains("file6.txt"));
   }
 
   /**
@@ -1303,6 +1570,61 @@ public class FilesystemTest
   }
 
   /**
+   * Complicated shadowing works.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testMountShadowComplex0()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    /**
+     * <ol>
+     * <li>Create /subdir</li>
+     * <li>Mount an archive into /subdir</li>
+     * <li>Shadow /subdir with a file</li>
+     * <li>Shadow the /subdir file with a directory</li>
+     * <li>Check that /subdir is now empty</li>
+     * <li>Mount an archive into /subdir</li>
+     * <li>Check that /subdir contains only the new files</li>
+     * </ol>
+     */
+
+    fs.createDirectory(PathVirtual.ofString("/subdir"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+
+    fs.mountArchive("files1-3.zip", PathVirtual.ofString("/subdir"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file3.txt")));
+
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
+
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file1.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file2.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file3.txt")));
+
+    fs.mountArchive("files4-6.zip", PathVirtual.ofString("/subdir"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file1.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file2.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file3.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file4.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file5.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file6.txt")));
+  }
+
+  /**
    * Asking for a snapshot of the mounts of an empty filesystem results in an
    * empty list.
    */
@@ -1538,4 +1860,5 @@ public class FilesystemTest
 
     Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
   }
+
 }

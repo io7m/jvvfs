@@ -34,6 +34,7 @@ import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.UnreachableCodeException;
 import com.io7m.jaux.functional.Option;
 import com.io7m.jaux.functional.Option.Some;
+import com.io7m.jlog.Log;
 import com.io7m.jvvfs.FileReference.Type;
 
 /**
@@ -70,12 +71,15 @@ import com.io7m.jvvfs.FileReference.Type;
   private final @Nonnull File        base;
   private final @Nonnull PathVirtual mount;
   private final @Nonnull PathReal    real;
+  private final @Nonnull Log         log;
 
   ArchiveDirectory(
+    final @Nonnull Log log,
     final @Nonnull PathReal base_path,
     final @Nonnull PathVirtual mount)
     throws ConstraintError
   {
+    this.log = new Log(log, "directory");
     this.mount = Constraints.constrainNotNull(mount, "Mount path");
     this.base = new File(base_path.toString());
     this.real = new PathReal(this.base.toString());
@@ -193,5 +197,10 @@ import com.io7m.jvvfs.FileReference.Type;
     builder.append(this.mount);
     builder.append("]");
     return builder.toString();
+  }
+
+  @Override protected @Nonnull Log getLogLookup()
+  {
+    return this.log;
   }
 }
