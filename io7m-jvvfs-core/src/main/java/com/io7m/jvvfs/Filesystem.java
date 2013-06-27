@@ -125,6 +125,65 @@ public final class Filesystem implements
     }
   }
 
+  private static abstract class LookupResult<T extends FSReference>
+  {
+    static enum Type
+    {
+      LOOKUP_EXISTS,
+      LOOKUP_NONEXISTENT,
+      LOOKUP_NONEXISTENT_SHADOWED
+    }
+
+    private final @Nonnull Type type;
+
+    protected LookupResult(
+      final @Nonnull Type type)
+    {
+      this.type = type;
+    }
+
+    @Nonnull Type getType()
+    {
+      return this.type;
+    }
+  }
+
+  private static abstract class LookupResultExists<T extends FSReference> extends
+    LookupResult<T>
+  {
+    private final @Nonnull T ref;
+
+    protected LookupResultExists(
+      final @Nonnull T ref)
+    {
+      super(Type.LOOKUP_EXISTS);
+      this.ref = ref;
+    }
+
+    @Nonnull T getReference()
+    {
+      return this.ref;
+    }
+  }
+
+  private static abstract class LookupResultNonexistent<T extends FSReference> extends
+    LookupResult<T>
+  {
+    protected LookupResultNonexistent()
+    {
+      super(Type.LOOKUP_NONEXISTENT);
+    }
+  }
+
+  private static abstract class LookupResultNonexistentShadowed<T extends FSReference> extends
+    LookupResult<T>
+  {
+    protected LookupResultNonexistentShadowed()
+    {
+      super(Type.LOOKUP_NONEXISTENT_SHADOWED);
+    }
+  }
+
   private static @Nonnull Calendar getUTCTimeNow()
   {
     return Calendar.getInstance(TimeZone.getTimeZone("UTC"));

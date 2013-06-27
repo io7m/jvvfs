@@ -213,29 +213,6 @@ public class FilesystemTest
   }
 
   /**
-   * If a directory in an archive shadows a file, then searching for any
-   * object in that archive does not cause an error to be raised due to the
-   * original file appearing to be an ancestor.
-   */
-
-  @SuppressWarnings("static-method") @Test public
-    void
-    testExistsFileShadowEdgeCase()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
-    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
-    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
-    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
-    Assert
-      .assertFalse(fs.exists(PathVirtual.ofString("/subdir/nonexistent")));
-  }
-
-  /**
    * Nonexistent objects do not exist.
    */
 
@@ -1710,6 +1687,146 @@ public class FilesystemTest
     Assert.assertTrue(fs.exists(PathVirtual.ROOT));
     Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
     Assert.assertFalse(fs.isFile(PathVirtual.ROOT));
+  }
+
+  /**
+   * @see #testShadowEdgeCaseShadowSameMount()
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testShadowEdgeCaseReverseShadowSameMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
+  }
+
+  /**
+   * If a directory in an archive shadows a file, then searching for any
+   * object in that archive does not cause an error to be raised due to the
+   * original file appearing to be an ancestor.
+   * 
+   * This tests checks the case where the shadowing file is in an archive
+   * mounted at an ancestor of the shadowed directory.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testShadowEdgeCaseShadowIsAncestor()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.createDirectory(PathVirtual.ofString("/subdir"));
+    fs.mountArchive(
+      "single-file-and-subdir.zip",
+      PathVirtual.ofString("/subdir"));
+
+    fs.mountArchive("subdir-subdir-shadow.zip", PathVirtual.ROOT);
+    Assert
+      .assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir/subdir")));
+    Assert.assertFalse(fs.exists(PathVirtual
+      .ofString("/subdir/subdir/nonexistent")));
+  }
+
+  /**
+   * If a directory in an archive shadows a file, then searching for any
+   * object in that archive does not cause an error to be raised due to the
+   * original file appearing to be an ancestor.
+   * 
+   * This tests checks the case where the shadowed directory in archive
+   * <code>A</code> mounted at <code>MA</code> is shadowed by a file in an
+   * archive mounted at a child of <code>MA</code>.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testShadowEdgeCaseShadowIsChild()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("single-file-in-subdir-subdir.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual
+      .ofString("/subdir/subdir/file.txt")));
+
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ofString("/subdir"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert
+      .assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir/subdir")));
+    Assert.assertFalse(fs.isFile(PathVirtual
+      .ofString("/subdir/subdir/file.txt")));
+  }
+
+  /**
+   * If a directory in an archive shadows a file, then searching for any
+   * object in that archive does not cause an error to be raised due to the
+   * original file appearing to be an ancestor.
+   * 
+   * This tests checks the case where the shadowing file is in an archive
+   * mounted at the same mount point as the archive containing the shadowed
+   * directory.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testShadowEdgeCaseShadowSameMount()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert
+      .assertFalse(fs.exists(PathVirtual.ofString("/subdir/nonexistent")));
+  }
+
+  @SuppressWarnings("static-method") @Test public void testShadowExample()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.createDirectory(PathVirtual.ofString("/subdir"));
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+
+    fs.mountArchive("files1-3.zip", PathVirtual.ofString("/subdir"));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file1.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file2.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file3.txt")));
+
+    fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
+
+    fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
+    Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file.txt")));
+
+    fs.mountArchive("files4-6.zip", PathVirtual.ofString("/subdir"));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file1.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file2.txt")));
+    Assert.assertFalse(fs.exists(PathVirtual.ofString("/subdir/file3.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file4.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file5.txt")));
+    Assert.assertTrue(fs.isFile(PathVirtual.ofString("/subdir/file6.txt")));
   }
 
   /**

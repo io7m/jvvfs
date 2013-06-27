@@ -119,8 +119,10 @@ final class TestData
     TestData.zip_list.add("single-file.jar");
     TestData.zip_list.add("single-file-and-subdir.zip");
     TestData.zip_list.add("single-file-and-subdir-implicit.zip");
+    TestData.zip_list.add("single-file-in-subdir-subdir.zip");
     TestData.zip_list.add("complex.zip");
     TestData.zip_list.add("subdir-shadow.zip");
+    TestData.zip_list.add("subdir-subdir-shadow.zip");
     TestData.zip_list.add("encrypted.zip");
     TestData.zip_list.add("files1-3.zip");
     TestData.zip_list.add("files4-6.zip");
@@ -131,8 +133,14 @@ final class TestData
     TestData.zip_unpack_map.put(
       "single-file-and-subdir.zip",
       "single-file-and-subdir");
+    TestData.zip_unpack_map.put(
+      "single-file-in-subdir-subdir.zip",
+      "single-file-in-subdir-subdir");
     TestData.zip_unpack_map.put("complex.zip", "complex");
     TestData.zip_unpack_map.put("subdir-shadow.zip", "subdir-shadow");
+    TestData.zip_unpack_map.put(
+      "subdir-subdir-shadow.zip",
+      "subdir-subdir-shadow");
     TestData.zip_unpack_map.put("files1-3.zip", "files1-3");
     TestData.zip_unpack_map.put("files4-6.zip", "files4-6");
   }

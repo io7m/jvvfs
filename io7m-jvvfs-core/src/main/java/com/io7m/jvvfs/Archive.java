@@ -126,6 +126,8 @@ abstract class Archive<T extends ArchiveKind>
     throws FilesystemError,
       ConstraintError;
 
+  abstract protected @Nonnull Log getLogLookup();
+
   /**
    * <p>
    * Retrieve the modification time of the file or directory at
@@ -319,8 +321,6 @@ abstract class Archive<T extends ArchiveKind>
 
     return new Option.Some<FileReference<T>>(r);
   }
-
-  abstract protected @Nonnull Log getLogLookup();
 
   /**
    * <p>
