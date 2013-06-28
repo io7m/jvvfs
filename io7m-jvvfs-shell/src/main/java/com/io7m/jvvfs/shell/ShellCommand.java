@@ -26,7 +26,7 @@ import java.util.Calendar;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
+import java.util.SortedSet;
 
 import javax.annotation.Nonnull;
 
@@ -34,6 +34,7 @@ import jline.console.completer.Completer;
 import jline.console.completer.StringsCompleter;
 
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.functional.Pair;
 import com.io7m.jaux.functional.PartialFunction;
 import com.io7m.jlog.Log;
 import com.io7m.jvvfs.Filesystem;
@@ -97,6 +98,82 @@ abstract class ShellCommand
     abstract @Nonnull String helpText();
   }
 
+  static final class ShellCommandFileList extends ShellCommand
+  {
+    private final @Nonnull PathVirtual path;
+
+    ShellCommandFileList(
+      final @Nonnull PathVirtual path)
+    {
+      this.path = path;
+    }
+
+    @Override void run(
+      final @Nonnull Log log,
+      final @Nonnull PrintStream out,
+      final @Nonnull ShellConfig config,
+      final @Nonnull Filesystem fs)
+      throws FilesystemError,
+        ConstraintError
+    {
+      final SortedSet<String> items = fs.listDirectory(this.path);
+      for (final String name : items) {
+        out.println(name);
+      }
+    }
+  }
+
+  static final class ShellCommandFileListLong extends ShellCommand
+  {
+    private final @Nonnull PathVirtual path;
+
+    ShellCommandFileListLong(
+      final @Nonnull PathVirtual path)
+    {
+      this.path = path;
+    }
+
+    @Override void run(
+      final @Nonnull Log log,
+      final @Nonnull PrintStream out,
+      final @Nonnull ShellConfig config,
+      final @Nonnull Filesystem fs)
+      throws FilesystemError,
+        ConstraintError
+    {
+      final SortedSet<String> items = fs.listDirectory(this.path);
+
+      int longest = 16;
+      for (final String name : items) {
+        longest = Math.max(name.length(), longest);
+      }
+
+      for (final String name : items) {
+        final PathVirtual p = this.path.appendName(name);
+        final Calendar t = fs.getModificationTime(p);
+
+        out.print(name);
+        if (fs.isDirectory(p)) {
+          out.print("/");
+          out.print(" ");
+          ShellCommand.printPadSpace(out, longest, name.length() + 1);
+          out.print(" ");
+          ShellCommand.printCalendarStamp(out, t);
+          out.print(" ");
+        } else {
+          out.print(" ");
+          ShellCommand.printPadSpace(out, longest, name.length());
+          out.print(" ");
+          ShellCommand.printCalendarStamp(out, t);
+          out.print(" ");
+          final long s = fs.getFileSize(p);
+          out.print(s);
+        }
+        out.println();
+      }
+    }
+  }
+
   static final class ShellCommandFileModificationTime extends ShellCommand
   {
     private final @Nonnull PathVirtual path;
@@ -116,9 +193,8 @@ abstract class ShellCommand
         ConstraintError
     {
       final Calendar c = fs.getModificationTime(this.path);
-      final SimpleDateFormat df =
-        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-      out.println(df.format(c.getTime()));
+      ShellCommand.printCalendarStamp(out, c);
+      out.println();
     }
   }
 
@@ -206,7 +282,7 @@ abstract class ShellCommand
       if (ShellCommand.commands.containsKey(this.command)) {
         final ShellCommandDefinition c =
           ShellCommand.commands.get(this.command);
-        log.info("help: " + c.helpText());
+        out.println(c.helpText());
       }
     }
   }
@@ -221,7 +297,7 @@ abstract class ShellCommand
       throws FilesystemError,
         ConstraintError
     {
-      log.info("help: " + ShellCommand.makeHelpText());
+      out.println(ShellCommand.makeHelpText());
     }
   }
 
@@ -240,25 +316,21 @@ abstract class ShellCommand
       throws FilesystemError,
         ConstraintError
     {
-      final SortedMap<PathVirtual, Deque<PathReal>> mounts =
+      final Deque<Pair<PathReal, PathVirtual>> mounts =
         fs.getMountedArchives();
 
       int longest = 0;
-      for (final PathVirtual mount : mounts.keySet()) {
-        longest = Math.max(longest, mount.toString().length());
+      for (final Pair<PathReal, PathVirtual> pair : mounts) {
+        longest = Math.max(longest, pair.second.toString().length());
       }
       longest += 2;
 
-      for (final PathVirtual mount : mounts.keySet()) {
-        final Deque<PathReal> stack = mounts.get(mount);
-        for (final PathReal p : stack) {
-          out.print(mount.toString());
-          final int pad = longest - mount.toString().length();
-          for (int index = 0; index < pad; ++index) {
-            out.append(' ');
-          }
-          out.println(p.toFile().getName());
-        }
+      for (final Pair<PathReal, PathVirtual> pair : mounts) {
+        out.print(pair.second);
+        ShellCommand.printPadSpace(out, longest, pair.second
+          .toString()
+          .length());
+        out.println(pair.first.toString());
       }
     }
   }
@@ -489,6 +561,75 @@ abstract class ShellCommand
       }
     });
 
+    ShellCommand.commands.put("file-list", new ShellCommandDefinition() {
+      @Override @Nonnull
+        PartialFunction<String[], ShellCommand, ShellCommandError>
+        getParser()
+      {
+        return new PartialFunction<String[], ShellCommand, ShellCommandError>() {
+          @Override public ShellCommand call(
+            final @Nonnull String[] arguments)
+            throws ShellCommandError
+          {
+            try {
+              if (arguments.length < 2) {
+                throw new ShellCommandError.ShellCommandParseError(
+                  "file-list <path>");
+              }
+              return new ShellCommandFileList(PathVirtual
+                .ofString(arguments[1]));
+            } catch (final ConstraintError e) {
+              throw new ShellCommandError.ShellCommandConstraintError(e);
+            }
+          }
+        };
+      }
+
+      @Override @Nonnull String helpText()
+      {
+        final StringBuilder b = new StringBuilder();
+        b.append("syntax: file-list <path>");
+        b.append(System.lineSeparator());
+        b.append("  Display the contents of the directory at <path>");
+        return b.toString();
+      }
+    });
+
+    ShellCommand.commands.put("file-list-long", new ShellCommandDefinition() {
+      @Override @Nonnull
+        PartialFunction<String[], ShellCommand, ShellCommandError>
+        getParser()
+      {
+        return new PartialFunction<String[], ShellCommand, ShellCommandError>() {
+          @Override public ShellCommand call(
+            final @Nonnull String[] arguments)
+            throws ShellCommandError
+          {
+            try {
+              if (arguments.length < 2) {
+                throw new ShellCommandError.ShellCommandParseError(
+                  "file-list-long <path>");
+              }
+              return new ShellCommandFileListLong(PathVirtual
+                .ofString(arguments[1]));
+            } catch (final ConstraintError e) {
+              throw new ShellCommandError.ShellCommandConstraintError(e);
+            }
+          }
+        };
+      }
+
+      @Override @Nonnull String helpText()
+      {
+        final StringBuilder b = new StringBuilder();
+        b.append("syntax: file-list-long <path>");
+        b.append(System.lineSeparator());
+        b
+          .append("  Display the contents of the directory at <path> in verbose form");
+        return b.toString();
+      }
+    });
+
     ShellCommand.commands.put("list-mounts", new ShellCommandDefinition() {
       @Override @Nonnull
         PartialFunction<String[], ShellCommand, ShellCommandError>
@@ -681,4 +822,23 @@ abstract class ShellCommand
     final @Nonnull Filesystem fs)
     throws FilesystemError,
       ConstraintError;
+
+  static void printPadSpace(
+    final @Nonnull PrintStream out,
+    final int longest,
+    final int length)
+  {
+    final int pad = longest - length;
+    for (int index = 0; index < pad; ++index) {
+      out.append(' ');
+    }
+  }
+
+  static void printCalendarStamp(
+    final PrintStream out,
+    final Calendar c)
+  {
+    final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+    out.print(df.format(c.getTime()));
+  }
 }
