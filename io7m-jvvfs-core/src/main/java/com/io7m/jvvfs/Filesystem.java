@@ -59,13 +59,7 @@ import com.io7m.jvvfs.FilesystemError.Code;
  * @see #makeWithoutArchiveDirectory(Log)
  */
 
-public final class Filesystem implements
-  FSCapabilityRead,
-  FSCapabilityMountDirectory,
-  FSCapabilityMountClasspath,
-  FSCapabilityMountSnapshot,
-  FSCapabilityUnmount,
-  FSCapabilityClose
+public final class Filesystem implements FSCapabilityAll
 {
   private static abstract class FSReference
   {
