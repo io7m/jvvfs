@@ -227,6 +227,21 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     }
   }
 
+  @Test public void testGetRealPath()
+    throws FileNotFoundException,
+      IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Archive<T> a =
+      this.getArchive("single-file-and-subdir", PathVirtual.ROOT);
+    Assert.assertTrue(a
+      .getRealPath()
+      .toFile()
+      .getName()
+      .startsWith("single-file-and-subdir"));
+  }
+
   @Test public void testListDirectory()
     throws FileNotFoundException,
       IOException,

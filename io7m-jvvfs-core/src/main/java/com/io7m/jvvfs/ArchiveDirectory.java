@@ -100,6 +100,11 @@ import com.io7m.jvvfs.FileReference.Type;
     return ra.actual.length();
   }
 
+  @Override protected @Nonnull Log getLogLookup()
+  {
+    return this.log;
+  }
+
   @Override protected @Nonnull Calendar getModificationTimeActual(
     final @Nonnull FileReference<ArchiveDirectoryKind> r)
   {
@@ -197,10 +202,5 @@ import com.io7m.jvvfs.FileReference.Type;
     builder.append(this.mount);
     builder.append("]");
     return builder.toString();
-  }
-
-  @Override protected @Nonnull Log getLogLookup()
-  {
-    return this.log;
   }
 }
