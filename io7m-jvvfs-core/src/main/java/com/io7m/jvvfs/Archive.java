@@ -28,7 +28,6 @@ import com.io7m.jaux.UnreachableCodeException;
 import com.io7m.jaux.functional.Option;
 import com.io7m.jaux.functional.Option.Some;
 import com.io7m.jlog.Log;
-import com.io7m.jvvfs.FileReference.Type;
 
 /**
  * <p>
@@ -195,65 +194,6 @@ abstract class Archive<T extends ArchiveKind>
    */
 
   abstract @Nonnull PathReal getRealPath();
-
-  /**
-   * <p>
-   * Return <code>true</code> if the object at <code>path</code> is a
-   * directory.
-   * </p>
-   * 
-   * @throws FilesystemError
-   */
-
-  final boolean isDirectory(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
-  {
-    final Option<FileReference<T>> ro = this.lookup(path);
-    switch (ro.type) {
-      case OPTION_NONE:
-      {
-        return false;
-      }
-      case OPTION_SOME:
-      {
-        final FileReference<T> r = ((Option.Some<FileReference<T>>) ro).value;
-        return r.type == Type.TYPE_DIRECTORY;
-      }
-    }
-
-    throw new UnreachableCodeException();
-  }
-
-  /**
-   * <p>
-   * Return <code>true</code> if the object at <code>path</code> is a file.
-   * </p>
-   * 
-   * @throws FilesystemError
-   */
-
-  final boolean isFile(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
-  {
-    final Option<FileReference<T>> ro = this.lookup(path);
-    switch (ro.type) {
-      case OPTION_NONE:
-      {
-        return false;
-      }
-      case OPTION_SOME:
-      {
-        final FileReference<T> r = ((Option.Some<FileReference<T>>) ro).value;
-        return r.type == Type.TYPE_FILE;
-      }
-    }
-
-    throw new UnreachableCodeException();
-  }
 
   /**
    * <p>

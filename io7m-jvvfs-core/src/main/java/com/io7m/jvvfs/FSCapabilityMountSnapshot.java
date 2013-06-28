@@ -17,9 +17,10 @@
 package com.io7m.jvvfs;
 
 import java.util.Deque;
-import java.util.SortedMap;
 
 import javax.annotation.Nonnull;
+
+import com.io7m.jaux.functional.Pair;
 
 /**
  * <p>
@@ -31,10 +32,8 @@ import javax.annotation.Nonnull;
 public interface FSCapabilityMountSnapshot
 {
   /**
-   * Produce a list of all mounted archives.
+   * Produce a snapshot of the stack of mounted archives.
    */
 
-  public @Nonnull
-    SortedMap<PathVirtual, Deque<PathReal>>
-    getMountedArchives();
+  public @Nonnull Deque<Pair<PathReal, PathVirtual>> getMountedArchives();
 }

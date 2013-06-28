@@ -29,10 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.annotation.CheckForNull;
@@ -46,6 +44,7 @@ import com.io7m.jaux.functional.Option.Some;
 import com.io7m.jaux.functional.Pair;
 import com.io7m.jlog.Log;
 import com.io7m.jvvfs.FileReference.Type;
+import com.io7m.jvvfs.FilesystemError.Code;
 
 /**
  * <p>
@@ -82,15 +81,6 @@ public final class Filesystem implements
       super(FSReferenceType.FS_REF_ARCHIVE);
       this.ref = ref;
     }
-
-    @Override public String toString()
-    {
-      final StringBuilder builder = new StringBuilder();
-      builder.append("[FSReferenceArchive ");
-      builder.append(this.ref);
-      builder.append("]");
-      return builder.toString();
-    }
   }
 
   private static enum FSReferenceType
@@ -112,114 +102,11 @@ public final class Filesystem implements
       this.path = path;
       this.mtime = mtime;
     }
-
-    @Override public String toString()
-    {
-      final StringBuilder builder = new StringBuilder();
-      builder.append("[FSReferenceVirtualDirectory ");
-      builder.append(this.path);
-      builder.append(" ");
-      builder.append(this.mtime);
-      builder.append("]");
-      return builder.toString();
-    }
-  }
-
-  private static abstract class LookupResult<T extends FSReference>
-  {
-    static enum Type
-    {
-      LOOKUP_EXISTS,
-      LOOKUP_NONEXISTENT,
-      LOOKUP_NONEXISTENT_SHADOWED
-    }
-
-    private final @Nonnull Type type;
-
-    protected LookupResult(
-      final @Nonnull Type type)
-    {
-      this.type = type;
-    }
-
-    @Nonnull Type getType()
-    {
-      return this.type;
-    }
-  }
-
-  private static abstract class LookupResultExists<T extends FSReference> extends
-    LookupResult<T>
-  {
-    private final @Nonnull T ref;
-
-    protected LookupResultExists(
-      final @Nonnull T ref)
-    {
-      super(Type.LOOKUP_EXISTS);
-      this.ref = ref;
-    }
-
-    @Nonnull T getReference()
-    {
-      return this.ref;
-    }
-  }
-
-  private static abstract class LookupResultNonexistent<T extends FSReference> extends
-    LookupResult<T>
-  {
-    protected LookupResultNonexistent()
-    {
-      super(Type.LOOKUP_NONEXISTENT);
-    }
-  }
-
-  private static abstract class LookupResultNonexistentShadowed<T extends FSReference> extends
-    LookupResult<T>
-  {
-    protected LookupResultNonexistentShadowed()
-    {
-      super(Type.LOOKUP_NONEXISTENT_SHADOWED);
-    }
   }
 
   private static @Nonnull Calendar getUTCTimeNow()
   {
     return Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-  }
-
-  /**
-   * List directories assuming at least one mount contains a directory at
-   * <code>path</code>.
-   * 
-   * @throws ConstraintError
-   * @throws FilesystemError
-   */
-
-  private static @Nonnull SortedSet<String> listDirectoryInMounts(
-    final @Nonnull Map<PathVirtual, Deque<Archive<?>>> mount_map,
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
-  {
-    final TreeSet<String> items = new TreeSet<String>();
-
-    for (final PathVirtual mount : mount_map.keySet()) {
-      if (mount.isAncestorOf(path) || mount.equals(path)) {
-        final PathVirtual inner_path = path.subtract(mount);
-        final Deque<Archive<?>> stack = mount_map.get(mount);
-        for (final Archive<?> a : stack) {
-          if (a.isFile(inner_path)) {
-            break;
-          }
-          final Set<String> a_items = a.listDirectory(inner_path);
-          items.addAll(a_items);
-        }
-      }
-    }
-
-    return items;
   }
 
   @SuppressWarnings("unchecked") private static @Nonnull
@@ -232,113 +119,6 @@ public final class Filesystem implements
   {
     final Option<?> r = a.lookup(path);
     return (Option<FileReference<?>>) r;
-  }
-
-  /**
-   * <p>
-   * Look up the object at <code>path</code> in the mounted archives
-   * <code>mount_map</code>. Only mount points that are ancestors of or equal
-   * to <code>path</code> are checked.
-   * </p>
-   * <p>
-   * The ancestors of <code>path</code> are not checked.
-   * </p>
-   * <p>
-   * Note that the order that mounts are checked is dependent on the ordering
-   * relation for {@link PathVirtual}. This provides "bottom up" semantics,
-   * where mounts closest to the root are checked first.
-   * </p>
-   * 
-   * @see PathVirtual#compareTo(PathVirtual)
-   * @throws ConstraintError
-   * @throws FilesystemError
-   */
-
-  private static @CheckForNull
-    <T extends FSReference>
-    Option<T>
-    lookupDirectInMounts(
-      final @Nonnull SortedMap<PathVirtual, Deque<Archive<?>>> mount_map,
-      final @Nonnull PathVirtual path)
-      throws FilesystemError,
-        ConstraintError
-  {
-    final Set<PathVirtual> paths = mount_map.keySet();
-    for (final PathVirtual mount : paths) {
-      if (mount.isAncestorOf(path) || mount.equals(path)) {
-        final Deque<Archive<?>> stack = mount_map.get(mount);
-        final Option<T> r =
-          Filesystem.lookupDirectInStack(path, stack, mount);
-        if (r.isSome()) {
-          return r;
-        }
-      }
-    }
-
-    return new Option.None<T>();
-  }
-
-  /**
-   * <p>
-   * Look up the object at <code>path</code> in the stack of archives
-   * <code>stack</code>.
-   * </p>
-   * <p>
-   * The ancestors of <code>path</code> are not checked.
-   * </p>
-   * 
-   * @throws ConstraintError
-   * @throws FilesystemError
-   */
-
-  private static @Nonnull
-    <T extends FSReference>
-    Option<T>
-    lookupDirectInStack(
-      final @Nonnull PathVirtual path,
-      final @Nonnull Deque<Archive<?>> stack,
-      final @Nonnull PathVirtual mount)
-      throws FilesystemError,
-        ConstraintError
-  {
-    assert stack != null;
-    assert stack.size() > 0;
-
-    /**
-     * Check each archive in the stack, from the top of the stack to the
-     * bottom.
-     */
-
-    final Iterator<Archive<?>> stack_iter = stack.iterator();
-    while (stack_iter.hasNext()) {
-      final Archive<?> a = stack_iter.next();
-      final PathVirtual inner_path = path.subtract(mount);
-
-      final Option<FileReference<?>> r =
-        Filesystem.lookupDirectInArchive(a, inner_path);
-      switch (r.type) {
-        case OPTION_NONE:
-        {
-          /**
-           * This archive did not contain the requested path.
-           */
-          break;
-        }
-        case OPTION_SOME:
-        {
-          /**
-           * This archive contained the requested path, return it.
-           */
-
-          final Some<FileReference<?>> s = (Option.Some<FileReference<?>>) r;
-          @SuppressWarnings("unchecked") final T f =
-            (T) new FSReferenceArchive(s.value);
-          return new Option.Some<T>(f);
-        }
-      }
-    }
-
-    return new Option.None<T>();
   }
 
   /**
@@ -377,15 +157,14 @@ public final class Filesystem implements
     return new Filesystem(log, null);
   }
 
-  private final @Nonnull Log                                       log;
-  private final @Nonnull Log                                       log_directory;
-  private final @Nonnull Log                                       log_mount;
-  private final @Nonnull Log                                       log_lookup;
-  private final @Nonnull Option<PathReal>                          archives;
-  private final @Nonnull List<ArchiveHandler<?>>                   handlers;
-  private final @Nonnull SortedMap<PathVirtual, Deque<Archive<?>>> mounts;
-
-  private final @Nonnull Map<PathVirtual, Calendar>                directories;
+  private final @Nonnull Log                        log;
+  private final @Nonnull Log                        log_directory;
+  private final @Nonnull Log                        log_mount;
+  private final @Nonnull Log                        log_lookup;
+  private final @Nonnull Option<PathReal>           archives;
+  private final @Nonnull List<ArchiveHandler<?>>    handlers;
+  private final @Nonnull LinkedList<Archive<?>>     archive_list;
+  private final @Nonnull Map<PathVirtual, Calendar> directories;
 
   private Filesystem(
     final @Nonnull Log log,
@@ -409,80 +188,23 @@ public final class Filesystem implements
     this.handlers.add(new ArchiveDirectoryHandler());
     this.handlers.add(new ArchiveZipHandler());
 
-    this.mounts = new TreeMap<PathVirtual, Deque<Archive<?>>>();
+    this.archive_list = new LinkedList<Archive<?>>();
 
     this.directories = new HashMap<PathVirtual, Calendar>();
     this.directories.put(PathVirtual.ROOT, Filesystem.getUTCTimeNow());
-  }
-
-  /**
-   * <p>
-   * Return <code>(Some(stack), TRUE)</code> if the archive named
-   * <code>archive_name</code> is mounted at <code>mount</code>.
-   * </p>
-   * <p>
-   * Return <code>(Some(stack), FALSE)</code> if there is an archive stack at
-   * <code>mount</code> but no archive named <code>archive_name</code> is in
-   * it.
-   * </p>
-   * <p>
-   * Return <code>(None, _)</code> if nothing is mounted at <code>mount</code>
-   * .
-   * </p>
-   */
-
-  private @Nonnull Pair<Option<Deque<Archive<?>>>, Boolean> archiveMountedAt(
-    final @Nonnull PathReal archive_name,
-    final @Nonnull PathVirtual mount)
-  {
-    if (this.mounts.containsKey(mount)) {
-      final Deque<Archive<?>> stack = this.mounts.get(mount);
-      final Option<Deque<Archive<?>>> ss =
-        new Option.Some<Deque<Archive<?>>>(stack);
-
-      for (final Archive<?> archive : stack) {
-        if (archive.getRealPath().equals(archive_name)) {
-          return new Pair<Option<Deque<Archive<?>>>, Boolean>(
-            ss,
-            Boolean.TRUE);
-        }
-      }
-      return new Pair<Option<Deque<Archive<?>>>, Boolean>(ss, Boolean.FALSE);
-    }
-
-    return new Pair<Option<Deque<Archive<?>>>, Boolean>(
-      new Option.None<Deque<Archive<?>>>(),
-      Boolean.FALSE);
   }
 
   @Override public void close()
     throws ConstraintError,
       FilesystemError
   {
-    FilesystemError saved_e = null;
-
-    final LinkedList<PathVirtual> mount_snapshot =
-      new LinkedList<PathVirtual>(this.mounts.keySet());
-
-    for (final PathVirtual mount : mount_snapshot) {
-      final Deque<Archive<?>> stack = this.mounts.get(mount);
-      final int size = stack.size();
-      for (int index = 0; index < size; ++index) {
-        try {
-          this.unmount(mount);
-        } catch (final FilesystemError e) {
-          saved_e = e;
-        }
-      }
+    for (final Archive<?> a : this.archive_list) {
+      a.close();
     }
 
-    assert this.mounts.size() == 0;
+    this.archive_list.clear();
     this.directories.clear();
     this.directories.put(PathVirtual.ROOT, Filesystem.getUTCTimeNow());
-
-    if (saved_e != null) {
-      throw saved_e;
-    }
   }
 
   @Override public void createDirectory(
@@ -647,25 +369,21 @@ public final class Filesystem implements
   }
 
   @Override public @Nonnull
-    SortedMap<PathVirtual, Deque<PathReal>>
+    Deque<Pair<PathReal, PathVirtual>>
     getMountedArchives()
   {
-    final TreeMap<PathVirtual, Deque<PathReal>> snap =
-      new TreeMap<PathVirtual, Deque<PathReal>>();
+    final Deque<Pair<PathReal, PathVirtual>> result =
+      new ArrayDeque<Pair<PathReal, PathVirtual>>();
 
-    for (final PathVirtual mount : this.mounts.keySet()) {
-      final Deque<PathReal> rstack = new ArrayDeque<PathReal>();
-      final Deque<Archive<?>> stack = this.mounts.get(mount);
-
-      final Iterator<Archive<?>> stack_iter = stack.descendingIterator();
-      while (stack_iter.hasNext()) {
-        final Archive<?> a = stack_iter.next();
-        rstack.push(a.getRealPath());
-      }
-      snap.put(mount, rstack);
+    final Iterator<Archive<?>> iter = this.archive_list.descendingIterator();
+    while (iter.hasNext()) {
+      final Archive<?> a = iter.next();
+      final Pair<PathReal, PathVirtual> p =
+        new Pair<PathReal, PathVirtual>(a.getRealPath(), a.getMountPath());
+      result.push(p);
     }
 
-    return snap;
+    return result;
   }
 
   @Override public boolean isDirectory(
@@ -765,7 +483,7 @@ public final class Filesystem implements
             if (ra.ref.type != Type.TYPE_DIRECTORY) {
               throw FilesystemError.notDirectory(path.toString());
             }
-            return Filesystem.listDirectoryInMounts(this.mounts, path);
+            return this.listDirectoryInternal(path);
           }
           case FS_REF_VIRTUAL_DIRECTORY:
           {
@@ -776,6 +494,49 @@ public final class Filesystem implements
     }
 
     throw new UnreachableCodeException();
+  }
+
+  private @Nonnull SortedSet<String> listDirectoryInternal(
+    final @Nonnull PathVirtual path)
+    throws ConstraintError,
+      FilesystemError
+  {
+    final TreeSet<String> items = new TreeSet<String>();
+
+    boolean lookup_shadowed = false;
+    boolean lookup_first = true;
+    final Iterator<Archive<?>> iter = this.archive_list.iterator();
+    while (iter.hasNext() && (!lookup_shadowed)) {
+      final Archive<?> a = iter.next();
+      final PathVirtual mount = a.getMountPath();
+
+      if (mount.isAncestorOf(path) || mount.equals(path)) {
+        final PathVirtual a_path = path.subtract(mount);
+
+        try {
+          final Set<String> a_items = a.listDirectory(a_path);
+          items.addAll(a_items);
+        } catch (final FilesystemError e) {
+
+          /**
+           * The path checked has an ancestor that happens to be a file in
+           * this archive. If this is the first archive that has been queried,
+           * then raise an error. Otherwise, don't check any further archives.
+           */
+
+          if (e.getCode() == Code.FS_ERROR_NOT_A_DIRECTORY) {
+            if (lookup_first) {
+              throw e;
+            }
+            lookup_shadowed = true;
+          }
+        }
+
+        lookup_first = false;
+      }
+    }
+
+    return items;
   }
 
   /**
@@ -813,42 +574,85 @@ public final class Filesystem implements
     return this.lookupDirect(path);
   }
 
-  /**
-   * Look up <code>path</code> directly. That is, do not check the ancestors
-   * of <code>path</code>, simply look for <code>path</code> in all relevant
-   * archives and the list of virtual directories.
-   */
-
   private <T extends FSReference> Option<T> lookupDirect(
     final @Nonnull PathVirtual path)
     throws FilesystemError,
       ConstraintError
   {
-    this.log_lookup.debug("direct: " + path.toString());
-
     /**
-     * Check mounts for path.
+     * Check the list of archives for <code>path</code>.
      */
 
-    final Option<T> r = Filesystem.lookupDirectInMounts(this.mounts, path);
-    if (r.isSome()) {
-      return r;
+    boolean lookup_shadowed = false;
+    boolean lookup_first = true;
+    final Iterator<Archive<?>> iter = this.archive_list.iterator();
+    while (iter.hasNext() && (!lookup_shadowed)) {
+      final Archive<?> a = iter.next();
+      final PathVirtual mount = a.getMountPath();
+
+      if (mount.isAncestorOf(path) || mount.equals(path)) {
+        final PathVirtual a_path = path.subtract(mount);
+
+        try {
+          final Option<FileReference<?>> r =
+            Filesystem.lookupDirectInArchive(a, a_path);
+
+          switch (r.type) {
+            case OPTION_NONE:
+            {
+              /**
+               * This archive did not contain the requested path.
+               */
+              break;
+            }
+            case OPTION_SOME:
+            {
+              /**
+               * This archive contained the requested path, return it.
+               */
+
+              final Some<FileReference<?>> s =
+                (Option.Some<FileReference<?>>) r;
+              @SuppressWarnings("unchecked") final T f =
+                (T) new FSReferenceArchive(s.value);
+              return new Option.Some<T>(f);
+            }
+          }
+        } catch (final FilesystemError e) {
+
+          /**
+           * The path checked has an ancestor that happens to be a file in
+           * this archive. If this is the first archive that has been queried,
+           * then raise an error. Otherwise, don't check any further archives.
+           */
+
+          if (e.getCode() == Code.FS_ERROR_NOT_A_DIRECTORY) {
+            if (lookup_first) {
+              throw e;
+            }
+            lookup_shadowed = true;
+          }
+        }
+
+        lookup_first = false;
+      }
     }
 
     /**
-     * No mounts contained <code>path</code>, check the list of virtual
+     * No archive contained <code>path</code>. Check the list of virtual
      * directories.
      */
 
     if (this.directories.containsKey(path)) {
-      final Calendar mtime = this.directories.get(path);
-      @SuppressWarnings("unchecked") final T f =
-        (T) new FSReferenceVirtualDirectory(path, mtime);
-      return new Option.Some<T>(f);
+      final FSReferenceVirtualDirectory r =
+        new FSReferenceVirtualDirectory(path, this.directories.get(path));
+      @SuppressWarnings("unchecked") final Some<T> ro =
+        new Option.Some<T>((T) r);
+      return ro;
     }
 
     /**
-     * <code>path</code> does not exist.
+     * No object exists at <code>path</code>.
      */
 
     return new Option.None<T>();
@@ -866,6 +670,7 @@ public final class Filesystem implements
    *           <li><code>path</code> does not exist</li>
    *           <li><code>path</code> is not a directory</li>
    *           </ul>
+   * @throws ConstraintError
    */
 
   private <T extends FSReference> void lookupDirectAssertIsDirectory(
@@ -935,6 +740,23 @@ public final class Filesystem implements
     }
   }
 
+  private void mountCheckArchiveStack(
+    final @Nonnull PathReal archive,
+    final @Nonnull PathVirtual mount)
+    throws FilesystemError
+  {
+    for (final Archive<?> a : this.archive_list) {
+      final PathReal a_p = a.getRealPath();
+      final PathVirtual a_m = a.getMountPath();
+
+      if (a_p.equals(archive) && a_m.equals(mount)) {
+        final String a_name = archive.toFile().getName();
+        final String m_name = mount.toString();
+        throw FilesystemError.archiveAlreadyMounted(a_name, m_name);
+      }
+    }
+  }
+
   @Override public void mountClasspathArchive(
     final @Nonnull Class<?> c,
     final @Nonnull PathVirtual mount)
@@ -970,10 +792,9 @@ public final class Filesystem implements
     throws FilesystemError,
       ConstraintError
   {
-    this.log_mount.debug("mount-internal: " + archive + " - " + mount);
+    this.mountCheckArchiveStack(archive, mount);
 
     final ArchiveHandler<?> handler = this.mountInternalCheckHandler(archive);
-
     final Option<FSReference> r = this.lookup(mount);
     switch (r.type) {
       case OPTION_NONE:
@@ -1000,25 +821,15 @@ public final class Filesystem implements
     }
   }
 
-  /**
-   * Load the archive named <code>archive_name</code> with
-   * <code>handler</code>, inserting it into the (possibly newly-created)
-   * stack of archives at <code>mount</code>.
-   */
-
   private void mountInternalActual(
     final @Nonnull ArchiveHandler<?> handler,
-    final @Nonnull PathReal archive_name,
+    final @Nonnull PathReal archive,
     final @Nonnull PathVirtual mount)
     throws FilesystemError,
       ConstraintError
   {
-    final Deque<Archive<?>> stack =
-      this.mountInternalGetStack(archive_name, mount);
-
-    final Archive<?> archive = handler.load(this.log, archive_name, mount);
-    stack.push(archive);
-    this.mounts.put(mount, stack);
+    final Archive<?> a = handler.load(this.log, archive, mount);
+    this.archive_list.addFirst(a);
   }
 
   /**
@@ -1037,41 +848,6 @@ public final class Filesystem implements
     }
 
     throw FilesystemError.archiveTypeUnsupported(archive.toString());
-  }
-
-  /**
-   * <p>
-   * Return the stack of archives at <code>mount</code>. If an archive named
-   * <code>archive_name</code> is already in that stack, raise an error.
-   * </p>
-   * 
-   * <p>
-   * If no stack of archives exists at <code>mount</code>, create a new stack
-   * and return it.
-   * </p>
-   */
-
-  private @Nonnull Deque<Archive<?>> mountInternalGetStack(
-    final PathReal archive_name,
-    final PathVirtual mount)
-    throws FilesystemError
-  {
-    final Pair<Option<Deque<Archive<?>>>, Boolean> r =
-      this.archiveMountedAt(archive_name, mount);
-
-    if (r.first.isSome()) {
-      if (r.second.booleanValue()) {
-        throw FilesystemError.archiveAlreadyMounted(
-          archive_name.toString(),
-          mount.toString());
-      }
-
-      final Deque<Archive<?>> stack =
-        ((Option.Some<Deque<Archive<?>>>) r.first).value;
-      return stack;
-    }
-
-    return new ArrayDeque<Archive<?>>();
   }
 
   @Override public @Nonnull InputStream openFile(
@@ -1140,23 +916,13 @@ public final class Filesystem implements
       throw FilesystemError.notDirectory(mount.toString());
     }
 
-    /**
-     * Pop an archive from the stack and close it, deleting the stack entirely
-     * if the stack is emptied by the pop.
-     */
-
-    if (this.mounts.containsKey(mount)) {
-      final Deque<Archive<?>> stack = this.mounts.get(mount);
-      assert stack != null;
-      assert stack.size() > 0;
-
-      try {
-        final Archive<?> a = stack.pop();
+    final Iterator<Archive<?>> iter = this.archive_list.iterator();
+    while (iter.hasNext()) {
+      final Archive<?> a = iter.next();
+      if (a.getMountPath().equals(mount)) {
         a.close();
-      } finally {
-        if (stack.isEmpty()) {
-          this.mounts.remove(mount);
-        }
+        iter.remove();
+        break;
       }
     }
   }

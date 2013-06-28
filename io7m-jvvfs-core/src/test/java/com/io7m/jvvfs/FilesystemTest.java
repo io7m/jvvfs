@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Deque;
-import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TimeZone;
 
@@ -39,6 +38,7 @@ import org.junit.Test;
 
 import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jaux.UnreachableCodeException;
+import com.io7m.jaux.functional.Pair;
 import com.io7m.jvvfs.FilesystemError.Code;
 
 public class FilesystemTest
@@ -355,6 +355,33 @@ public class FilesystemTest
   }
 
   /**
+   * Opening a file with a file ancestor fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testFileOpenFileAncestor()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      fs.openFile(PathVirtual.ofString("/subdir/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
+      throw e;
+    }
+  }
+
+  /**
    * Opening a nonexistent file fails.
    */
 
@@ -476,6 +503,33 @@ public class FilesystemTest
   }
 
   /**
+   * Retrieving the size of a file with a file ancestor fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testFileSizeFileAncestor()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      fs.getFileSize(PathVirtual.ofString("/subdir/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
+      throw e;
+    }
+  }
+
+  /**
    * Retrieving the size of a nonexistent file fails.
    */
 
@@ -492,6 +546,33 @@ public class FilesystemTest
       fs.getFileSize(PathVirtual.ofString("/nonexistent"));
     } catch (final FilesystemError e) {
       Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
+      throw e;
+    }
+  }
+
+  /**
+   * Checking if an object is a directory with a file ancestor fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testIsDirectoryFileAncestor()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      fs.isDirectory(PathVirtual.ofString("/subdir/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
       throw e;
     }
   }
@@ -983,6 +1064,33 @@ public class FilesystemTest
 
     final long diff = Math.abs(cdir_t - cnow_t);
     Assert.assertTrue(diff < 2);
+  }
+
+  /**
+   * Retrieving the size of a file with a file ancestor fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testModificationTimeFileAncestor()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    try {
+      fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
+    } catch (final FilesystemError e) {
+      Assert.fail();
+    }
+
+    try {
+      fs.getModificationTime(PathVirtual.ofString("/subdir/nonexistent"));
+    } catch (final FilesystemError e) {
+      Assert.assertEquals(Code.FS_ERROR_NOT_A_DIRECTORY, e.getCode());
+      throw e;
+    }
   }
 
   /**
@@ -1639,37 +1747,39 @@ public class FilesystemTest
     fs.mountArchive("single-file.zip", PathVirtual.ofString("/c"));
     fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ofString("/c"));
 
-    final SortedMap<PathVirtual, Deque<PathReal>> mounts =
-      fs.getMountedArchives();
-
-    Assert.assertTrue(mounts.containsKey(PathVirtual.ofString("/a")));
-    Assert.assertTrue(mounts.containsKey(PathVirtual.ofString("/b")));
-    Assert.assertTrue(mounts.containsKey(PathVirtual.ofString("/c")));
+    final Deque<Pair<PathReal, PathVirtual>> mounts = fs.getMountedArchives();
+    Assert.assertEquals(5, mounts.size());
 
     {
-      final Deque<PathReal> s = mounts.get(PathVirtual.ofString("/c"));
-      final PathReal a0 = s.pop();
-      Assert
-        .assertEquals("single-file-and-subdir.zip", a0.toFile().getName());
-      final PathReal a1 = s.pop();
-      Assert.assertEquals("single-file.zip", a1.toFile().getName());
-      Assert.assertTrue(s.isEmpty());
+      final Pair<PathReal, PathVirtual> p = mounts.pop();
+      Assert.assertEquals("single-file-and-subdir.zip", p.first
+        .toFile()
+        .getName());
+      Assert.assertEquals(PathVirtual.ofString("/c"), p.second);
     }
 
     {
-      final Deque<PathReal> s = mounts.get(PathVirtual.ofString("/b"));
-      final PathReal a0 = s.pop();
-      Assert.assertEquals("single-file.zip", a0.toFile().getName());
-      Assert.assertTrue(s.isEmpty());
+      final Pair<PathReal, PathVirtual> p = mounts.pop();
+      Assert.assertEquals("single-file.zip", p.first.toFile().getName());
+      Assert.assertEquals(PathVirtual.ofString("/c"), p.second);
     }
 
     {
-      final Deque<PathReal> s = mounts.get(PathVirtual.ofString("/a"));
-      final PathReal a0 = s.pop();
-      Assert.assertEquals("complex.zip", a0.toFile().getName());
-      final PathReal a1 = s.pop();
-      Assert.assertEquals("single-file.zip", a1.toFile().getName());
-      Assert.assertTrue(s.isEmpty());
+      final Pair<PathReal, PathVirtual> p = mounts.pop();
+      Assert.assertEquals("single-file.zip", p.first.toFile().getName());
+      Assert.assertEquals(PathVirtual.ofString("/b"), p.second);
+    }
+
+    {
+      final Pair<PathReal, PathVirtual> p = mounts.pop();
+      Assert.assertEquals("complex.zip", p.first.toFile().getName());
+      Assert.assertEquals(PathVirtual.ofString("/a"), p.second);
+    }
+
+    {
+      final Pair<PathReal, PathVirtual> p = mounts.pop();
+      Assert.assertEquals("single-file.zip", p.first.toFile().getName());
+      Assert.assertEquals(PathVirtual.ofString("/a"), p.second);
     }
   }
 
@@ -1734,8 +1844,6 @@ public class FilesystemTest
     fs.mountArchive("subdir-subdir-shadow.zip", PathVirtual.ROOT);
     Assert
       .assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir/subdir")));
-    Assert.assertFalse(fs.exists(PathVirtual
-      .ofString("/subdir/subdir/nonexistent")));
   }
 
   /**
@@ -1767,8 +1875,6 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
     Assert
       .assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir/subdir")));
-    Assert.assertFalse(fs.isFile(PathVirtual
-      .ofString("/subdir/subdir/file.txt")));
   }
 
   /**
