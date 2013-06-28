@@ -195,13 +195,6 @@
               </archive>
             </configuration>
           </execution>
-          <!-- Produce jar file of tests -->
-          <execution>
-            <id>test-jar</id>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
         </executions>
       </plugin>
 
