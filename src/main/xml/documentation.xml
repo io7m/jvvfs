@@ -420,7 +420,9 @@ final InputStream s1 = fs.openFile("/c/xyz/file.txt");]]>
 	      The sole purpose of the configuration file, at present, is to
 	      control logging. The <s:term type="package">jvvfs</s:term> package
 	      uses <s:term type="package">jlog</s:term>
+	      <s:footnote>
 	      <s:link-external target="http://io7m.com/software/jlog">http://io7m.com/software/jlog</s:link-external>
+	      </s:footnote>
 	      internally for extremely fine-grained control of logging. All logging
 	      controls for <s:term type="package">jvvfs</s:term> are given the prefix
 	      <s:term type="constant">com.io7m.jvvfs</s:term>. A trivial configuration
@@ -451,7 +453,83 @@ com.io7m.jvvfs.level      = LOG_ERROR]]>
 	  	<s:formal-item>
 	  	  <s:formal-item-title>Example session</s:formal-item-title>
 	  	  <s:verbatim><![CDATA[
+jvvfs> 
+archives         close            file-list        file-list-long   file-read        file-size        file-time        
+help             list-mounts      mkdir            mount            unmount  
+        
+jvvfs> archives 
+complex.zip
+encrypted.zip
+files1-3.zip
+files4-6.zip
+io7m-jvvfs.properties
+single-file-and-subdir-implicit.zip
+single-file-and-subdir.zip
+single-file-in-subdir-subdir.zip
+single-file.jar
+single-file.zip
+subdir-shadow.zip
+subdir-subdir-shadow.zip
+unknown.unknown
 
+jvvfs> mkdir /z
+jvvfs> file-list-long /
+z/                2013-06-29 14:19:51 +0000 
+jvvfs> file-list-long /z
+
+jvvfs> mount files1-3.zip /z
+jvvfs> file-list-long /z
+file1.txt         2013-05-08 11:35:16 +0000 7
+file2.txt         2013-05-08 11:35:20 +0000 7
+file3.txt         2013-05-08 11:35:24 +0000 7
+jvvfs> file-read /z/file1.txt
+File 1
+
+jvvfs> list-mounts 
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs> mount complex.zip /
+jvvfs> list-mounts 
+/   /tmp/jvvfs/complex.zip
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs> file-list-long /
+a/                2012-03-15 21:13:12 +0000
+b/                2012-03-15 21:13:12 +0000
+z/                2013-06-28 22:13:47 +0000
+
+jvvfs> file-list-long /a
+a/                2012-03-15 21:13:12 +0000
+a1.txt            2012-03-15 21:13:12 +0000 9
+a2.txt            2012-03-15 21:13:12 +0000 9
+a3.txt            2012-03-15 21:13:12 +0000 9
+b/                2012-03-15 21:13:12 +0000
+c/                2012-03-15 21:13:12 +0000
+
+jvvfs> mount files4-6.zip /a
+
+jvvfs> file-list-long /a
+a/                2012-03-15 21:13:12 +0000 
+a1.txt            2012-03-15 21:13:12 +0000 9
+a2.txt            2012-03-15 21:13:12 +0000 9
+a3.txt            2012-03-15 21:13:12 +0000 9
+b/                2012-03-15 21:13:12 +0000 
+c/                2012-03-15 21:13:12 +0000 
+file4.txt         2013-05-08 11:36:02 +0000 7
+file5.txt         2013-05-08 11:36:06 +0000 7
+file6.txt         2013-05-08 11:36:10 +0000 7
+
+jvvfs> list-mounts 
+/a  /tmp/jvvfs/files4-6.zip
+/   /tmp/jvvfs/complex.zip
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs> close
+jvvfs> list-mounts
+jvvfs> file-list-long /
+
+jvvfs> mount encrypted.zip /
+shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt - invalid CEN header (encrypted entry)
 ]]>
 	  	  </s:verbatim>
 	  	</s:formal-item>

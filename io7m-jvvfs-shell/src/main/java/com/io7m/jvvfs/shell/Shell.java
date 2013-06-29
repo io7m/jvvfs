@@ -78,7 +78,13 @@ public final class Shell implements Runnable
 
   private void cleanup()
   {
-
+    try {
+      this.filesystem.close();
+    } catch (final FilesystemError e) {
+      e.printStackTrace();
+    } catch (final ConstraintError e) {
+      e.printStackTrace();
+    }
   }
 
   @Override public void run()
@@ -89,6 +95,9 @@ public final class Shell implements Runnable
         if (line == null) {
           this.cleanup();
           break;
+        }
+        if (line.equals("")) {
+          continue;
         }
 
         final ShellCommand cmd = ShellCommand.parseCommand(line);
