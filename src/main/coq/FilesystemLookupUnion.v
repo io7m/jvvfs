@@ -31,3 +31,27 @@ Definition filesystem_lookup_union
   (archives : list archive)
   (p        : path_virtual)
 := filesystem_lookup_union' archives p 0.
+
+Fixpoint filesystem_lookup_ancestors
+  (archives : list archive)
+  (p_a      : list path_virtual)
+: io error_code (option file_reference) :=
+  match p_a with
+  | nil       => Success _ _ (Some (FSReferenceDirectory))
+  | cons q qs =>
+    match filesystem_lookup_union archives q with
+    | Success None                        => Failure _ _ FSErrorNotADirectory
+    | Success (Some FSReferenceFile)      => Failure _ _ FSErrorNotADirectory
+    | Success (Some FSReferenceDirectory) => filesystem_lookup_ancestors archives qs
+    | Failure e                           => Failure _ _ e
+    end
+  end.
+
+Definition filesystem_lookup
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (option file_reference) :=
+  match filesystem_lookup_ancestors archives (ancestors p) with
+  | Success _ => filesystem_lookup_union archives p
+  | Failure e => Failure _ _ e
+  end.

@@ -674,7 +674,7 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
           (where <s:term type="function">app</s:term> is the standard list append function).
         </s:paragraph>
         <s:formal-item kind="specifications">
-          <s:formal-item-title>Virtual path ancestor</s:formal-item-title>
+          <s:formal-item-title>Virtual path parent</s:formal-item-title>
 	      <s:verbatim><xi:include href="../coq/PathVirtualParent.v" parse="text"/></s:verbatim>
         </s:formal-item>
         <s:paragraph>
@@ -689,6 +689,16 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
         <s:formal-item kind="specifications">
           <s:formal-item-title>Virtual path subtraction</s:formal-item-title>
 	      <s:verbatim><xi:include href="../coq/PathVirtualSubtract.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+        <s:paragraph>
+          It naturally follows that it is possible to obtain a list
+          of all ancestors of a path <s:term type="variable">p</s:term>
+          by successively concatenating the elements of
+          <s:term type="variable">p</s:term> to the root, minus the last element.
+        </s:paragraph>
+        <s:formal-item kind="specifications">
+          <s:formal-item-title>Virtual path ancestors</s:formal-item-title>
+	      <s:verbatim><xi:include href="../coq/PathVirtualAncestors.v" parse="text"/></s:verbatim>
         </s:formal-item>
       </s:subsection>
       <s:subsection>
@@ -752,10 +762,6 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
           are used here to express further properties of archives. As stated,
           a referenced object must either be a file or a directory.
         </s:paragraph>
-        <s:formal-item kind="specifications">
-          <s:formal-item-title>Archive file type</s:formal-item-title>
-	      <s:verbatim><xi:include href="../coq/FileType.v" parse="text"/></s:verbatim>
-        </s:formal-item>
         <s:formal-item kind="specifications">
           <s:formal-item-title>Archive file references</s:formal-item-title>
 	      <s:verbatim><xi:include href="../coq/ArchiveFileReference.v" parse="text"/></s:verbatim>
@@ -842,8 +848,15 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
 	      filesystem has so-called "union" semantics. The filesystem maintains
 	      a list of mounted archives, sorted in order of most-recently mounted -
 	      the first archive in the list is the archive that was most recently mounted.
-          When attempting to look up an object in the filesystem at a given path
-          <s:term type="variable">p</s:term>, 
+	      In order to look up an object in the filesystem at a given path
+	      <s:term type="variable">p</s:term>, it's first necessary to look up all
+	      of the ancestors of <s:term type="variable">p</s:term> to ensure that
+	      they exist and are directories. Looking up an object at
+	      <s:term type="variable">p</s:term> <s:term type="term">directly</s:term>
+	      means to look up <s:term type="variable">p</s:term> without looking up
+	      any of the ancestors of <s:term type="variable">p</s:term>.
+          When attempting to look up an object <s:term type="term">directly</s:term>
+          in the filesystem at a given path <s:term type="variable">p</s:term>,
 	      each archive <s:term type="variable">a</s:term> in the list of archives
 	      is considered in turn, starting with the most recently mounted first. The
 	      lookup procedure takes the following steps:
@@ -887,9 +900,18 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
 	     </s:list-ordered>
 	   </s:formal-item>
 	   <s:paragraph>
-	     If no archives return an object, then no object
-	     exists at <s:term type="variable">p</s:term>
-	     in the filesystem.
+	     If no archives return an object, then no object exists at
+	     <s:term type="variable">p</s:term> in the filesystem.
+       </s:paragraph>
+       <s:paragraph>
+         As mentioned, it's necessary to look up all of the ancestors
+         of <s:term type="variable">p</s:term> to ensure the correct
+         semantics, so the above procedure is simply applied to all
+         ancestors of <s:term type="variable">p</s:term> before being
+         applied to <s:term type="variable">p</s:term> itself. If any
+         ancestor of <s:term type="variable">p</s:term> turns out not
+         to exist, or not to be a directory, or if an error occurs,
+         the function returns an error.
        </s:paragraph>
        <s:formal-item kind="specifications">
          <s:formal-item-title>Filesystem union search (Coq)</s:formal-item-title>
@@ -956,8 +978,13 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
         </s:paragraph>
         <s:paragraph>
           When attempting to list a directory in the filesystem at a given path
-          <s:term type="variable">p</s:term>, 
-	      each archive <s:term type="variable">a</s:term> in the list of archives
+          <s:term type="variable">p</s:term>, <s:term type="variable">p</s:term>
+          is first <s:link target="com.io7m.jvvfs.semantics.filesystem.lookup">looked up</s:link>
+          to ensure that it is a directory as are all of its ancestors.
+          If this is not the case, an error is returned.
+        </s:paragraph>
+        <s:paragraph>
+          Then, each archive <s:term type="variable">a</s:term> in the list of archives
 	      is considered in turn, starting with the most recently mounted first. The
 	      listing procedure begins with an empty set of names
 	      <s:term type="variable">S</s:term> and takes the following steps:

@@ -25,6 +25,8 @@ Definition path_virtual :=
 
 Definition root : path_virtual :=
   nil.
+End PathVirtual.
+
 Section PathVirtualAncestor.
 Require Coq.Lists.List.
 
@@ -49,19 +51,25 @@ Definition subtract
   (_     : is_ancestor_of p1 p0 \/ p0 = p1) :=
   List.skipn (length p1) p0.
 End PathVirtualSubtract.
-End PathVirtual.
+
+Section PathVirtualAncestors.
+Require Coq.Lists.List.
+
+Fixpoint ancestors_including_self (p : path_virtual) : list path_virtual :=
+  cons root (match p with
+    | nil       => nil
+    | cons y ys => List.map (cons y) (ancestors_including_self ys)
+    end).
+
+Definition ancestors (p : path_virtual) : list path_virtual :=
+  List.removelast (ancestors_including_self p).
+End PathVirtualAncestors.
 
 Section IO.
 Inductive io (F S : Type) : Type :=
   | Success : S -> io F S
   | Failure : F -> io F S.
 End IO.
-
-Section FileType.
-Inductive file_type :=
-  | File
-  | Directory.
-End FileType.
 
 Section ErrorCode.
 Inductive error_code :=
@@ -74,8 +82,9 @@ Axiom archive : Set.
 End Archive.
 
 Section ArchiveFileReference.
-Axiom file_reference      : Set.
-Axiom file_reference_type : file_reference -> file_type.
+Inductive file_reference :=
+  | FSReferenceFile
+  | FSReferenceDirectory.
 End ArchiveFileReference.
 
 Section ArchiveMount.
@@ -91,7 +100,7 @@ Axiom archive_lookup_file_ancestor : forall
   (a   : archive)
   (p q : path_virtual),
   is_ancestor_of p q ->
-    exists r, archive_lookup a p = Success _ _ (Some r) /\ file_reference_type r = File ->
+    archive_lookup a p = Success _ _ (Some FSReferenceFile) ->
       archive_lookup a q = Failure _ _ FSErrorNotADirectory.
 End ArchiveLookupFileAncestorFailure.
 
@@ -100,8 +109,8 @@ Axiom archive_lookup_ancestor : forall
   (a   : archive)
   (p q : path_virtual),
   is_ancestor_of p q ->
-    exists r, archive_lookup a q = Success _ _ (Some r) ->
-      exists s, archive_lookup a p = Success _ _ (Some s) /\ file_reference_type s = Directory.
+    (exists r, archive_lookup a q = Success _ _ (Some r)) ->
+      archive_lookup a p = Success _ _ (Some FSReferenceDirectory).
 End ArchiveLookupAncestor.
 
 Section ArchiveDirectoryList.
@@ -112,7 +121,7 @@ Section ArchiveDirectoryListFile.
 Axiom archive_directory_list_file : forall
   (a : archive)
   (p : path_virtual),
-  exists r, archive_lookup a p = Success _ _ (Some r) /\ file_reference_type r = File ->
+  archive_lookup a p = Success _ _ (Some FSReferenceFile) ->
     archive_directory_list a p = Failure _ _ FSErrorNotADirectory.
 End ArchiveDirectoryListFile.
 
@@ -150,6 +159,30 @@ Definition filesystem_lookup_union
   (archives : list archive)
   (p        : path_virtual)
 := filesystem_lookup_union' archives p 0.
+
+Fixpoint filesystem_lookup_ancestors
+  (archives : list archive)
+  (p_a      : list path_virtual)
+: io error_code (option file_reference) :=
+  match p_a with
+  | nil       => Success _ _ (Some (FSReferenceDirectory))
+  | cons q qs =>
+    match filesystem_lookup_union archives q with
+    | Success None                        => Failure _ _ FSErrorNotADirectory
+    | Success (Some FSReferenceFile)      => Failure _ _ FSErrorNotADirectory
+    | Success (Some FSReferenceDirectory) => filesystem_lookup_ancestors archives qs
+    | Failure e                           => Failure _ _ e
+    end
+  end.
+
+Definition filesystem_lookup
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (option file_reference) :=
+  match filesystem_lookup_ancestors archives (ancestors p) with
+  | Success _ => filesystem_lookup_union archives p
+  | Failure e => Failure _ _ e
+  end.
 End FilesystemLookupUnion.
 
 Section FilesystemLookupTypical.
@@ -205,4 +238,17 @@ Definition filesystem_directory_list_union
   (archives : list archive)
   (p        : path_virtual)
 := filesystem_directory_list_union' archives p 0 nil.
+
+Definition filesystem_directory_list
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (list name) :=
+  match filesystem_lookup archives p with
+  | Success None                        => Failure _ _ FSErrorNotADirectory
+  | Success (Some FSReferenceFile)      => Failure _ _ FSErrorNotADirectory
+  | Success (Some FSReferenceDirectory) => filesystem_directory_list_union archives p
+  | Failure e                           => Failure _ _ e
+  end.
 End FilesystemListUnion.
+
+Open Scope list_scope.

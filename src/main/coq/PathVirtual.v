@@ -3,4 +3,3 @@ Definition path_virtual :=
 
 Definition root : path_virtual :=
   nil.
-
