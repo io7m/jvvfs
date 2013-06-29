@@ -212,16 +212,95 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.]]>
   </s:part>
 
   <s:part>
-    <s:part-title>Tutorial</s:part-title>
+    <s:part-title>User Manual</s:part-title>
     <s:part-contents/>
 
     <s:section>
+      <s:section-title>Overview</s:section-title>
+      <s:subsection xml:id="com.io7m.jvvfs.usage.filesystem">
+      	<s:subsection-title>Filesystem</s:subsection-title>
+        <s:paragraph>
+      	  The <s:term type="package">jvvfs</s:term> package presents
+          a virtual <s:term>filesystem</s:term> in which
+          <s:link target="com.io7m.jvvfs.usage.archives">archives</s:link> are
+          <s:link target="com.io7m.jvvfs.usage.mounting">mounted</s:link> to
+          form a unified namespace. This filesystem is conceptually
+          and practically distinct from the filesystem
+          presented by the operating system. The
+          <s:term type="package">jvvfs</s:term> package never writes to
+          or otherwise modifies the operating system filesystem in any
+          way.
+        </s:paragraph>
+        <s:paragraph>
+          The <s:term type="package">jvvfs</s:term> virtual <s:term>filesystem</s:term>
+          presents a hierarchical directory system very similar to the typical
+          UNIX filesystem, supporting a subset of the normal UNIX filesystem operations
+          such as retrieving the modification time of a file, retrieving the
+          size of a file in bytes, listing the contents of a directory,
+          and opening a file as a stream of bytes.
+        </s:paragraph>
+      </s:subsection>
+      <s:subsection xml:id="com.io7m.jvvfs.usage.archives">
+      	<s:subsection-title>Archives</s:subsection-title>
+        <s:paragraph>
+	      An <s:term>archive</s:term> is a file or directory in the
+	      operating system that can be
+	      <s:link target="com.io7m.jvvfs.usage.mounting">mounted</s:link>.
+	      The <s:term type="package">jvvfs</s:term> package currently
+	      supports mounting operating system
+	      <s:term>directories</s:term> and
+	      <s:term>zip</s:term>
+	      <s:footnote>
+	        <s:link-external target="http://en.wikipedia.org/wiki/Zip_(file_format)">http://en.wikipedia.org/wiki/Zip_(file_format)</s:link-external>
+	      </s:footnote>
+	      files.
+        </s:paragraph>
+      </s:subsection>
+      <s:subsection xml:id="com.io7m.jvvfs.usage.mounting">
+      	<s:subsection-title>Mounting</s:subsection-title>
+      	<s:paragraph>
+      	  Mounting an <s:link target="com.io7m.jvvfs.usage.archives">archive</s:link>
+      	  makes the contents of that archive accessible in the filesystem.
+      	</s:paragraph>
+      	<s:paragraph>
+          If an <s:link target="com.io7m.jvvfs.usage.archives">archive</s:link>
+          is <s:term>mounted</s:term> at a directory
+          <s:term type="variable">/M</s:term>, and the archive
+          contains a file or directory named <s:term type="variable">F</s:term>,
+          then that file or directory is accessible in the
+          virtual
+          <s:link target="com.io7m.jvvfs.usage.filesystem">filesystem</s:link>
+          at <s:term type="variable">/M/F</s:term>. As mentioned, directories
+          can be arbitrarily nested, and archives can be mounted at any
+          directory in the filesystem.
+      	</s:paragraph>
+      </s:subsection>
+      <s:subsection xml:id="com.io7m.jvvfs.usage.capabilities">
+      	<s:subsection-title>Capabilities</s:subsection-title>
+      	<s:paragraph>
+	      The set of operations that can be performed on the virtual
+	      <s:link target="com.io7m.jvvfs.usage.filesystem">filesystem</s:link>
+	      is divided into <s:term>capabilities</s:term>. The purpose of this
+	      is to allow code to be separated according to the principle of
+	      least privilege. That is, if a given function only needs to read
+	      from the filesystem and does not need to be able to mount or unmount
+	      archives, then it can be declared as taking a value of type
+	      <s:link-external target="javadoc/com/io7m/jvvfs/FSCapabilityRead.html">FSCapabilityRead</s:link-external>
+	      as opposed to, for example, a value of type
+	      <s:link-external target="javadoc/com/io7m/jvvfs/Filesystem.html">Filesystem</s:link-external>.
+	      This allows the type system to give much stronger guarantees about
+	      what a particular function can do to the filesystem.
+      	</s:paragraph>
+      	<s:paragraph>
+          See the JavaDoc documentation for
+          <s:link-external target="javadoc/com/io7m/jvvfs/FSCapabilityAll.html">FSCapabilityAll</s:link-external>
+          for the definitions of the capabilities.
+      	</s:paragraph>
+      </s:subsection>
+    </s:section>
+
+    <s:section>
       <s:section-title>Tutorial</s:section-title>
-      <s:paragraph>
-        The <s:term type="package">jvvfs</s:term> package arbitrates
-        access to a set of <s:term>archives</s:term> by presenting a
-        unified namespace similar to the UNIX "virtual filesystem".
-      </s:paragraph>
       <s:paragraph>
         First, the filesystem is created by specifying an
         <s:term type="term">archive directory</s:term> containing archives
@@ -312,36 +391,93 @@ final InputStream s0 = fs.openFile("/a/xyz/file.txt");
 final InputStream s1 = fs.openFile("/c/xyz/file.txt");]]>
         </s:verbatim>
       </s:formal-item>
-      <s:paragraph>
-        The virtual filesystem presented by the
-        <s:term type="package">jvvfs</s:term> package supports a subset
-        of the usual filesystem operations: directories may be listed, files
-        have modification dates and sizes.
-      </s:paragraph>
+    </s:section>
+    
+    <s:section>
+      <s:section-title>The Jvvfs Shell</s:section-title>
+	  <s:subsection>
+	  	<s:subsection-title>Overview</s:subsection-title>
+	  	<s:paragraph>
+      	  The <s:term type="package">jvvfs</s:term> package includes a simple
+      	  command-line shell program for manipulating and exploring
+      	  <s:term type="package">jvvfs</s:term> filesystems.
+        </s:paragraph>
+        <s:paragraph>
+          The program is distributed as part of the
+          <s:term type="package">io7m-jvvfs-shell</s:term> package, with the
+          <s:term type="function">main</s:term> program provided in the
+          <s:link-external target="javadoc/com/io7m/jvvfs/shell/Shell.html">Shell</s:link-external>
+          class.
+        </s:paragraph>
+	  	<s:paragraph>
+	  	  The program takes a pair of arguments: The name of a configuration
+	  	  file, and the name of a directory containing archive files.
+	  	</s:paragraph>
+	  </s:subsection>
+	  <s:subsection>
+	  	<s:subsection-title>shell.conf</s:subsection-title>
+	  	<s:paragraph>
+	      The sole purpose of the configuration file, at present, is to
+	      control logging. The <s:term type="package">jvvfs</s:term> package
+	      uses <s:term type="package">jlog</s:term>
+	      <s:link-external target="http://io7m.com/software/jlog">http://io7m.com/software/jlog</s:link-external>
+	      internally for extremely fine-grained control of logging. All logging
+	      controls for <s:term type="package">jvvfs</s:term> are given the prefix
+	      <s:term type="constant">com.io7m.jvvfs</s:term>. A trivial configuration
+	      file that only logs errors is sufficient for almost all users:
+	  	</s:paragraph>
+	  	<s:formal-item>
+	  	  <s:formal-item-title>Example shell.conf</s:formal-item-title>
+	  	  <s:verbatim><![CDATA[
+com.io7m.jvvfs.logs.shell = true
+com.io7m.jvvfs.level      = LOG_ERROR]]>
+	  	  </s:verbatim>
+	  	</s:formal-item>
+	  </s:subsection>
+	  <s:subsection>
+	    <s:subsection-title>Commands</s:subsection-title>
+	    <s:paragraph>
+		  Usage information on shell commands can be obtained from the
+		  <s:term type="function">help</s:term> command. The shell supports
+		  tab-completion
+		  <s:footnote>
+		  	<s:link-external target="http://en.wikipedia.org/wiki/Command_line_completion">http://en.wikipedia.org/wiki/Command_line_completion</s:link-external>
+		  </s:footnote> for commands.
+	  	</s:paragraph>
+	  	<s:paragraph>
+	  	  A transcript of an example session showing some of the features
+	  	  of the shell is as follows:
+	  	</s:paragraph>
+	  	<s:formal-item>
+	  	  <s:formal-item-title>Example session</s:formal-item-title>
+	  	  <s:verbatim><![CDATA[
+
+]]>
+	  	  </s:verbatim>
+	  	</s:formal-item>
+	  </s:subsection>
     </s:section>
   </s:part>
 
   <s:part>
-    <s:part-title>The Jvvfs Shell</s:part-title>
+    <s:part-title>Semantics</s:part-title>
     <s:part-contents/>
     <s:section>
-      <s:section-title>Overview</s:section-title>
+      <s:section-title>Virtual paths</s:section-title>
       <s:paragraph>
-      	The <s:term type="package">jvvfs</s:term> package includes a simple
-      	command-line shell program for manipulating and exploring
-      	<s:term type="package">jvvfs</s:term> filesystems.
+      	The syntax and semantics of virtual paths.
       </s:paragraph>
     </s:section>
-  </s:part>
-
-  <s:part>
-    <s:part-title>Design And Implementation</s:part-title>
-    <s:part-contents/>
     <s:section>
-      <s:section-title>Overview</s:section-title>
+      <s:section-title>Archives</s:section-title>
       <s:paragraph>
-      	This section attempts to document the design and implementation of
-      	the <s:term type="package">jvvfs</s:term> filesystem.
+      	The semantics of archives.
+      </s:paragraph>
+    </s:section>
+    <s:section>
+      <s:section-title>Filesystem</s:section-title>
+      <s:paragraph>
+      	The semantics of the filesystem.
       </s:paragraph>
     </s:section>
   </s:part>
