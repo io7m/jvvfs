@@ -34,6 +34,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.functional.Option;
+import com.io7m.jaux.functional.Option.Some;
 import com.io7m.jaux.functional.Pair;
 import com.io7m.jvvfs.NameTest.ValidNameGenerator;
 
@@ -118,6 +120,30 @@ public final class PathVirtualTest
 
     Assert.assertFalse(u.isAncestorOf(p));
     Assert.assertTrue(p.isAncestorOf(u));
+  }
+
+  @SuppressWarnings("static-method") @Test public void testBaseName()
+  {
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          final String n0 = g.next();
+          final PathVirtual p0 = p.appendName(n0);
+          final Option<String> o = p0.getBaseName();
+          Assert.assertTrue(o.isSome());
+          final Some<String> s = (Option.Some<String>) o;
+          Assert.assertEquals(n0, s.value);
+        }
+      });
+  }
+
+  @SuppressWarnings("static-method") @Test public void testBaseNameRoot()
+  {
+    Assert.assertTrue(PathVirtual.ROOT.getBaseName().isNone());
   }
 
   @SuppressWarnings("static-method") @Test public

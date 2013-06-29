@@ -25,6 +25,7 @@ import javax.annotation.concurrent.Immutable;
 
 import com.io7m.jaux.Constraints;
 import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jaux.functional.Option;
 
 /**
  * <p>
@@ -281,6 +282,20 @@ import com.io7m.jaux.Constraints.ConstraintError;
     }
     final PathVirtual other = (PathVirtual) obj;
     return this.image.equals(other.image);
+  }
+
+  /**
+   * Retrieve the last element of this path.
+   * 
+   * @return <code>None</code> iff this path is empty.
+   */
+
+  public @Nonnull Option<String> getBaseName()
+  {
+    if (this.names.isEmpty() == false) {
+      return new Option.Some<String>(this.names.get(this.names.size() - 1));
+    }
+    return new Option.None<String>();
   }
 
   /**

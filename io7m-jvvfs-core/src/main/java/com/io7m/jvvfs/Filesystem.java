@@ -530,7 +530,7 @@ public final class Filesystem implements FSCapabilityAll
           }
           case FS_REF_VIRTUAL_DIRECTORY:
           {
-            return new TreeSet<String>();
+            return this.listDirectoryInternal(path);
           }
         }
       }
@@ -545,6 +545,10 @@ public final class Filesystem implements FSCapabilityAll
       FilesystemError
   {
     final TreeSet<String> items = new TreeSet<String>();
+
+    /**
+     * Take the union of the sets of unshadowed files in the archive stack.
+     */
 
     boolean lookup_shadowed = false;
     boolean lookup_first = true;
@@ -576,6 +580,30 @@ public final class Filesystem implements FSCapabilityAll
         }
 
         lookup_first = false;
+      }
+    }
+
+    /**
+     * Add any virtual directories with parents equal to <code>path</code>.
+     */
+
+    for (final PathVirtual d : this.directories.keySet()) {
+      if (path.isParentOf(d)) {
+        final Option<String> name_o = d.getBaseName();
+        switch (name_o.type) {
+          case OPTION_NONE:
+          {
+            /**
+             * If path is a parent of d, then d cannot be root.
+             */
+
+            throw new UnreachableCodeException();
+          }
+          case OPTION_SOME:
+          {
+            items.add(((Option.Some<String>) name_o).value);
+          }
+        }
       }
     }
 

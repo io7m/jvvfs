@@ -994,6 +994,35 @@ public class FilesystemTest
   }
 
   /**
+   * Listing a directory shows virtual directories.
+   */
+
+  @SuppressWarnings("static-method") @Test public void testListVirtual()
+    throws IOException,
+      ConstraintError,
+      FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("complex.zip", PathVirtual.ROOT);
+    fs.mountArchive("complex.zip", PathVirtual.ofString("/a/b"));
+    fs.unmount(PathVirtual.ROOT);
+
+    {
+      final SortedSet<String> items = fs.listDirectory(PathVirtual.ROOT);
+      Assert.assertEquals(1, items.size());
+      Assert.assertTrue(items.contains("a"));
+    }
+
+    {
+      final SortedSet<String> items =
+        fs.listDirectory(PathVirtual.ofString("/a"));
+      Assert.assertEquals(1, items.size());
+      Assert.assertTrue(items.contains("b"));
+    }
+  }
+
+  /**
    * Passing <code>null</code> as an archive directory fails.
    */
 
