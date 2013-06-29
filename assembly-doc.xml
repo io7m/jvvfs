@@ -26,5 +26,15 @@
       <outputDirectory>/</outputDirectory>
     </fileSet>
   </fileSets>
+
+  <files>
+    <file>
+      <outputDirectory>/</outputDirectory>
+      <fileMode>0644</fileMode>
+      <source>src/main/coq/model-actual.v_in</source>
+      <destName>Model.v</destName>
+    </file>
+  </files>
+
 </assembly>
 

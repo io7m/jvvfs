@@ -9,7 +9,9 @@
 .command,
 .constant,
 .element,
+.expression,
 .file,
+.function,
 .type,
 .variable
 {
