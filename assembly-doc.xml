@@ -10,7 +10,7 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>${project.build.directory}/apidocs</directory>
+      <directory>io7m-jvvfs-core/target/apidocs</directory>
       <outputDirectory>/javadoc</outputDirectory>
     </fileSet>
     <fileSet>

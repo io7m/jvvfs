@@ -19,7 +19,7 @@
 <s:document
   xmlns:s="http://www.io7m.com/schemas/structural/1.0.0"
   xmlns:xi="http://www.w3.org/2001/XInclude">
-  <s:document-title>io7m-jvvfs 2.4.0 Documentation</s:document-title>
+  <s:document-title>io7m-jvvfs 3.0.0 Documentation</s:document-title>
   <s:document-style>documentation.css</s:document-style>
   <s:document-contents/>
 
@@ -92,8 +92,17 @@
           <s:verbatim type="example"><![CDATA[<dependency>
   <groupId>com.io7m.jvvfs</groupId>
   <artifactId>io7m-jvvfs</artifactId>
-  <version>[2.4.0, 3.0.0)</version>
+  <version>[3.0.0, 4.0.0)</version>
 </dependency>]]></s:verbatim>
+        </s:paragraph>
+        <s:paragraph>
+          All <s:link-external target="http://io7m.com">io7m.com</s:link-external>
+          packages use Semantic Versioning <s:footnote>
+          	<s:link-external target="http://semver.org">http://semver.org</s:link-external>
+          </s:footnote>, which implies that it is always safe to use version ranges
+          with an exclusive upper bound equal to the next major version - the API of
+          the package will not change in a backwards-incompatible manner before the
+          next major version.
         </s:paragraph>
       </s:subsection>
     </s:section>
@@ -222,7 +231,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.]]>
         <s:formal-item-title>Filesystem creation</s:formal-item-title>
         <s:verbatim><![CDATA[
 final PathReal path = new PathReal("/path/to/application/resources");
-final Filesystem fs = new Filesystem(log, path);]]>
+final Filesystem fs = Filesystem.makeWithArchiveDirectory(log, path);]]>
         </s:verbatim>
       </s:formal-item>
       <s:paragraph>
@@ -247,8 +256,8 @@ final Filesystem fs = new Filesystem(log, path);]]>
       <s:formal-item kind="example">
         <s:formal-item-title>Mounting archives</s:formal-item-title>
         <s:verbatim><![CDATA[
-final PathVirtual mount = new PathVirtual("/");
-fs.mount("archive.zip", mount);]]>
+final PathVirtual mount = PathVirtual.ofString("/");
+fs.mountArchive("archive.zip", mount);]]>
         </s:verbatim>
       </s:formal-item>
       <s:paragraph>
@@ -261,12 +270,6 @@ fs.mount("archive.zip", mount);]]>
         working directory", so relative paths have no meaning.
       </s:paragraph>
       <s:paragraph>
-        The above restrictions on notation are applied as part of the
-        <s:term type="type">PathVirtual</s:term> constructor. Therefore,
-        having a value of type <s:term type="type">PathVirtual</s:term>
-        essentially encodes a proof that the given path is valid.
-      </s:paragraph>
-      <s:paragraph>
         Assuming <s:term type="file">archive.zip</s:term> contains the
         file <s:term type="file">/a/b/c/file.txt</s:term>, the file can
         be opened, unsurprisingly, by the path
@@ -275,39 +278,38 @@ fs.mount("archive.zip", mount);]]>
       <s:formal-item kind="example">
         <s:formal-item-title>Opening a file</s:formal-item-title>
         <s:verbatim><![CDATA[
-final PathVirthal path   = new PathVirtual("/a/b/c/file.txt");
+final PathVirthal path   = PathVirtual.ofString("/a/b/c/file.txt");
 final InputStream stream = fs.openFile(path);]]>
         </s:verbatim>
       </s:formal-item>
       <s:paragraph>
-        It is possible to mount archives at paths other than the root, but
-        the paths must be manually created (in other words, it's not possible
-        to mount an archive in a directory that only exists inside another
-        archive). Manually created directories are purely virtual constructs;
+        It is possible to mount archives at directories other than the
+        root. It is possible to create directories in the virtual filesystem
+        with the
+       	<s:link-external target="javadoc/com/io7m/jvvfs/FSCapabilityCreateDirectory#createDirectory(com.io7m.jvvfs.PathVirtual)">createDirectory</s:link-external>
+       	function, if no currently mounted archive provides the desired
+       	mount point. Manually created directories are purely virtual constructs;
         creating a directory via the <s:term type="package">jvvfs</s:term>
         API does not modify the real OS filesystem or any archives.
       </s:paragraph>
       <s:formal-item kind="example">
         <s:formal-item-title>Creating a directory</s:formal-item-title>
         <s:verbatim><![CDATA[
-// The directory "/a" only exists in the virtual filesystem because
-// the originally mounted archive contained a file at "/a/b/c/file.txt"
+// If "archive1.zip" contains "/a/b/file.txt", then "archive2.zip" could, for
+// example, be mounted at "/a" or "/a/b".
+fs.mount("archive1.zip", PathVirtual.ROOT);
+assert fs.isDirectory(PathVirtual.ofString("/a"));
+assert fs.isDirectory(PathVirtual.ofString("/a/b"));
+fs.mount("archive2.zip", PathVirtual.ofString("/a"));
 
-try {
-  fs.mount("archive2.zip", new PathVirtual("/a"));
-} catch (FilesystemError e) {
-  // ...
-}
+// Explicitly creating "/c" and mounting "archive2.zip" there is also a possibility.
+fs.createDirectory(PathVirtual.ofString("/c"));
+assert fs.isDirectory(PathVirtual.ofString("/c"));
+fs.mount("archive2.zip", PathVirtual.ofString("/c"));
 
-// After explicitly creating the "/a" directory, the archive can be mounted
-// without issue.
-
-fs.createDirectory(new PathVirtual("/a"));
-fs.mount("archive2.zip", new PathVirtual("/a"));
-
-// Assuming "/xyz/file.txt" exists in "archive2.zip"... 
-
-final InputStream stream = fs.openFile("/a/xyz/file.txt");]]>
+// Assuming "/xyz/file.txt" exists in "archive2.zip", both of the following will work:
+final InputStream s0 = fs.openFile("/a/xyz/file.txt");
+final InputStream s1 = fs.openFile("/c/xyz/file.txt");]]>
         </s:verbatim>
       </s:formal-item>
       <s:paragraph>
@@ -315,6 +317,31 @@ final InputStream stream = fs.openFile("/a/xyz/file.txt");]]>
         <s:term type="package">jvvfs</s:term> package supports a subset
         of the usual filesystem operations: directories may be listed, files
         have modification dates and sizes.
+      </s:paragraph>
+    </s:section>
+  </s:part>
+
+  <s:part>
+    <s:part-title>The Jvvfs Shell</s:part-title>
+    <s:part-contents/>
+    <s:section>
+      <s:section-title>Overview</s:section-title>
+      <s:paragraph>
+      	The <s:term type="package">jvvfs</s:term> package includes a simple
+      	command-line shell program for manipulating and exploring
+      	<s:term type="package">jvvfs</s:term> filesystems.
+      </s:paragraph>
+    </s:section>
+  </s:part>
+
+  <s:part>
+    <s:part-title>Design And Implementation</s:part-title>
+    <s:part-contents/>
+    <s:section>
+      <s:section-title>Overview</s:section-title>
+      <s:paragraph>
+      	This section attempts to document the design and implementation of
+      	the <s:term type="package">jvvfs</s:term> filesystem.
       </s:paragraph>
     </s:section>
   </s:part>
