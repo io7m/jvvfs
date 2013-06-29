@@ -105,6 +105,20 @@ public final class Filesystem implements FSCapabilityAll
     }
   }
 
+  private static class UpdateTimeEntry
+  {
+    final @Nonnull Calendar time_when_updated;
+    final @Nonnull Calendar time_value;
+
+    UpdateTimeEntry(
+      final @Nonnull Calendar time_when_updated,
+      final @Nonnull Calendar time_value)
+    {
+      this.time_when_updated = time_when_updated;
+      this.time_value = time_value;
+    }
+  }
+
   private static @Nonnull Calendar getUTCTimeNow()
   {
     return Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -158,14 +172,16 @@ public final class Filesystem implements FSCapabilityAll
     return new Filesystem(log, null);
   }
 
-  private final @Nonnull Log                        log;
-  private final @Nonnull Log                        log_directory;
-  private final @Nonnull Log                        log_mount;
-  private final @Nonnull Log                        log_lookup;
-  private final @Nonnull Option<PathReal>           archives;
-  private final @Nonnull List<ArchiveHandler<?>>    handlers;
-  private final @Nonnull LinkedList<Archive<?>>     archive_list;
-  private final @Nonnull Map<PathVirtual, Calendar> directories;
+  private final @Nonnull Log                               log;
+  private final @Nonnull Log                               log_directory;
+  private final @Nonnull Log                               log_mount;
+  private final @Nonnull Log                               log_lookup;
+  private final @Nonnull Option<PathReal>                  archives;
+  private final @Nonnull List<ArchiveHandler<?>>           handlers;
+  private final @Nonnull LinkedList<Archive<?>>            archive_list;
+  private final @Nonnull Map<PathVirtual, Calendar>        directories;
+
+  private final @Nonnull Map<PathVirtual, UpdateTimeEntry> time_updates;
 
   private Filesystem(
     final @Nonnull Log log,
@@ -193,6 +209,7 @@ public final class Filesystem implements FSCapabilityAll
 
     this.directories = new HashMap<PathVirtual, Calendar>();
     this.directories.put(PathVirtual.ROOT, Filesystem.getUTCTimeNow());
+    this.time_updates = new HashMap<PathVirtual, UpdateTimeEntry>();
   }
 
   @Override public void close()
@@ -204,6 +221,7 @@ public final class Filesystem implements FSCapabilityAll
     }
 
     this.archive_list.clear();
+    this.time_updates.clear();
     this.directories.clear();
     this.directories.put(PathVirtual.ROOT, Filesystem.getUTCTimeNow());
   }
@@ -337,7 +355,31 @@ public final class Filesystem implements FSCapabilityAll
       ConstraintError
   {
     Constraints.constrainNotNull(path, "Path");
+    final Calendar t_in_archive = this.getModificationTimeActual(path);
+    if (this.time_updates.containsKey(path)) {
+      final UpdateTimeEntry u = this.time_updates.get(path);
+      if (t_in_archive.after(u.time_when_updated)) {
+        return t_in_archive;
+      }
+      return u.time_value;
+    }
 
+    return t_in_archive;
+  }
+
+  /**
+   * Retrieve the modification time of the object at <code>path</code>,
+   * ignoring any explicit updates that may have been made.
+   * 
+   * @see #updateModificationTime(PathVirtual, Calendar)
+   * @see #time_updates
+   */
+
+  private @Nonnull Calendar getModificationTimeActual(
+    final @Nonnull PathVirtual path)
+    throws FilesystemError,
+      ConstraintError
+  {
     final Option<? extends FSReference> r = this.lookup(path);
     switch (r.type) {
       case OPTION_NONE:
@@ -926,5 +968,17 @@ public final class Filesystem implements FSCapabilityAll
         break;
       }
     }
+  }
+
+  @Override public void updateModificationTime(
+    final @Nonnull PathVirtual path,
+    final @Nonnull Calendar t)
+    throws ConstraintError,
+      FilesystemError
+  {
+    Constraints.constrainNotNull(path, "Path");
+
+    final Calendar ct = this.getModificationTimeActual(path);
+    this.time_updates.put(path, new UpdateTimeEntry(ct, t));
   }
 }

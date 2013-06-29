@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Deque;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -1156,18 +1157,15 @@ public class FilesystemTest
         FilesystemError
   {
     final Filesystem fs = FilesystemTest.makeFS();
+    final File dir = TestData.getTestDataDirectory();
+    final File zip = new File(dir, "complex.zip");
 
     fs.mountArchive("complex.zip", PathVirtual.ROOT);
 
-    final Calendar cnow = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-    final long cnow_t = cnow.getTime().getTime();
-    final Calendar cdir = fs.getModificationTime(PathVirtual.ROOT);
-    final long cdir_t = cdir.getTime().getTime();
-
-    final long diff = Math.abs(cdir_t - cnow_t);
-    System.out.println("diff: " + diff);
-
-    Assert.assertTrue(diff < 2000);
+    final Calendar cr = fs.getModificationTime(PathVirtual.ROOT);
+    final Calendar cz = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    cz.setTimeInMillis(zip.lastModified());
+    Assert.assertEquals(cz, cr);
   }
 
   /**
@@ -2084,4 +2082,109 @@ public class FilesystemTest
     Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
   }
 
+  /**
+   * When a file changes time inside an archive, the newer time is used
+   * instead of any explicitly given updated time.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testUpdateTimeChangesPreferred()
+      throws IOException,
+        ConstraintError,
+        FilesystemError,
+        InterruptedException
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+    final File d = TestData.getTestDataDirectory();
+    final File sd = new File(d, "single-file");
+    final File sdf = new File(sd, "file.txt");
+
+    /**
+     * Get the modification time of the real on-disk "file.txt".
+     */
+
+    final Calendar sdf_t = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    sdf_t.setTimeInMillis(sdf.lastModified());
+
+    /**
+     * Mount the archive, get the modification time of "file.txt" and assert
+     * that it equals the one retrieved above.
+     */
+
+    fs.mountArchive("single-file", PathVirtual.ROOT);
+    final PathVirtual p = PathVirtual.ofString("/file.txt");
+    final Calendar t = fs.getModificationTime(p);
+    Assert.assertEquals(sdf_t, t);
+
+    /**
+     * Construct a calendar t0 that's set to be equal to the epoch, and update
+     * the modification time of p to t0.
+     */
+
+    final Calendar t0 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    t0.setTimeInMillis(0);
+    fs.updateModificationTime(p, t0);
+
+    /**
+     * Retrieve the modification time of the object at p and assert that it
+     * has been updated to t0.
+     */
+
+    final Calendar t1 = fs.getModificationTime(p);
+    Assert.assertEquals(t0, t1);
+
+    /**
+     * Wait a few seconds...
+     */
+
+    Thread.sleep(TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS));
+
+    /**
+     * Now, edit the modification time of the real on-disk "file.txt" to the
+     * current time.
+     */
+
+    final Calendar t2 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    Assert.assertFalse(t2.equals(t0));
+    Assert.assertFalse(t2.equals(t1));
+    sdf.setLastModified(t2.getTimeInMillis());
+
+    /**
+     * Assert that the time returned for "file.txt" is equal to t2, as opposed
+     * to being equal to t0 as explicitly set previously.
+     */
+
+    final Calendar t3 = fs.getModificationTime(p);
+    final long t3s =
+      TimeUnit.SECONDS.convert(t3.getTimeInMillis(), TimeUnit.MILLISECONDS);
+    final long t2s =
+      TimeUnit.SECONDS.convert(t2.getTimeInMillis(), TimeUnit.MILLISECONDS);
+
+    Assert.assertEquals(t2s, t3s);
+    Assert.assertFalse(t3.equals(t0));
+  }
+
+  /**
+   * Updating the time of an object works.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testUpdateTimeCorrect()
+      throws IOException,
+        ConstraintError,
+        FilesystemError,
+        InterruptedException
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    final Calendar t0 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
+    Thread.sleep(TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
+    fs.updateModificationTime(PathVirtual.ROOT, t0);
+
+    final Calendar t1 = fs.getModificationTime(PathVirtual.ROOT);
+    Assert.assertEquals(t0, t1);
+  }
 }

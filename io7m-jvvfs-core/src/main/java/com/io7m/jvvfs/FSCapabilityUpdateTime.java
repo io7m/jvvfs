@@ -16,20 +16,37 @@
 
 package com.io7m.jvvfs;
 
+import java.util.Calendar;
+
+import javax.annotation.Nonnull;
+
+import com.io7m.jaux.Constraints.ConstraintError;
+
 /**
  * <p>
- * The set of all possible filesystem capabilities.
+ * The interface exposed by filesystem implementations that have the
+ * capability to update modification times.
  * </p>
  */
 
-public interface FSCapabilityAll extends
-  FSCapabilityRead,
-  FSCapabilityClose,
-  FSCapabilityMountClasspath,
-  FSCapabilityMountDirectory,
-  FSCapabilityMountSnapshot,
-  FSCapabilityUnmount,
-  FSCapabilityUpdateTime
+public interface FSCapabilityUpdateTime
 {
-  // No additions to super interfaces.
+  /**
+   * <p>
+   * Updates the modification time of the object at <code>path</code> to
+   * <code>t</code>.
+   * </p>
+   * 
+   * @param path
+   *          The mount point.
+   * @throws ConstraintError
+   *           Iff <code>path == null</code>.
+   * @throws FilesystemError
+   */
+
+  public void updateModificationTime(
+    final @Nonnull PathVirtual path,
+    final @Nonnull Calendar t)
+    throws ConstraintError,
+      FilesystemError;
 }
