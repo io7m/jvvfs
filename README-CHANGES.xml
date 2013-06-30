@@ -3,13 +3,13 @@
   <c:project>io7m-jvvfs</c:project>
 
   <c:release ticket-system="com.io7m.fossil.jvvfs">
-    <c:date>2013-06-17</c:date>
+    <c:date>2013-06-30</c:date>
     <c:version>3.0.0</c:version>
 
     <c:item>
-      <c:date>2013-06-17</c:date>
+      <c:date>2013-06-30</c:date>
       <c:type-code-change/>
-      <c:summary>Complete rewrite.</c:summary>
+      <c:summary>Complete rewrite. Please consult the documentation for details on how to migrate a 2.*.* program to 3.0.0.</c:summary>
     </c:item>
   </c:release>
 
