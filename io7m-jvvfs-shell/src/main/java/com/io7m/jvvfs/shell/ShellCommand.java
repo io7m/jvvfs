@@ -428,7 +428,7 @@ abstract class ShellCommand
       {
         final StringBuilder b = new StringBuilder();
         b.append("syntax: archives");
-        b.append(System.lineSeparator());
+        b.append(System.getProperty("line.separator"));
         b.append("  List all available archive files");
         return b.toString();
       }
@@ -453,7 +453,7 @@ abstract class ShellCommand
       {
         final StringBuilder b = new StringBuilder();
         b.append("syntax: close");
-        b.append(System.lineSeparator());
+        b.append(System.getProperty("line.separator"));
         b.append("  Close (reset) the current filesystem");
         return b.toString();
       }
@@ -487,7 +487,7 @@ abstract class ShellCommand
       {
         final StringBuilder b = new StringBuilder();
         b.append("syntax: file-size <path>");
-        b.append(System.lineSeparator());
+        b.append(System.getProperty("line.separator"));
         b.append("  Retrieve the size of the file at <path>");
         return b.toString();
       }
@@ -521,7 +521,7 @@ abstract class ShellCommand
       {
         final StringBuilder b = new StringBuilder();
         b.append("syntax: file-time <path>");
-        b.append(System.lineSeparator());
+        b.append(System.getProperty("line.separator"));
         b.append("  Retrieve the modification time of the file at <path>");
         return b.toString();
       }
@@ -555,7 +555,7 @@ abstract class ShellCommand
       {
         final StringBuilder b = new StringBuilder();
         b.append("syntax: file-read <path>");
-        b.append(System.lineSeparator());
+        b.append(System.getProperty("line.separator"));
         b.append("  Display the contents of the file at <path>");
         return b.toString();
       }
@@ -589,7 +589,7 @@ abstract class ShellCommand
       {
         final StringBuilder b = new StringBuilder();
         b.append("syntax: file-list <path>");
-        b.append(System.lineSeparator());
+        b.append(System.getProperty("line.separator"));
         b.append("  Display the contents of the directory at <path>");
         return b.toString();
       }
@@ -623,7 +623,7 @@ abstract class ShellCommand
       {
         final StringBuilder b = new StringBuilder();
         b.append("syntax: file-list-long <path>");
-        b.append(System.lineSeparator());
+        b.append(System.getProperty("line.separator"));
         b
           .append("  Display the contents of the directory at <path> in verbose form");
         return b.toString();
@@ -649,7 +649,7 @@ abstract class ShellCommand
       {
         final StringBuilder b = new StringBuilder();
         b.append("syntax: list-mounts");
-        b.append(System.lineSeparator());
+        b.append(System.getProperty("line.separator"));
         b.append("  List all currently mounted archives.");
         b
           .append("For each mount point, most recently mounted archives are listed first.");
@@ -684,7 +684,7 @@ abstract class ShellCommand
       {
         final StringBuilder b = new StringBuilder();
         b.append("syntax: mkdir <path>");
-        b.append(System.lineSeparator());
+        b.append(System.getProperty("line.separator"));
         b.append("  Create a directory at <path>");
         return b.toString();
       }
@@ -718,7 +718,7 @@ abstract class ShellCommand
       {
         final StringBuilder b = new StringBuilder();
         b.append("syntax: mount <archive> <path>");
-        b.append(System.lineSeparator());
+        b.append(System.getProperty("line.separator"));
         b.append("  Mount the archive <archive> at <path>");
         return b.toString();
       }
@@ -752,7 +752,7 @@ abstract class ShellCommand
       {
         final StringBuilder b = new StringBuilder();
         b.append("syntax: unmount <path>");
-        b.append(System.lineSeparator());
+        b.append(System.getProperty("line.separator"));
         b.append("  Unmount the topmost archive mounted at <path>");
         return b.toString();
       }
@@ -797,7 +797,7 @@ abstract class ShellCommand
       b.append(" ");
     }
     b.append("]");
-    b.append(System.lineSeparator());
+    b.append(System.getProperty("line.separator"));
     b.append("  Get help on the given command");
     return b;
   }
