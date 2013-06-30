@@ -15,3 +15,13 @@
 2013-04-06:io7m-jvvfs-2.4.0.jar:37258
 2013-04-06:io7m-jvvfs-2.4.0.zip:381175
 2013-04-06:io7m-jvvfs-2.4.0-documentation.zip:416674
+2013-06-30:io7m-jvvfs-shell-3.0.0.jar:50066
+2013-06-30:io7m-jvvfs-core-3.0.0-tests.jar:89908
+2013-06-30:io7m-jvvfs-shell-3.0.0-sources.jar:7603
+2013-06-30:io7m-jvvfs-shell-3.0.0-javadoc.jar:36153
+2013-06-30:io7m-jvvfs-core-3.0.0.jar:50221
+2013-06-30:io7m-jvvfs-core-3.0.0-javadoc.jar:112791
+2013-06-30:io7m-jvvfs-core-3.0.0-sources.jar:39413
+2013-06-30:io7m-jvvfs-shell-3.0.0-dist.zip:391512
+2013-06-30:io7m-jvvfs-3.0.0.zip:455891
+2013-06-30:io7m-jvvfs-3.0.0-documentation.zip:450850
