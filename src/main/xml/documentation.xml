@@ -536,6 +536,59 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
 	  	</s:formal-item>
 	  </s:subsection>
     </s:section>
+
+    <s:section>
+      <s:section-title>Migrating from 2.*.*</s:section-title>
+      <s:section-contents/>
+	  <s:subsection>
+	  	<s:subsection-title>FilesystemAPI</s:subsection-title>
+	  	<s:paragraph>
+	  	  The API exposed by filesystems changed and was broken up into
+	  	  separate filesystem capabilities. See
+	  	  <s:link target="com.io7m.jvvfs.usage.capabilities">Capabilities</s:link>
+	  	  for the details. The only significantly different function is
+	  	  <s:link-external target="javadoc/com/io7m/jvvfs/FSCapabilityRead.html#getModificationTime(com.io7m.jvvfs.PathVirtual)">getModificationTime</s:link-external>,
+	  	  which replaced <s:term type="function">modificationTime()</s:term>. This
+	  	  now uses values of type <s:term type="type">Calendar</s:term>, to
+	  	  deal correctly with timezones.
+	  	</s:paragraph>
+	  	<s:paragraph>
+	  	  Most of the function names have changed in order to statically
+	  	  indicate that the semantics may be subtly different.
+	  	</s:paragraph>
+	  </s:subsection>
+	  <s:subsection>
+	  	<s:subsection-title>Filesystem</s:subsection-title>
+	  	<s:paragraph>
+		  The <s:link-external target="javadoc/com/io7m/jvvfs/Filesystem.html">Filesystem</s:link-external>
+		  type is still the main filesystem implementation, but now requires
+		  that users use the provided static methods to initialize the
+		  filesystem, instead of the now-private constructors.
+	  	</s:paragraph>
+	  </s:subsection>
+	  <s:subsection>
+	  	<s:subsection-title>PathVirtual</s:subsection-title>
+	  	<s:paragraph>
+	  	  The constructors of the <s:term type="type">PathVirtual</s:term>
+	  	  type are now private and were replaced by
+	  	  <s:link-external target="javadoc/com/io7m/jvvfs/PathVirtual.html#ofString(java.lang.String)">ofString</s:link-external>.
+	  	  The <s:term type="function">ofString</s:term> function is much
+	  	  stricter in what it'll accept as a valid path. The
+	  	  <s:link-external target="javadoc/com/io7m/jvvfs/PathVirtual.html#ofStringLax(java.lang.String)">ofStringLax</s:link-external>
+	  	  function is more permissive in the syntax that it supports and
+	  	  may be required for directly migrating old code.
+	  	</s:paragraph>
+	  	<s:paragraph>
+	  	  The semantics of the <s:term type="type">PathVirtual</s:term> type
+	  	  have also changed with regard to what is considered to be a parent
+	  	  or ancestor of a path. For example, the root directory is now not
+	  	  considered to have a parent. These changes are unlikely to affect
+	  	  any existing code that uses <s:term type="package">jvvfs</s:term>.
+	  	  See <s:link target="com.io7m.jvvfs.semantics.virtual-paths">virtual path semantics</s:link>
+	  	  for the precise details.
+	  	</s:paragraph>
+	  </s:subsection>
+    </s:section>
   </s:part>
 
   <s:part>
