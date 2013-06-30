@@ -7,7 +7,7 @@
   <groupId>com.io7m.jvvfs.core</groupId>
   <artifactId>io7m-jvvfs-core</artifactId>
   <name>io7m-jvvfs-core</name>
-  <version>3.0.0-SNAPSHOT</version>
+  <version>3.0.0</version>
   <description>Virtual filesystem abstraction (Core API)</description>
   <url>http://mvn.io7m.com/jvvfs-core/</url>
 
@@ -90,7 +90,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.6</version>
+        <version>2.7</version>
         <configuration>
           <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
         </configuration>
@@ -98,7 +98,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.2</version>
+        <version>3.3</version>
       </plugin>
       <plugin>
         <groupId>org.sonatype.maven.plugin</groupId>
@@ -136,7 +136,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.0</version>
+        <version>3.1</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
@@ -148,7 +148,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.13</version>
+        <version>2.15</version>
         <configuration>
           <forkMode>once</forkMode>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -214,7 +214,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9</version>
+        <version>2.9.1</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>

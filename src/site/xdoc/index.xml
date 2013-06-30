@@ -22,7 +22,7 @@
       <ul>
         <li>Transparent mounting of archives/directories into a unified namespace.</li>
         <li>Supports the zip file format (using the Java standard library implementation, for better or worse).</li>
-        <li>90% automated unit test coverage of executable code.</li>
+        <li>94.4% automated unit test coverage of executable code.</li>
         <li>ISC license.</li>
         <li>Platform independent (tested on FreeBSD, Linux, Mac OS X, Solaris, Windows XP).</li>
       </ul>
