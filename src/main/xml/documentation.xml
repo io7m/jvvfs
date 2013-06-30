@@ -90,8 +90,8 @@
         </s:paragraph>
         <s:paragraph>
           <s:verbatim type="examples"><![CDATA[<dependency>
-  <groupId>com.io7m.jvvfs</groupId>
-  <artifactId>io7m-jvvfs</artifactId>
+  <groupId>com.io7m.jvvfs.core</groupId>
+  <artifactId>io7m-jvvfs-core</artifactId>
   <version>[3.0.0, 4.0.0)</version>
 </dependency>]]></s:verbatim>
         </s:paragraph>
