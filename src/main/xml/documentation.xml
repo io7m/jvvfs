@@ -138,6 +138,16 @@
   <s:table-cell>24.0-b40</s:table-cell>
 </s:table-row>
 <s:table-row xmlns:s="http://www.io7m.com/schemas/structural/1.0.0">
+  <s:table-cell>Mac OS X</s:table-cell>
+  <s:table-cell>10.6.8</s:table-cell>
+  <s:table-cell>x86_64</s:table-cell>
+  <s:table-cell>Apple Inc.</s:table-cell>
+  <s:table-cell>1.6.0_45</s:table-cell>
+  <s:table-cell>Java HotSpot(TM) 64-Bit Server VM</s:table-cell>
+  <s:table-cell>Apple Inc.</s:table-cell>
+  <s:table-cell>20.45-b01-451</s:table-cell>
+</s:table-row>
+<s:table-row xmlns:s="http://www.io7m.com/schemas/structural/1.0.0">
   <s:table-cell>Windows XP</s:table-cell>
   <s:table-cell>5.1</s:table-cell>
   <s:table-cell>x86</s:table-cell>
