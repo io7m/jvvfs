@@ -128,6 +128,16 @@
           </s:table-head>
           <s:table-body>
 <s:table-row xmlns:s="http://www.io7m.com/schemas/structural/1.0.0">
+  <s:table-cell>FreeBSD</s:table-cell>
+  <s:table-cell>9.1-RELEASE</s:table-cell>
+  <s:table-cell>amd64</s:table-cell>
+  <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+  <s:table-cell>1.6.0_32</s:table-cell>
+  <s:table-cell>OpenJDK 64-Bit Server VM</s:table-cell>
+  <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+  <s:table-cell>20.0-b12</s:table-cell>
+</s:table-row>
+<s:table-row xmlns:s="http://www.io7m.com/schemas/structural/1.0.0">
   <s:table-cell>Linux</s:table-cell>
   <s:table-cell>3.9.7-1-ARCH</s:table-cell>
   <s:table-cell>amd64</s:table-cell>
@@ -146,6 +156,16 @@
   <s:table-cell>Java HotSpot(TM) 64-Bit Server VM</s:table-cell>
   <s:table-cell>Apple Inc.</s:table-cell>
   <s:table-cell>20.45-b01-451</s:table-cell>
+</s:table-row>
+<s:table-row xmlns:s="http://www.io7m.com/schemas/structural/1.0.0">
+  <s:table-cell>SunOS</s:table-cell>
+  <s:table-cell>5.11</s:table-cell>
+  <s:table-cell>x86</s:table-cell>
+  <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+  <s:table-cell>1.6.0_21</s:table-cell>
+  <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
+  <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+  <s:table-cell>17.0-b16</s:table-cell>
 </s:table-row>
 <s:table-row xmlns:s="http://www.io7m.com/schemas/structural/1.0.0">
   <s:table-cell>Windows XP</s:table-cell>
