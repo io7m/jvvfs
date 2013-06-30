@@ -1064,11 +1064,11 @@ public class FilesystemTest
 
     final Calendar ct =
       fs.getModificationTime(PathVirtual.ofString("/subdir"));
-    Assert.assertEquals(ct.get(Calendar.YEAR), 2012);
-    Assert.assertEquals(ct.get(Calendar.MONTH), 0);
-    Assert.assertEquals(ct.get(Calendar.DAY_OF_MONTH), 23);
-    Assert.assertEquals(ct.get(Calendar.HOUR_OF_DAY), 21);
-    Assert.assertEquals(ct.get(Calendar.MINUTE), 50);
+    Assert.assertEquals(2012, ct.get(Calendar.YEAR));
+    Assert.assertEquals(0, ct.get(Calendar.MONTH));
+    Assert.assertEquals(23, ct.get(Calendar.DAY_OF_MONTH));
+    Assert.assertEquals(21, ct.get(Calendar.HOUR_OF_DAY));
+    Assert.assertEquals(50, ct.get(Calendar.MINUTE));
   }
 
   /**
@@ -1140,11 +1140,11 @@ public class FilesystemTest
 
     final Calendar ct =
       fs.getModificationTime(PathVirtual.ofString("/file.txt"));
-    Assert.assertEquals(ct.get(Calendar.YEAR), 2012);
-    Assert.assertEquals(ct.get(Calendar.MONTH), 0);
-    Assert.assertEquals(ct.get(Calendar.DAY_OF_MONTH), 20);
-    Assert.assertEquals(ct.get(Calendar.HOUR_OF_DAY), 21);
-    Assert.assertEquals(ct.get(Calendar.MINUTE), 47);
+    Assert.assertEquals(2012, ct.get(Calendar.YEAR));
+    Assert.assertEquals(0, ct.get(Calendar.MONTH));
+    Assert.assertEquals(20, ct.get(Calendar.DAY_OF_MONTH));
+    Assert.assertEquals(21, ct.get(Calendar.HOUR_OF_DAY));
+    Assert.assertEquals(47, ct.get(Calendar.MINUTE));
   }
 
   /**
