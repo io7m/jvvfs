@@ -3,6 +3,17 @@
   <c:project>io7m-jvvfs</c:project>
 
   <c:release ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2013-07-13</c:date>
+    <c:version>3.0.1</c:version>
+
+    <c:item>
+      <c:date>2013-07-13</c:date>
+      <c:type-code-fix/>
+      <c:summary>Reduce log level of archive operations to 'debug'.</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2013-06-30</c:date>
     <c:version>3.0.0</c:version>
 
