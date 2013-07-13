@@ -232,7 +232,7 @@ abstract class Archive<T extends ArchiveKind>
   {
     final Log log = this.getLogLookup();
     if (log.enabledByConfiguration()) {
-      log.info(path.toString());
+      log.debug(path.toString());
     }
 
     final PathVirtualEnum e = new PathVirtualEnum(path);
