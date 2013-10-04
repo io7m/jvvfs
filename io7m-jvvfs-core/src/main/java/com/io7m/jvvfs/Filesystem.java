@@ -180,7 +180,6 @@ public final class Filesystem implements FSCapabilityAll
   private final @Nonnull List<ArchiveHandler<?>>           handlers;
   private final @Nonnull LinkedList<Archive<?>>            archive_list;
   private final @Nonnull Map<PathVirtual, Calendar>        directories;
-
   private final @Nonnull Map<PathVirtual, UpdateTimeEntry> time_updates;
 
   private Filesystem(
