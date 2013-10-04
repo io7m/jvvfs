@@ -316,7 +316,9 @@ final class TestData
       properties.load(stream);
       return new Log(properties, "com.io7m.jvvfs", "main");
     } finally {
-      stream.close();
+      if (stream != null) {
+        stream.close();
+      }
     }
   }
 
