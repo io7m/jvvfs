@@ -810,6 +810,24 @@ public final class Filesystem implements FSCapabilityAll
     }
   }
 
+  @Override public void mountArchiveFromAnywhere(
+    final @Nonnull File archive,
+    final @Nonnull PathVirtual mount)
+    throws ConstraintError,
+      FilesystemError
+  {
+    Constraints.constrainNotNull(archive, "Archive path");
+    Constraints.constrainNotNull(mount, "Mount path");
+
+    this.log_mount.info("mount-archive: " + archive + " - " + mount);
+
+    if (archive.exists() == false) {
+      throw FilesystemError.archiveNonexistent(archive.toString());
+    }
+
+    this.mountInternal(new PathReal(archive.toString()), mount);
+  }
+
   private void mountCheckArchiveStack(
     final @Nonnull PathReal archive,
     final @Nonnull PathVirtual mount)

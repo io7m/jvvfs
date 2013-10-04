@@ -1684,6 +1684,76 @@ public class FilesystemTest
   }
 
   /**
+   * Mounting a nonexistent archive using
+   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+    void
+    testMountFromAnywhereNonexistentArchive()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchiveFromAnywhere(new File("nonexistent"), PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
+    void
+    testMountFromAnywhereNullArchive()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchiveFromAnywhere(null, PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
+   */
+
+  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
+    void
+    testMountFromAnywhereNullPath()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchiveFromAnywhere(new File("nonexistent"), null);
+  }
+
+  /**
+   * Mounting an archive with
+   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)} works.
+   */
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testMountFromAnywhereWorks()
+      throws IOException,
+        ConstraintError,
+        FilesystemError
+  {
+    final File td = TestData.getTestDataDirectory();
+    final Filesystem fs = FilesystemTest.makeFS();
+
+    fs.mountArchiveFromAnywhere(td, PathVirtual.ROOT);
+    fs.exists(PathVirtual.ofString("/single-file.zip"));
+  }
+
+  /**
    * Complicated shadowing works.
    */
 

@@ -25,6 +25,7 @@ package com.io7m.jvvfs;
 public interface FSCapabilityAll extends
   FSCapabilityRead,
   FSCapabilityClose,
+  FSCapabilityMountAnywhere,
   FSCapabilityMountClasspath,
   FSCapabilityMountDirectory,
   FSCapabilityMountSnapshot,
