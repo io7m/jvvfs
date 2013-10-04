@@ -7,7 +7,7 @@
   <groupId>com.io7m.jvvfs.core</groupId>
   <artifactId>io7m-jvvfs-core</artifactId>
   <name>io7m-jvvfs-core</name>
-  <version>3.0.0</version>
+  <version>3.1.0</version>
   <description>Virtual filesystem abstraction (Core API)</description>
   <url>http://mvn.io7m.com/jvvfs-core/</url>
 

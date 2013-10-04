@@ -4,7 +4,13 @@
 
   <c:release ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2013-07-13</c:date>
-    <c:version>3.0.1</c:version>
+    <c:version>3.1.0</c:version>
+
+    <c:item>
+      <c:date>2013-10-04</c:date>
+      <c:type-code-new/>
+      <c:summary>Add the ability to mount archives from anywhere, exposed as a capability.</c:summary>
+    </c:item>
 
     <c:item>
       <c:date>2013-07-13</c:date>
