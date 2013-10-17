@@ -148,6 +148,16 @@
   <s:table-cell>24.0-b56</s:table-cell>
 </s:table-row>
 <s:table-row xmlns:s="http://www.io7m.com/schemas/structural/1.0.0">
+  <s:table-cell>SunOS</s:table-cell>
+  <s:table-cell>5.11</s:table-cell>
+  <s:table-cell>x86</s:table-cell>
+  <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+  <s:table-cell>1.6.0_21</s:table-cell>
+  <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
+  <s:table-cell>Sun Microsystems Inc.</s:table-cell>
+  <s:table-cell>17.0-b16</s:table-cell>
+</s:table-row>
+<s:table-row xmlns:s="http://www.io7m.com/schemas/structural/1.0.0">
   <s:table-cell>Windows XP</s:table-cell>
   <s:table-cell>5.1</s:table-cell>
   <s:table-cell>x86</s:table-cell>
