@@ -208,13 +208,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.]]>
 
     <s:section>
       <s:section-title>Overview</s:section-title>
-      <s:subsection xml:id="com.io7m.jvvfs.usage.filesystem">
+      <s:subsection xml:id="com.io7m.jvvfs.3.1.0.usage.filesystem">
       	<s:subsection-title>Filesystem</s:subsection-title>
         <s:paragraph>
       	  The <s:term type="package">jvvfs</s:term> package presents
           a virtual <s:term>filesystem</s:term> in which
-          <s:link target="com.io7m.jvvfs.usage.archives">archives</s:link> are
-          <s:link target="com.io7m.jvvfs.usage.mounting">mounted</s:link> to
+          <s:link target="com.io7m.jvvfs.3.1.0.usage.archives">archives</s:link> are
+          <s:link target="com.io7m.jvvfs.3.1.0.usage.mounting">mounted</s:link> to
           form a unified namespace. This filesystem is conceptually
           and practically distinct from the filesystem
           presented by the operating system. The
@@ -231,12 +231,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.]]>
           and opening a file as a stream of bytes.
         </s:paragraph>
       </s:subsection>
-      <s:subsection xml:id="com.io7m.jvvfs.usage.archives">
+      <s:subsection xml:id="com.io7m.jvvfs.3.1.0.usage.archives">
       	<s:subsection-title>Archives</s:subsection-title>
         <s:paragraph>
 	      An <s:term>archive</s:term> is a file or directory in the
 	      operating system that can be
-	      <s:link target="com.io7m.jvvfs.usage.mounting">mounted</s:link>.
+	      <s:link target="com.io7m.jvvfs.3.1.0.usage.mounting">mounted</s:link>.
 	      The <s:term type="package">jvvfs</s:term> package currently
 	      supports mounting operating system
 	      <s:term>directories</s:term> and
@@ -247,30 +247,30 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.]]>
 	      files.
         </s:paragraph>
       </s:subsection>
-      <s:subsection xml:id="com.io7m.jvvfs.usage.mounting">
+      <s:subsection xml:id="com.io7m.jvvfs.3.1.0.usage.mounting">
       	<s:subsection-title>Mounting</s:subsection-title>
       	<s:paragraph>
-      	  Mounting an <s:link target="com.io7m.jvvfs.usage.archives">archive</s:link>
+      	  Mounting an <s:link target="com.io7m.jvvfs.3.1.0.usage.archives">archive</s:link>
       	  makes the contents of that archive accessible in the filesystem.
       	</s:paragraph>
       	<s:paragraph>
-          If an <s:link target="com.io7m.jvvfs.usage.archives">archive</s:link>
+          If an <s:link target="com.io7m.jvvfs.3.1.0.usage.archives">archive</s:link>
           is <s:term>mounted</s:term> at a directory
           <s:term type="variable">/M</s:term>, and the archive
           contains a file or directory named <s:term type="variable">F</s:term>,
           then that file or directory is accessible in the
           virtual
-          <s:link target="com.io7m.jvvfs.usage.filesystem">filesystem</s:link>
+          <s:link target="com.io7m.jvvfs.3.1.0.usage.filesystem">filesystem</s:link>
           at <s:term type="variable">/M/F</s:term>. As mentioned, directories
           can be arbitrarily nested, and archives can be mounted at any
           directory in the filesystem.
       	</s:paragraph>
       </s:subsection>
-      <s:subsection xml:id="com.io7m.jvvfs.usage.capabilities">
+      <s:subsection xml:id="com.io7m.jvvfs.3.1.0.usage.capabilities">
       	<s:subsection-title>Capabilities</s:subsection-title>
       	<s:paragraph>
 	      The set of operations that can be performed on the virtual
-	      <s:link target="com.io7m.jvvfs.usage.filesystem">filesystem</s:link>
+	      <s:link target="com.io7m.jvvfs.3.1.0.usage.filesystem">filesystem</s:link>
 	      is divided into <s:term>capabilities</s:term>. The purpose of this
 	      is to allow code to be separated according to the principle of
 	      least privilege. That is, if a given function only needs to read
@@ -535,7 +535,7 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
 	  	<s:paragraph>
 	  	  The API exposed by filesystems changed and was broken up into
 	  	  separate filesystem capabilities. See
-	  	  <s:link target="com.io7m.jvvfs.usage.capabilities">Capabilities</s:link>
+	  	  <s:link target="com.io7m.jvvfs.3.1.0.usage.capabilities">Capabilities</s:link>
 	  	  for the details. The only significantly different function is
 	  	  <s:link-external target="javadoc/com/io7m/jvvfs/FSCapabilityRead.html#getModificationTime(com.io7m.jvvfs.PathVirtual)">getModificationTime</s:link-external>,
 	  	  which replaced <s:term type="function">modificationTime()</s:term>. This
@@ -574,7 +574,7 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
 	  	  or ancestor of a path. For example, the root directory is now not
 	  	  considered to have a parent. These changes are unlikely to affect
 	  	  any existing code that uses <s:term type="package">jvvfs</s:term>.
-	  	  See <s:link target="com.io7m.jvvfs.semantics.virtual-paths">virtual path semantics</s:link>
+	  	  See <s:link target="com.io7m.jvvfs.3.1.0.semantics.virtual-paths">virtual path semantics</s:link>
 	  	  for the precise details.
 	  	</s:paragraph>
 	  </s:subsection>
@@ -585,7 +585,7 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
     <s:part-title>Semantics</s:part-title>
     <s:part-contents/>
 
-    <s:section xml:id="com.io7m.jvvfs.semantics.overview">
+    <s:section xml:id="com.io7m.jvvfs.3.1.0.semantics.overview">
       <s:section-title>Overview</s:section-title>
       <s:subsection>
         <s:subsection-title>Specification</s:subsection-title>
@@ -648,7 +648,7 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
       </s:subsection>
     </s:section>
 
-    <s:section xml:id="com.io7m.jvvfs.semantics.names">
+    <s:section xml:id="com.io7m.jvvfs.3.1.0.semantics.names">
       <s:section-title>Names</s:section-title>
       <s:subsection>
         <s:subsection-title>Semantics</s:subsection-title>
@@ -684,13 +684,13 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
       </s:subsection>
     </s:section>
 
-    <s:section xml:id="com.io7m.jvvfs.semantics.virtual-paths">
+    <s:section xml:id="com.io7m.jvvfs.3.1.0.semantics.virtual-paths">
       <s:section-title>Virtual paths</s:section-title>
       <s:subsection>
         <s:subsection-title>Semantics</s:subsection-title>
         <s:paragraph>
 		  Virtual paths in <s:term type="package">jvvfs</s:term> are conceptually
-		  a list of <s:link target="com.io7m.jvvfs.semantics.names">names</s:link>,
+		  a list of <s:link target="com.io7m.jvvfs.3.1.0.semantics.names">names</s:link>,
 		  with the empty list representing the root.
         </s:paragraph>
         <s:formal-item kind="specifications">
@@ -759,12 +759,12 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
         </s:formal-item>
         <s:paragraph>
           Where <s:term type="variable">name</s:term> represents a valid
-          <s:link target="com.io7m.jvvfs.semantics.names">name</s:link>.
+          <s:link target="com.io7m.jvvfs.3.1.0.semantics.names">name</s:link>.
         </s:paragraph>
       </s:subsection>
     </s:section>
 
-    <s:section xml:id="com.io7m.jvvfs.semantics.archives">
+    <s:section xml:id="com.io7m.jvvfs.3.1.0.semantics.archives">
       <s:section-title>Archives</s:section-title>
       <s:subsection>
       	<s:subsection-title>Overview</s:subsection-title>
@@ -791,7 +791,7 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
 	      <s:verbatim><xi:include href="../coq/ArchiveMount.v" parse="text"/></s:verbatim>
         </s:formal-item>
       </s:subsection>
-      <s:subsection xml:id="com.io7m.jvvfs.semantics.archives.lookup">
+      <s:subsection xml:id="com.io7m.jvvfs.3.1.0.semantics.archives.lookup">
       	<s:subsection-title>Lookup</s:subsection-title>
 		<s:paragraph>
           Archives contain files and directories, each of which have
@@ -857,7 +857,7 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
         <s:paragraph>
           The contents of directories within archives may be listed. The
           <s:term type="function">archive_directory_list</s:term> function
-          returns a list of <s:link target="com.io7m.jvvfs.semantics.names">names</s:link>
+          returns a list of <s:link target="com.io7m.jvvfs.3.1.0.semantics.names">names</s:link>
           of direct children of the directory at <s:term type="variable">p</s:term>,
           iff <s:term type="variable">p</s:term> refers to a directory and
           all ancestors of <s:term type="variable">p</s:term> are directories.
@@ -874,18 +874,18 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
       </s:subsection>
     </s:section>
 
-    <s:section xml:id="com.io7m.jvvfs.semantics.filesystem">
+    <s:section xml:id="com.io7m.jvvfs.3.1.0.semantics.filesystem">
       <s:section-title>Filesystem</s:section-title>
       <s:subsection>
       	<s:subsection-title>Overview</s:subsection-title>
         <s:paragraph>
 	      The filesystem maintains a list of
-	      <s:link target="com.io7m.jvvfs.semantics.archives">archives</s:link>,
+	      <s:link target="com.io7m.jvvfs.3.1.0.semantics.archives">archives</s:link>,
 	      and presents an interface that allows archives to be "mounted" and
 	      "unmounted" at directories within the filesystem.
         </s:paragraph>
       </s:subsection>
-      <s:subsection xml:id="com.io7m.jvvfs.semantics.filesystem.lookup">
+      <s:subsection xml:id="com.io7m.jvvfs.3.1.0.semantics.filesystem.lookup">
       	<s:subsection-title>Lookup</s:subsection-title>
         <s:paragraph>
 	      Unlike most operating-system filesystems, the <s:term type="package">jvvfs</s:term>
@@ -915,7 +915,7 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
 	         <s:term type="expression">m = p</s:term>,
 	         then the object at
 	         <s:term type="expression">subtract p m</s:term> is
-	         <s:link target="com.io7m.jvvfs.semantics.archives.lookup">looked up</s:link> in
+	         <s:link target="com.io7m.jvvfs.3.1.0.semantics.archives.lookup">looked up</s:link> in
 	         <s:term type="variable">a</s:term>, and
 	         <s:term type="variable">a</s:term> is said to have been
 	         <s:term type="term">checked</s:term>.
@@ -977,7 +977,7 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
 	         <s:term type="expression">m = p</s:term>,
 	         then the object at
 	         <s:term type="expression">subtract p m</s:term> is
-	         <s:link target="com.io7m.jvvfs.semantics.archives.lookup">looked up</s:link> in
+	         <s:link target="com.io7m.jvvfs.3.1.0.semantics.archives.lookup">looked up</s:link> in
 	         <s:term type="variable">a</s:term>.
 	         Otherwise, the next archive in the list is considered.
 	       </s:list-item>
@@ -1014,16 +1014,16 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
 	     archives, but a directories can never hide other directories.
        </s:paragraph>
       </s:subsection>
-      <s:subsection xml:id="com.io7m.jvvfs.semantics.filesystem.listing">
+      <s:subsection xml:id="com.io7m.jvvfs.3.1.0.semantics.filesystem.listing">
       	<s:subsection-title>Directory Listing</s:subsection-title>
         <s:paragraph>
           Listing directories proceeds in a similar manner to
-          <s:link target="com.io7m.jvvfs.semantics.filesystem.lookup">file lookups</s:link>.
+          <s:link target="com.io7m.jvvfs.3.1.0.semantics.filesystem.lookup">file lookups</s:link>.
         </s:paragraph>
         <s:paragraph>
           When attempting to list a directory in the filesystem at a given path
           <s:term type="variable">p</s:term>, <s:term type="variable">p</s:term>
-          is first <s:link target="com.io7m.jvvfs.semantics.filesystem.lookup">looked up</s:link>
+          is first <s:link target="com.io7m.jvvfs.3.1.0.semantics.filesystem.lookup">looked up</s:link>
           to ensure that it is a directory as are all of its ancestors.
           If this is not the case, an error is returned.
         </s:paragraph>
@@ -1043,7 +1043,7 @@ shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt 
 	         <s:term type="expression">m = p</s:term>,
 	         then the object at
 	         <s:term type="expression">subtract p m</s:term> is
-	         <s:link target="com.io7m.jvvfs.semantics.archives.lookup">looked up</s:link> in
+	         <s:link target="com.io7m.jvvfs.3.1.0.semantics.archives.lookup">looked up</s:link> in
 	         <s:term type="variable">a</s:term>, and
 	         <s:term type="variable">a</s:term> is said to have been
 	         <s:term type="term">checked</s:term>.
