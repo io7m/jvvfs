@@ -147,6 +147,16 @@
   <s:table-cell>Oracle Corporation</s:table-cell>
   <s:table-cell>24.0-b56</s:table-cell>
 </s:table-row>
+<s:table-row xmlns:s="http://www.io7m.com/schemas/structural/1.0.0">
+  <s:table-cell>Windows XP</s:table-cell>
+  <s:table-cell>5.1</s:table-cell>
+  <s:table-cell>x86</s:table-cell>
+  <s:table-cell>Oracle Corporation</s:table-cell>
+  <s:table-cell>1.7.0_45</s:table-cell>
+  <s:table-cell>Java HotSpot(TM) Client VM</s:table-cell>
+  <s:table-cell>Oracle Corporation</s:table-cell>
+  <s:table-cell>23.5-b02</s:table-cell>
+</s:table-row>
           </s:table-body>
         </s:table>
       </s:formal-item>
