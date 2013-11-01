@@ -183,7 +183,7 @@
         <executions>
           <!-- Produce custom manifest in jar files -->
           <execution>
-            <id>code-jar</id>
+            <id>default-jar</id>
             <configuration>
               <archive>
                 <manifestEntries>
