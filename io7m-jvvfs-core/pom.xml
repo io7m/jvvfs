@@ -186,12 +186,6 @@
                   <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
                   <Built-By>io7m</Built-By>
                 </manifestEntries>
-                <manifestSection>
-                  <name>com/io7m/jvvfs</name>
-                  <manifestEntries>
-                    <Sealed>true</Sealed>
-                  </manifestEntries>
-                </manifestSection>
               </archive>
             </configuration>
           </execution>
