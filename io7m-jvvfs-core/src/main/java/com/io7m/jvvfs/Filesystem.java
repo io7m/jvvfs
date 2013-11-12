@@ -51,8 +51,9 @@ import com.io7m.jvvfs.FilesystemError.Code;
  * The basic filesystem implementation.
  * </p>
  * <p>
- * This implementation supports loading of archives from a single directory,
- * or from the classpath.
+ * This implementation supports all of the defined capabilities, such as
+ * loading archives from a single directory, any directory, or from the
+ * classpath.
  * </p>
  * 
  * @see #makeWithArchiveDirectory(Log, PathReal)
