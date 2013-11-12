@@ -30,6 +30,11 @@ import com.io7m.jlog.Log;
 
 final class ArchiveZipHandler extends ArchiveHandler<ArchiveZipKind>
 {
+  ArchiveZipHandler()
+  {
+    // Nothing.
+  }
+
   @Override boolean canHandle(
     final @Nonnull PathReal name)
   {

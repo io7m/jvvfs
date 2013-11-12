@@ -16,38 +16,22 @@
 
 package com.io7m.jvvfs;
 
-import java.io.File;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
-import javax.annotation.Nonnull;
+import org.junit.Assert;
+import org.junit.Test;
 
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jlog.Log;
-
-/**
- * The handler responsible for loading directory archives.
- */
-
-final class ArchiveDirectoryHandler extends
-  ArchiveHandler<ArchiveDirectoryKind>
+public final class ArchiveHandlerRegistrationTest
 {
-  ArchiveDirectoryHandler()
+  @SuppressWarnings("static-method") @Test public void testRegisterInitial()
   {
-    // Nothing.
-  }
+    final Map<String, Callable<? extends ArchiveHandler<?>>> m =
+      ArchiveHandlerRegistration.getHandlers();
+    Assert.assertEquals(2, m.size());
 
-  @Override boolean canHandle(
-    final @Nonnull PathReal name)
-  {
-    return new File(name.toString()).isDirectory();
-  }
-
-  @Override @Nonnull Archive<ArchiveDirectoryKind> load(
-    final @Nonnull Log log,
-    final @Nonnull PathReal name,
-    final @Nonnull PathVirtual mount)
-    throws ConstraintError,
-      FilesystemError
-  {
-    return new ArchiveDirectory(log, name, mount);
+    for (final String k : m.keySet()) {
+      System.out.println(k);
+    }
   }
 }

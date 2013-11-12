@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Deque;
 import java.util.HashMap;
@@ -201,9 +200,7 @@ public final class Filesystem implements FSCapabilityAll
         ? new Option.None<PathReal>()
         : new Option.Some<PathReal>(archives);
 
-    this.handlers = new ArrayList<ArchiveHandler<?>>();
-    this.handlers.add(new ArchiveDirectoryHandler());
-    this.handlers.add(new ArchiveZipHandler());
+    this.handlers = ArchiveHandlerRegistration.makeHandlers();
 
     this.archive_list = new LinkedList<Archive<?>>();
 

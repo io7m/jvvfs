@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document
+  xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+  <properties>
+    <title>io7m-jvvfs-commons-compress</title>
+  </properties>
+
+  <body>
+    <subsection name="jvvfs-commons-compress">
+      The <var>jvvfs-commons-compress</var> package contains support for
+      extra archive formats, provided by
+      <a href="http://commons.apache.org/proper/commons-compress">Apache Commons Compress</a>.
+    </subsection>
+  </body>
+
+</document>
