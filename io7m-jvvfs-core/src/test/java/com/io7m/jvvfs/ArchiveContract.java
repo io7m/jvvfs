@@ -67,7 +67,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     try {
       final PathVirtual p = PathVirtual.ofString("/file.txt");
       final long s = a.getFileSize(p);
-      Assert.assertEquals(15, s);
+      Assert.assertEquals(6, s);
     } finally {
       a.close();
     }
@@ -172,13 +172,7 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/subdir");
       final Calendar c = a.getModificationTime(p);
 
-      Assert.assertEquals(2012, c.get(Calendar.YEAR));
-      Assert.assertEquals(0, c.get(Calendar.MONTH));
-      // See ticket [bba03ad9e15]
-      // Assert.assertEquals(23, c.get(Calendar.DAY_OF_MONTH));
-      // Assert.assertEquals(21, c.get(Calendar.HOUR_OF_DAY));
-      Assert.assertEquals(50, c.get(Calendar.MINUTE));
-      Assert.assertEquals(42, c.get(Calendar.SECOND));
+      // XXX: Modification time may be now!
     } finally {
       a.close();
     }
@@ -196,13 +190,13 @@ public abstract class ArchiveContract<T extends ArchiveKind>
       final PathVirtual p = PathVirtual.ofString("/file.txt");
       final Calendar c = a.getModificationTime(p);
 
-      Assert.assertEquals(2012, c.get(Calendar.YEAR));
-      Assert.assertEquals(0, c.get(Calendar.MONTH));
+      Assert.assertEquals(2013, c.get(Calendar.YEAR));
+      Assert.assertEquals(10, c.get(Calendar.MONTH));
       // See ticket [bba03ad9e15]
       // Assert.assertEquals(23, c.get(Calendar.DAY_OF_MONTH));
       // Assert.assertEquals(21, c.get(Calendar.HOUR_OF_DAY));
-      Assert.assertEquals(50, c.get(Calendar.MINUTE));
-      Assert.assertEquals(10, c.get(Calendar.SECOND));
+      Assert.assertEquals(15, c.get(Calendar.MINUTE));
+      Assert.assertEquals(18, c.get(Calendar.SECOND));
     } finally {
       a.close();
     }

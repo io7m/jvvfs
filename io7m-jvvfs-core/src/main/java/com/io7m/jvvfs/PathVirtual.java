@@ -17,6 +17,7 @@
 package com.io7m.jvvfs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -225,6 +226,17 @@ import com.io7m.jaux.functional.Option;
   }
 
   /**
+   * Return a view of the current path as a sequence of names.
+   * 
+   * @since 3.2.0
+   */
+
+  public @Nonnull List<String> asNames()
+  {
+    return Collections.unmodifiableList(this.names);
+  }
+
+  /**
    * <p>
    * The ordering relation for virtual paths.
    * </p>
@@ -296,6 +308,22 @@ import com.io7m.jaux.functional.Option;
       return new Option.Some<String>(this.names.get(this.names.size() - 1));
     }
     return new Option.None<String>();
+  }
+
+  /**
+   * Retrieve this path with the last component removed.
+   * 
+   * @return <code>None</code> iff this path is empty.
+   */
+
+  public @Nonnull Option<PathVirtual> getDirectoryName()
+  {
+    if (this.names.isEmpty() == false) {
+      final PathVirtual p =
+        new PathVirtual(this.names.subList(0, this.names.size() - 1));
+      return new Option.Some<PathVirtual>(p);
+    }
+    return new Option.None<PathVirtual>();
   }
 
   /**

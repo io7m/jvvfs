@@ -204,6 +204,32 @@ public final class PathVirtualTest
       });
   }
 
+  @SuppressWarnings("static-method") @Test public void testDirectoryName()
+  {
+    PathVirtualTest
+      .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
+        @Override protected void doSpecify(
+          final @Nonnull PathVirtual p)
+          throws Throwable
+        {
+          final ValidNameGenerator g = new NameTest.ValidNameGenerator();
+          final String n0 = g.next();
+          final PathVirtual p0 = p.appendName(n0);
+          final Option<PathVirtual> op1 = p0.getDirectoryName();
+          Assert.assertTrue(op1.isSome());
+          final Some<PathVirtual> s = (Option.Some<PathVirtual>) op1;
+          Assert.assertEquals(p, s.value);
+        }
+      });
+  }
+
+  @SuppressWarnings("static-method") @Test public
+    void
+    testDirectoryNameRoot()
+  {
+    Assert.assertTrue(PathVirtual.ROOT.getDirectoryName().isNone());
+  }
+
   @SuppressWarnings("static-method") @Test public void testEqualsClass()
   {
     PathVirtualTest

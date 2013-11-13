@@ -72,6 +72,13 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.io7m.jvvfs.core</groupId>
+      <artifactId>io7m-jvvfs-core</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.io7m.jaux</groupId>
       <artifactId>io7m-jaux</artifactId>
       <version>[2.3.0, 3.0.0)</version>

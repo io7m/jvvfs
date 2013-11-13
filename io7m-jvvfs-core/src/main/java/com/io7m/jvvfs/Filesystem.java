@@ -176,6 +176,7 @@ public final class Filesystem implements FSCapabilityAll
   private final @Nonnull Log                               log_directory;
   private final @Nonnull Log                               log_mount;
   private final @Nonnull Log                               log_lookup;
+  private final @Nonnull Log                               log_handlers;
   private final @Nonnull Option<PathReal>                  archives;
   private final @Nonnull List<ArchiveHandler<?>>           handlers;
   private final @Nonnull LinkedList<Archive<?>>            archive_list;
@@ -191,6 +192,7 @@ public final class Filesystem implements FSCapabilityAll
       new Log(
         Constraints.constrainNotNull(log, "Log interface"),
         "filesystem");
+    this.log_handlers = new Log(this.log, "handlers");
     this.log_directory = new Log(this.log, "directory");
     this.log_mount = new Log(this.log, "mount");
     this.log_lookup = new Log(this.log, "lookup");
@@ -201,6 +203,9 @@ public final class Filesystem implements FSCapabilityAll
         : new Option.Some<PathReal>(archives);
 
     this.handlers = ArchiveHandlerRegistration.makeHandlers();
+    for (final ArchiveHandler<?> h : this.handlers) {
+      log.debug("Registered " + h.getClass().getCanonicalName());
+    }
 
     this.archive_list = new LinkedList<Archive<?>>();
 

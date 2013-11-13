@@ -107,6 +107,12 @@ final class TestData
   private static @Nonnull Set<String>             zip_list;
 
   /**
+   * A list of 7z files that should be copied to the filesystem.
+   */
+
+  private static @Nonnull Set<String>             f7z_list;
+
+  /**
    * A mapping from zip file names to the names of the directories to which
    * they will be unpacked.
    */
@@ -127,6 +133,19 @@ final class TestData
     TestData.zip_list.add("files1-3.zip");
     TestData.zip_list.add("files4-6.zip");
     TestData.zip_list.add("unknown.unknown");
+
+    TestData.f7z_list = new HashSet<String>();
+    TestData.f7z_list.add("single-file.7z");
+    TestData.f7z_list.add("single-file-and-subdir.7z");
+    TestData.f7z_list.add("single-file-and-subdir-implicit.7z");
+    TestData.f7z_list.add("single-file-in-subdir-subdir.7z");
+    TestData.f7z_list.add("complex.7z");
+    TestData.f7z_list.add("subdir-shadow.7z");
+    TestData.f7z_list.add("subdir-subdir-shadow.7z");
+    TestData.f7z_list.add("encrypted.7z");
+    TestData.f7z_list.add("files1-3.7z");
+    TestData.f7z_list.add("files4-6.7z");
+    TestData.f7z_list.add("unknown.unknown");
 
     TestData.zip_unpack_map = new HashMap<String, String>();
     TestData.zip_unpack_map.put("single-file.zip", "single-file");
@@ -356,6 +375,13 @@ final class TestData
     final File outdir = d.getFile();
 
     for (final String file : TestData.zip_list) {
+      final File outfile = new File(outdir, file);
+      System.err.println("test-data: Unpacking " + file + " to " + outfile);
+      TestData.copyResourceOut(file, outfile);
+      TestData.deleteOnExit(outfile);
+    }
+
+    for (final String file : TestData.f7z_list) {
       final File outfile = new File(outdir, file);
       System.err.println("test-data: Unpacking " + file + " to " + outfile);
       TestData.copyResourceOut(file, outfile);
