@@ -389,6 +389,106 @@
               <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-3.1.0-documentation.zip">io7m-jvvfs-3.1.0-documentation.zip</a>
             </td>
           </tr>
+          <tr class="page_table_row">
+            <td class="page_table_column">2014-01-04</td>
+            <td class="page_table_column">50272</td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-shell-3.1.1.jar.asc">asc</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-shell-3.1.1.jar">io7m-jvvfs-shell-3.1.1.jar</a>
+            </td>
+          </tr>
+          <tr class="page_table_row">
+            <td class="page_table_column">2014-01-04</td>
+            <td class="page_table_column">90236</td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-core-3.1.1-tests.jar.asc">asc</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-core-3.1.1-tests.jar">io7m-jvvfs-core-3.1.1-tests.jar</a>
+            </td>
+          </tr>
+          <tr class="page_table_row">
+            <td class="page_table_column">2014-01-04</td>
+            <td class="page_table_column">40657</td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-core-3.1.1-sources.jar.asc">asc</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-core-3.1.1-sources.jar">io7m-jvvfs-core-3.1.1-sources.jar</a>
+            </td>
+          </tr>
+          <tr class="page_table_row">
+            <td class="page_table_column">2014-01-04</td>
+            <td class="page_table_column">7604</td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-shell-3.1.1-sources.jar.asc">asc</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-shell-3.1.1-sources.jar">io7m-jvvfs-shell-3.1.1-sources.jar</a>
+            </td>
+          </tr>
+          <tr class="page_table_row">
+            <td class="page_table_column">2014-01-04</td>
+            <td class="page_table_column">36168</td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-shell-3.1.1-javadoc.jar.asc">asc</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-shell-3.1.1-javadoc.jar">io7m-jvvfs-shell-3.1.1-javadoc.jar</a>
+            </td>
+          </tr>
+          <tr class="page_table_row">
+            <td class="page_table_column">2014-01-04</td>
+            <td class="page_table_column">117694</td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-core-3.1.1-javadoc.jar.asc">asc</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-core-3.1.1-javadoc.jar">io7m-jvvfs-core-3.1.1-javadoc.jar</a>
+            </td>
+          </tr>
+          <tr class="page_table_row">
+            <td class="page_table_column">2014-01-04</td>
+            <td class="page_table_column">51035</td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-core-3.1.1.jar.asc">asc</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-core-3.1.1.jar">io7m-jvvfs-core-3.1.1.jar</a>
+            </td>
+          </tr>
+          <tr class="page_table_row">
+            <td class="page_table_column">2014-01-04</td>
+            <td class="page_table_column">395575</td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-shell-3.1.1-dist.zip.asc">asc</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-shell-3.1.1-dist.zip">io7m-jvvfs-shell-3.1.1-dist.zip</a>
+            </td>
+          </tr>
+          <tr class="page_table_row">
+            <td class="page_table_column">2014-01-04</td>
+            <td class="page_table_column">455918</td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-3.1.1-documentation.zip.asc">asc</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-3.1.1-documentation.zip">io7m-jvvfs-3.1.1-documentation.zip</a>
+            </td>
+          </tr>
+          <tr class="page_table_row">
+            <td class="page_table_column">2014-01-04</td>
+            <td class="page_table_column">442083</td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-3.1.1.zip.asc">asc</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-3.1.1.zip">io7m-jvvfs-3.1.1.zip</a>
+            </td>
+          </tr>
         </tbody>
       </table>
     </section>
@@ -483,6 +583,19 @@
               <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-3.1.0-documentation.zip">io7m-jvvfs-3.1.0-documentation.zip</a>
             </td>
           </tr>
+          <tr class="page_table_row">
+            <td class="page_table_column">2014-01-04</td>
+            <td class="page_table_column">455918</td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-3.1.1-documentation.zip.asc">asc</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://io7m.com/software/jvvfs/doc/3.1.1/d1.xhtml">io7m-jvvfs 3.1.1</a>
+            </td>
+            <td class="page_table_column">
+              <a class="page_link_file" href="http://distribution.io7m.com/jvvfs/io7m-jvvfs-3.1.1-documentation.zip">io7m-jvvfs-3.1.1-documentation.zip</a>
+            </td>
+          </tr>
         </tbody>
       </table>
     </section>
@@ -491,6 +604,14 @@
 <table xmlns="http://www.w3.org/1999/xhtml"
        class="changelog page_table"
        summary="Changes">
+   <tr class="page_table_row">
+      <td class="page_table_column">2014-01-04</td>
+      <td class="page_table_column">Release: io7m-jvvfs 3.1.1</td>
+   </tr>
+   <tr class="page_table_row">
+      <td class="page_table_column">2014-01-04</td>
+      <td class="page_table_column">Code new: Use jaux 3.0.0 and jsr305 2.0.2.</td>
+   </tr>
    <tr class="page_table_row">
       <td class="page_table_column">2013-07-13</td>
       <td class="page_table_column">Release: io7m-jvvfs 3.1.0</td>
