@@ -7,7 +7,7 @@
   <groupId>com.io7m.jvvfs.core</groupId>
   <artifactId>io7m-jvvfs-core</artifactId>
   <name>io7m-jvvfs-core</name>
-  <version>3.1.0</version>
+  <version>3.1.1</version>
   <description>Virtual filesystem abstraction (Core API)</description>
   <url>http://mvn.io7m.com/jvvfs-core/</url>
 
@@ -69,12 +69,12 @@
     <dependency>
       <groupId>com.io7m.jaux</groupId>
       <artifactId>io7m-jaux</artifactId>
-      <version>[2.3.0, 3.0.0)</version>
+      <version>[3.0.0, 4.0.0)</version>
     </dependency>
     <dependency>
       <groupId>com.io7m.jlog</groupId>
       <artifactId>io7m-jlog</artifactId>
-      <version>[2.3.0, 3.0.0)</version>
+      <version>[2.4.0, 3.0.0)</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -85,7 +85,7 @@
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
-      <version>2.0.1</version>
+      <version>2.0.2</version>
     </dependency>
     <dependency>
       <groupId>net.java</groupId>
