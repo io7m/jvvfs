@@ -39,19 +39,19 @@ import com.io7m.jaux.Constraints.ConstraintError;
   private final @Nonnull File actual;
 
   public PathReal(
-    final @Nonnull File actual)
+    final @Nonnull File in_actual)
     throws ConstraintError
   {
-    Constraints.constrainNotNull(actual, "Path");
-    this.actual = actual;
+    Constraints.constrainNotNull(in_actual, "Path");
+    this.actual = in_actual;
   }
 
   public PathReal(
-    final @Nonnull String actual)
+    final @Nonnull String in_actual)
     throws ConstraintError
   {
-    Constraints.constrainNotNull(actual, "Path");
-    this.actual = new File(actual);
+    Constraints.constrainNotNull(in_actual, "Path");
+    this.actual = new File(in_actual);
   }
 
   @Override public boolean equals(

@@ -103,9 +103,9 @@ abstract class ShellCommand
     private final @Nonnull PathVirtual path;
 
     ShellCommandFileList(
-      final @Nonnull PathVirtual path)
+      final @Nonnull PathVirtual in_path)
     {
-      this.path = path;
+      this.path = in_path;
     }
 
     @Override void run(
@@ -128,9 +128,9 @@ abstract class ShellCommand
     private final @Nonnull PathVirtual path;
 
     ShellCommandFileListLong(
-      final @Nonnull PathVirtual path)
+      final @Nonnull PathVirtual in_path)
     {
-      this.path = path;
+      this.path = in_path;
     }
 
     @Override void run(
@@ -179,9 +179,9 @@ abstract class ShellCommand
     private final @Nonnull PathVirtual path;
 
     ShellCommandFileModificationTime(
-      final @Nonnull PathVirtual path)
+      final @Nonnull PathVirtual in_path)
     {
-      this.path = path;
+      this.path = in_path;
     }
 
     @Override void run(
@@ -203,9 +203,9 @@ abstract class ShellCommand
     private final @Nonnull PathVirtual path;
 
     ShellCommandFileRead(
-      final @Nonnull PathVirtual path)
+      final @Nonnull PathVirtual in_path)
     {
-      this.path = path;
+      this.path = in_path;
     }
 
     @Override void run(
@@ -244,9 +244,9 @@ abstract class ShellCommand
     private final @Nonnull PathVirtual path;
 
     ShellCommandFileSize(
-      final @Nonnull PathVirtual path)
+      final @Nonnull PathVirtual in_path)
     {
-      this.path = path;
+      this.path = in_path;
     }
 
     @Override void run(
@@ -266,9 +266,9 @@ abstract class ShellCommand
     private final @Nonnull String command;
 
     ShellCommandHelp(
-      final @Nonnull String command)
+      final @Nonnull String in_command)
     {
-      this.command = command;
+      this.command = in_command;
     }
 
     @SuppressWarnings("synthetic-access") @Override void run(
@@ -340,9 +340,9 @@ abstract class ShellCommand
     private final @Nonnull PathVirtual path;
 
     ShellCommandMkdir(
-      final @Nonnull PathVirtual path)
+      final @Nonnull PathVirtual in_path)
     {
-      this.path = path;
+      this.path = in_path;
     }
 
     @Override void run(
@@ -363,11 +363,11 @@ abstract class ShellCommand
     private final @Nonnull String      archive;
 
     ShellCommandMount(
-      final @Nonnull String archive,
-      final @Nonnull PathVirtual path)
+      final @Nonnull String in_archive,
+      final @Nonnull PathVirtual in_path)
     {
-      this.archive = archive;
-      this.path = path;
+      this.archive = in_archive;
+      this.path = in_path;
     }
 
     @Override void run(
@@ -387,9 +387,9 @@ abstract class ShellCommand
     private final @Nonnull PathVirtual path;
 
     ShellCommandUnmount(
-      final @Nonnull PathVirtual path)
+      final @Nonnull PathVirtual in_path)
     {
-      this.path = path;
+      this.path = in_path;
     }
 
     @Override void run(

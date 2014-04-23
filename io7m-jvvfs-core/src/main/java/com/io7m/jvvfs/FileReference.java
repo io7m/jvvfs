@@ -51,14 +51,14 @@ import com.io7m.jaux.Constraints.ConstraintError;
   final @Nonnull FileReference.Type type;
 
   FileReference(
-    final @CheckForNull Archive<T> archive,
-    final @Nonnull PathVirtual path,
-    final @Nonnull FileReference.Type type)
+    final @CheckForNull Archive<T> in_archive,
+    final @Nonnull PathVirtual in_path,
+    final @Nonnull FileReference.Type in_type)
     throws ConstraintError
   {
-    this.archive = archive;
-    this.path = Constraints.constrainNotNull(path, "path");
-    this.type = Constraints.constrainNotNull(type, "type");
+    this.archive = in_archive;
+    this.path = Constraints.constrainNotNull(in_path, "path");
+    this.type = Constraints.constrainNotNull(in_type, "type");
   }
 
   @Override public final String toString()

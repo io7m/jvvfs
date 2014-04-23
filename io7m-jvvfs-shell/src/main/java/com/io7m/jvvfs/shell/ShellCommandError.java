@@ -67,19 +67,19 @@ abstract class ShellCommandError extends Exception
   private final @Nonnull Type type;
 
   protected ShellCommandError(
-    final @Nonnull Type type,
+    final @Nonnull Type in_type,
     final @Nonnull String message)
   {
     super(message);
-    this.type = type;
+    this.type = in_type;
   }
 
   protected ShellCommandError(
-    final @Nonnull Type type,
+    final @Nonnull Type in_type,
     final @Nonnull Throwable error)
   {
     super(error);
-    this.type = type;
+    this.type = in_type;
   }
 
   @Nonnull Type getType()

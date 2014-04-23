@@ -66,9 +66,9 @@ public final class Filesystem implements FSCapabilityAll
     final @Nonnull FSReferenceType type;
 
     FSReference(
-      final @Nonnull FSReferenceType type)
+      final @Nonnull FSReferenceType in_type)
     {
-      this.type = type;
+      this.type = in_type;
     }
   }
 
@@ -77,10 +77,10 @@ public final class Filesystem implements FSCapabilityAll
     final @Nonnull FileReference<?> ref;
 
     FSReferenceArchive(
-      final @Nonnull FileReference<?> ref)
+      final @Nonnull FileReference<?> in_ref)
     {
       super(FSReferenceType.FS_REF_ARCHIVE);
-      this.ref = ref;
+      this.ref = in_ref;
     }
   }
 
@@ -96,12 +96,12 @@ public final class Filesystem implements FSCapabilityAll
     final @Nonnull Calendar    mtime;
 
     FSReferenceVirtualDirectory(
-      final @Nonnull PathVirtual path,
-      final @Nonnull Calendar mtime)
+      final @Nonnull PathVirtual in_path,
+      final @Nonnull Calendar in_mtime)
     {
       super(FSReferenceType.FS_REF_VIRTUAL_DIRECTORY);
-      this.path = path;
-      this.mtime = mtime;
+      this.path = in_path;
+      this.mtime = in_mtime;
     }
   }
 
@@ -111,11 +111,11 @@ public final class Filesystem implements FSCapabilityAll
     final @Nonnull Calendar time_value;
 
     UpdateTimeEntry(
-      final @Nonnull Calendar time_when_updated,
-      final @Nonnull Calendar time_value)
+      final @Nonnull Calendar in_time_when_updated,
+      final @Nonnull Calendar in_time_value)
     {
-      this.time_when_updated = time_when_updated;
-      this.time_value = time_value;
+      this.time_when_updated = in_time_when_updated;
+      this.time_value = in_time_value;
     }
   }
 
@@ -183,22 +183,22 @@ public final class Filesystem implements FSCapabilityAll
   private final @Nonnull Map<PathVirtual, UpdateTimeEntry> time_updates;
 
   private Filesystem(
-    final @Nonnull Log log,
-    final @CheckForNull PathReal archives)
+    final @Nonnull Log in_log,
+    final @CheckForNull PathReal in_archives)
     throws ConstraintError
   {
     this.log =
       new Log(
-        Constraints.constrainNotNull(log, "Log interface"),
+        Constraints.constrainNotNull(in_log, "Log interface"),
         "filesystem");
     this.log_directory = new Log(this.log, "directory");
     this.log_mount = new Log(this.log, "mount");
     this.log_lookup = new Log(this.log, "lookup");
 
     this.archives =
-      archives == null
+      in_archives == null
         ? new Option.None<PathReal>()
-        : new Option.Some<PathReal>(archives);
+        : new Option.Some<PathReal>(in_archives);
 
     this.handlers = new ArrayList<ArchiveHandler<?>>();
     this.handlers.add(new ArchiveDirectoryHandler());

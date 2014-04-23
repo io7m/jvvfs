@@ -60,17 +60,17 @@ import com.io7m.jvvfs.FileReference.Type;
     final @Nonnull Option<ZipEntry> zip_entry_opt;
 
     ArchiveZipReference(
-      final @Nonnull Archive<ArchiveZipKind> archive,
-      final @Nonnull PathVirtual path,
-      final @Nonnull Type type,
+      final @Nonnull Archive<ArchiveZipKind> in_archive,
+      final @Nonnull PathVirtual in_path,
+      final @Nonnull Type in_type,
       final @Nonnull ZipEntry actual)
       throws ConstraintError
     {
-      super(archive, path, type);
+      super(in_archive, in_path, in_type);
 
       if (actual == null) {
         Constraints.constrainArbitrary(
-          path.isRoot(),
+          in_path.isRoot(),
           "Path must be root for null zip entry");
         this.zip_entry_opt = new Option.None<ZipEntry>();
       } else {
@@ -86,18 +86,18 @@ import com.io7m.jvvfs.FileReference.Type;
   private final @Nonnull Log         log_lookup;
 
   ArchiveZip(
-    final @Nonnull Log log,
+    final @Nonnull Log in_log,
     final @Nonnull PathReal base_path,
-    final @Nonnull PathVirtual mount)
+    final @Nonnull PathVirtual in_mount)
     throws ConstraintError,
       IOException,
       FilesystemError
   {
     try {
-      this.log = new Log(log, "zip");
+      this.log = new Log(in_log, "zip");
       this.log_lookup = new Log(this.log, "lookup");
 
-      this.mount = Constraints.constrainNotNull(mount, "Mount path");
+      this.mount = Constraints.constrainNotNull(in_mount, "Mount path");
       this.zip = new ZipFile(base_path.toString());
       this.real = new PathReal(base_path.toString());
     } catch (final ZipException e) {

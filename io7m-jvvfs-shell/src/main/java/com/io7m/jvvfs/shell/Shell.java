@@ -61,15 +61,15 @@ public final class Shell implements Runnable
   private final @Nonnull Filesystem    filesystem;
 
   private Shell(
-    final @Nonnull ShellConfig config,
-    final @Nonnull Log log)
+    final @Nonnull ShellConfig in_config,
+    final @Nonnull Log in_log)
     throws IOException,
       ConstraintError
   {
-    this.config = config;
-    this.log = log;
+    this.config = in_config;
+    this.log = in_log;
     this.filesystem =
-      Filesystem.makeWithArchiveDirectory(log, config.getArchiveDirectory());
+      Filesystem.makeWithArchiveDirectory(in_log, in_config.getArchiveDirectory());
 
     this.reader = new ConsoleReader();
     this.reader.addCompleter(ShellCommand.commandCompleter());

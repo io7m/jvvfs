@@ -34,9 +34,9 @@ final class ShellConfig
   private final @Nonnull PathReal archive_directory;
 
   private ShellConfig(
-    final @Nonnull PathReal archive_directory)
+    final @Nonnull PathReal in_archive_directory)
   {
-    this.archive_directory = archive_directory;
+    this.archive_directory = in_archive_directory;
   }
 
   @Nonnull PathReal getArchiveDirectory()

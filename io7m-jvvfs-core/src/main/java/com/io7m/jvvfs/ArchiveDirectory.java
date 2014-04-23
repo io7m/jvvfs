@@ -57,14 +57,14 @@ import com.io7m.jvvfs.FileReference.Type;
     final @Nonnull File actual;
 
     ArchiveDirectoryReference(
-      final @Nonnull Archive<ArchiveDirectoryKind> archive,
-      final @Nonnull PathVirtual path,
-      final @Nonnull Type type,
-      final @Nonnull File actual)
+      final @Nonnull Archive<ArchiveDirectoryKind> in_archive,
+      final @Nonnull PathVirtual in_path,
+      final @Nonnull Type in_type,
+      final @Nonnull File in_actual)
       throws ConstraintError
     {
-      super(archive, path, type);
-      this.actual = actual;
+      super(in_archive, in_path, in_type);
+      this.actual = in_actual;
     }
   }
 
@@ -74,13 +74,13 @@ import com.io7m.jvvfs.FileReference.Type;
   private final @Nonnull Log         log;
 
   ArchiveDirectory(
-    final @Nonnull Log log,
+    final @Nonnull Log in_log,
     final @Nonnull PathReal base_path,
-    final @Nonnull PathVirtual mount)
+    final @Nonnull PathVirtual in_mount)
     throws ConstraintError
   {
-    this.log = new Log(log, "directory");
-    this.mount = Constraints.constrainNotNull(mount, "Mount path");
+    this.log = new Log(in_log, "directory");
+    this.mount = Constraints.constrainNotNull(in_mount, "Mount path");
     this.base = new File(base_path.toString());
     this.real = new PathReal(this.base.toString());
   }

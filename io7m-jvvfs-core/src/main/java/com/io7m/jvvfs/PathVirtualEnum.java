@@ -46,10 +46,10 @@ import com.io7m.jaux.UnreachableCodeException;
   private int                              index = -1;
 
   PathVirtualEnum(
-    final @Nonnull PathVirtual path)
+    final @Nonnull PathVirtual in_path)
     throws ConstraintError
   {
-    this.path = Constraints.constrainNotNull(path, "Path");
+    this.path = Constraints.constrainNotNull(in_path, "Path");
     this.names = new ArrayList<String>();
   }
 

@@ -32,12 +32,12 @@ public final class FileReferenceTest
   static final class FileReferenceId extends FileReference<ArchiveKind>
   {
     FileReferenceId(
-      final @Nonnull Archive<ArchiveKind> archive,
-      final @Nonnull PathVirtual path,
-      final @Nonnull Type type)
+      final @Nonnull Archive<ArchiveKind> in_archive,
+      final @Nonnull PathVirtual in_path,
+      final @Nonnull Type in_type)
       throws ConstraintError
     {
-      super(archive, path, type);
+      super(in_archive, in_path, in_type);
     }
   }
 

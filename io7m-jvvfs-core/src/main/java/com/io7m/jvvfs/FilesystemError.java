@@ -178,11 +178,11 @@ public final class FilesystemError extends Exception
   private final @Nonnull Code code;
 
   FilesystemError(
-    final @Nonnull Code code,
+    final @Nonnull Code in_code,
     final @Nonnull String message)
   {
     super(message);
-    this.code = code;
+    this.code = in_code;
   }
 
   FilesystemError(
