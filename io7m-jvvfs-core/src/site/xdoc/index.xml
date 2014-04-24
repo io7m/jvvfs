@@ -10,8 +10,7 @@
 
   <body>
     <subsection name="jvvfs-core">
-      The <var>jvvfs-core</var> package contains the main interfaces and implementations
-      of the <var>jvvfs</var> package.
+      The <var>jvvfs-core</var> package contains the core types of the package.
     </subsection>
   </body>
 
