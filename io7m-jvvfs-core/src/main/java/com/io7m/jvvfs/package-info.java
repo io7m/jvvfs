@@ -14,5 +14,9 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Core functions and types.
+ */
+
 @com.io7m.jnull.NonNullByDefault package com.io7m.jvvfs;
 
