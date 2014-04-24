@@ -1,17 +1,31 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.io7m.jvvfs</groupId>
   <artifactId>io7m-jvvfs</artifactId>
-  <version>3.1.1</version>
-  <name>io7m-jvvfs</name>
-  <description>Virtual filesystem abstraction</description>
-  <url>http://mvn.io7m.com/jvvfs/</url>
+  <version>4.0.0</version>
+
   <packaging>pom</packaging>
+  <name>io7m-jvvfs</name>
+  <description>Virtual filesystem</description>
+  <url>http://mvn.io7m.com/${project.artifactId}/</url>
 
   <modules>
     <module>io7m-jvvfs-core</module>
+    <module>io7m-jvvfs-documentation</module>
     <module>io7m-jvvfs-shell</module>
   </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <siteReposDirectory>/com/io7m/jvvfs</siteReposDirectory>
+    <siteDocumentationDirectory>/com/io7m/jvvfs/io7m-jvvfs-documentation</siteDocumentationDirectory>
+  </properties>
 
   <licenses>
     <license>
@@ -44,7 +58,7 @@
     <site>
       <id>io7m</id>
       <name>io7m.com</name>
-      <url>http://mvn.io7m.com/jvvfs/</url>
+      <url>http://mvn.io7m.com/${project.artifactId}/</url>
     </site>
   </distributionManagement>
 
@@ -57,11 +71,6 @@
       <archive>http://lists.io7m.com/io7m-jvvfs/archive</archive>
     </mailingList>
   </mailingLists>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-  </properties>
 
   <prerequisites>
     <maven>2.2.1</maven>
@@ -83,9 +92,15 @@
         <version>3.3</version>
       </plugin>
       <plugin>
-        <groupId>org.sonatype.maven.plugin</groupId>
-        <artifactId>emma-maven-plugin</artifactId>
-        <version>1.2</version>
+        <groupId>com.io7m.changelog</groupId>
+        <artifactId>io7m-changelog-plugin</artifactId>
+        <version>2.1.0</version>
+        <inherited>false</inherited>
+        <configuration>
+          <file>README-CHANGES.xml</file>
+          <feedAuthorEmail>contact@io7m.com</feedAuthorEmail>
+          <feedAuthorName>io7m release robot</feedAuthorName>
+        </configuration>
       </plugin>
     </plugins>
   </reporting>
@@ -113,86 +128,6 @@
         <artifactId>maven-resources-plugin</artifactId>
         <version>2.6</version>
       </plugin>
-
-      <!-- Produce aggregate javadoc for all subprojects -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9.1</version>
-        <executions>
-          <execution>
-            <id>aggregate</id>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <phase>package</phase>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- Transform XML documentation with Saxon -->
-      <plugin>
-        <groupId>com.io7m.saxon-plugin</groupId>
-        <artifactId>io7m-saxon-plugin</artifactId>
-        <version>1.1.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>transform</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <transformation>
-            <stylesheetFile>src/main/xsl/structural-1_0_0-standalone-x20.xsl</stylesheetFile>
-            <documentFile>src/main/xml/documentation.xml</documentFile>
-            <outputDirectory>${project.build.directory}/xhtml</outputDirectory>
-            <outputDirectoryParameterName>io7m.structural-1_0_0.output_directory</outputDirectoryParameterName>
-            <outputFile>out.txt</outputFile>
-          </transformation>
-        </configuration>
-      </plugin>
-
-      <!-- Validate XML documentation -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>xml-maven-plugin</artifactId>
-        <version>1.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>validate</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <validationSets>
-            <validationSet>
-              <dir>src/main/xml</dir>
-            </validationSet>
-          </validationSets>
-        </configuration>
-      </plugin>
-
-      <!-- Produce documentation archive -->
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <descriptors>
-            <descriptor>assembly-doc.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
 
     <!-- Allow deployment over ssh -->
@@ -204,7 +139,7 @@
       </extension>
     </extensions>
 
-    <!-- Mark certain plugins as ignored in Eclipse. Does not affect the build. -->
+    <!-- Mark plugins as ignored in Eclipse, does not affect the build. -->
     <pluginManagement>
       <plugins>
         <plugin>
@@ -221,32 +156,6 @@
                     <versionRange>[1.2,)</versionRange>
                     <goals>
                       <goal>instrument</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>xml-maven-plugin</artifactId>
-                    <versionRange>[1.0,)</versionRange>
-                    <goals>
-                      <goal>transform</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>com.io7m.saxon-plugin</groupId>
-                    <artifactId>io7m-saxon-plugin</artifactId>
-                    <versionRange>[1.0.0,)</versionRange>
-                    <goals>
-                      <goal>transform</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>

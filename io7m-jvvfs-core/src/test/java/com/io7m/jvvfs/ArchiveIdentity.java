@@ -18,14 +18,11 @@ package com.io7m.jvvfs;
 
 import java.io.InputStream;
 import java.util.Calendar;
-import java.util.Set;
+import java.util.SortedSet;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnreachableCodeException;
-import com.io7m.jlog.Log;
+import com.io7m.jlog.LogType;
+import com.io7m.jnull.Nullable;
+import com.io7m.junreachable.UnreachableCodeException;
 
 final class ArchiveIdentity extends Archive<ArchiveKind>
 {
@@ -36,53 +33,49 @@ final class ArchiveIdentity extends Archive<ArchiveKind>
   }
 
   @Override protected long getFileSizeActual(
-    final @Nonnull FileReference<ArchiveKind> r)
-    throws FilesystemError,
-      ConstraintError
+    final FileReference<ArchiveKind> r)
+    throws FilesystemError
   {
     throw new UnreachableCodeException();
   }
 
-  @Override protected @Nonnull Log getLogLookup()
+  @Override protected LogType getLogLookup()
   {
     throw new UnreachableCodeException();
   }
 
-  @Override protected @Nonnull Calendar getModificationTimeActual(
+  @Override protected Calendar getModificationTimeActual(
     final FileReference<ArchiveKind> r)
   {
     throw new UnreachableCodeException();
   }
 
-  @Override @Nonnull PathVirtual getMountPath()
+  @Override PathVirtual getMountPath()
   {
     throw new UnreachableCodeException();
   }
 
-  @Override @Nonnull PathReal getRealPath()
+  @Override PathReal getRealPath()
   {
     throw new UnreachableCodeException();
   }
 
-  @Override @Nonnull Set<String> listDirectory(
+  @Override SortedSet<String> listDirectory(
     final PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+    throws FilesystemError
   {
     throw new UnreachableCodeException();
   }
 
-  @Override protected @CheckForNull FileReference<ArchiveKind> lookupActual(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError
+  @Override protected @Nullable FileReference<ArchiveKind> lookupActual(
+    final PathVirtual path)
   {
     throw new UnreachableCodeException();
   }
 
-  @Override protected @Nonnull InputStream openFileActual(
+  @Override protected InputStream openFileActual(
     final FileReference<ArchiveKind> r)
-    throws FilesystemError,
-      ConstraintError
+    throws FilesystemError
   {
     throw new UnreachableCodeException();
   }

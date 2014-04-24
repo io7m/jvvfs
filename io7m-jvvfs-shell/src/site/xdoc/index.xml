@@ -10,8 +10,8 @@
 
   <body>
     <subsection name="jvvfs-shell">
-      The <var>jvvfs-shell</var> package contains a simple interactive shell
-      for exploring and manipulationg <var>jvvfs</var> filesystems.
+      The <var>jvvfs-shell</var> package contains an interactive shell for exploring
+      <var>jvvfs</var> filesystems.
     </subsection>
   </body>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -33,16 +33,19 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
-import com.io7m.jaux.Constraints;
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnreachableCodeException;
-import com.io7m.jaux.functional.Option;
-import com.io7m.jaux.functional.Option.Some;
-import com.io7m.jaux.functional.Pair;
-import com.io7m.jlog.Log;
+import com.io7m.jfunctional.None;
+import com.io7m.jfunctional.Option;
+import com.io7m.jfunctional.OptionPartialVisitorType;
+import com.io7m.jfunctional.OptionType;
+import com.io7m.jfunctional.OptionVisitorType;
+import com.io7m.jfunctional.Pair;
+import com.io7m.jfunctional.PartialFunctionType;
+import com.io7m.jfunctional.Some;
+import com.io7m.jfunctional.Unit;
+import com.io7m.jlog.LogUsableType;
+import com.io7m.jnull.NullCheck;
+import com.io7m.jnull.Nullable;
+import com.io7m.junreachable.UnreachableCodeException;
 import com.io7m.jvvfs.FileReference.Type;
 import com.io7m.jvvfs.FilesystemError.Code;
 
@@ -55,32 +58,43 @@ import com.io7m.jvvfs.FilesystemError.Code;
  * or from the classpath.
  * </p>
  * 
- * @see #makeWithArchiveDirectory(Log, PathReal)
- * @see #makeWithoutArchiveDirectory(Log)
+ * @see #makeWithArchiveDirectory(LogUsableType, PathReal)
+ * @see #makeWithoutArchiveDirectory(LogUsableType)
  */
 
-public final class Filesystem implements FSCapabilityAll
+@SuppressWarnings("synthetic-access") public final class Filesystem implements
+  FilesystemType
 {
+  private static final Boolean TRUE_NOT_NULL  = NullCheck
+                                                .notNull(Boolean.TRUE);
+  private static final Boolean FALSE_NOT_NULL = NullCheck
+                                                .notNull(Boolean.FALSE);
+
   private static abstract class FSReference
   {
-    final @Nonnull FSReferenceType type;
+    private final FSReferenceType type;
 
     FSReference(
-      final @Nonnull FSReferenceType type)
+      final FSReferenceType in_type)
     {
-      this.type = type;
+      this.type = in_type;
+    }
+
+    final FSReferenceType getType()
+    {
+      return this.type;
     }
   }
 
   private static final class FSReferenceArchive extends FSReference
   {
-    final @Nonnull FileReference<?> ref;
+    private final FileReference<?> ref;
 
     FSReferenceArchive(
-      final @Nonnull FileReference<?> ref)
+      final FileReference<?> in_ref)
     {
       super(FSReferenceType.FS_REF_ARCHIVE);
-      this.ref = ref;
+      this.ref = in_ref;
     }
   }
 
@@ -92,48 +106,51 @@ public final class Filesystem implements FSCapabilityAll
 
   private static final class FSReferenceVirtualDirectory extends FSReference
   {
-    final @Nonnull PathVirtual path;
-    final @Nonnull Calendar    mtime;
+    private final PathVirtual path;
+    private final Calendar    mtime;
 
     FSReferenceVirtualDirectory(
-      final @Nonnull PathVirtual path,
-      final @Nonnull Calendar mtime)
+      final PathVirtual in_path,
+      final Calendar in_mtime)
     {
       super(FSReferenceType.FS_REF_VIRTUAL_DIRECTORY);
-      this.path = path;
-      this.mtime = mtime;
+      this.path = in_path;
+      this.mtime = in_mtime;
     }
   }
 
   private static class UpdateTimeEntry
   {
-    final @Nonnull Calendar time_when_updated;
-    final @Nonnull Calendar time_value;
+    private final Calendar time_when_updated;
+    private final Calendar time_value;
 
     UpdateTimeEntry(
-      final @Nonnull Calendar time_when_updated,
-      final @Nonnull Calendar time_value)
+      final Calendar in_time_when_updated,
+      final Calendar in_time_value)
     {
-      this.time_when_updated = time_when_updated;
-      this.time_value = time_value;
+      this.time_when_updated = in_time_when_updated;
+      this.time_value = in_time_value;
     }
   }
 
-  private static @Nonnull Calendar getUTCTimeNow()
+  private static Calendar getUTCTimeNow()
   {
-    return Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    final TimeZone utc = TimeZone.getTimeZone("UTC");
+    final Calendar ci =
+      Calendar.getInstance(NullCheck.notNull(utc, "UTC time zone"));
+    assert ci != null;
+    return ci;
   }
 
-  @SuppressWarnings("unchecked") private static @Nonnull
-    Option<FileReference<?>>
+  @SuppressWarnings("unchecked") private static
+    OptionType<FileReference<?>>
     lookupDirectInArchive(
-      final @Nonnull Archive<?> a,
-      final @Nonnull PathVirtual path)
-      throws FilesystemError,
-        ConstraintError
+      final Archive<?> a,
+      final PathVirtual path)
+      throws FilesystemError
   {
-    final Option<?> r = a.lookup(path);
-    return (Option<FileReference<?>>) r;
+    final OptionType<?> r = a.lookup(path);
+    return (OptionType<FileReference<?>>) r;
   }
 
   /**
@@ -142,16 +159,18 @@ public final class Filesystem implements FSCapabilityAll
    * archive directory.
    * </p>
    * 
-   * @throws ConstraintError
-   *           Iff <code>log == null || archives == null</code>.
+   * @param log
+   *          The log interface
+   * @param archives
+   *          The archive directory
+   * @return A new filesystem
    */
 
-  public static @Nonnull Filesystem makeWithArchiveDirectory(
-    final @Nonnull Log log,
-    final @Nonnull PathReal archives)
-    throws ConstraintError
+  public static FilesystemType makeWithArchiveDirectory(
+    final LogUsableType log,
+    final PathReal archives)
   {
-    Constraints.constrainNotNull(archives, "Archive directory");
+    NullCheck.notNull(archives, "Archive directory");
     return new Filesystem(log, archives);
   }
 
@@ -161,44 +180,36 @@ public final class Filesystem implements FSCapabilityAll
    * constructed in this manner may only access archives on the classpath.
    * </p>
    * 
-   * @throws ConstraintError
-   *           Iff <code>log == null</code>.
+   * @param log
+   *          The log interface
+   * @return A new filesystem
    */
 
-  public static @Nonnull Filesystem makeWithoutArchiveDirectory(
-    final @Nonnull Log log)
-    throws ConstraintError
+  public static FilesystemType makeWithoutArchiveDirectory(
+    final LogUsableType log)
   {
     return new Filesystem(log, null);
   }
 
-  private final @Nonnull Log                               log;
-  private final @Nonnull Log                               log_directory;
-  private final @Nonnull Log                               log_mount;
-  private final @Nonnull Log                               log_lookup;
-  private final @Nonnull Option<PathReal>                  archives;
-  private final @Nonnull List<ArchiveHandler<?>>           handlers;
-  private final @Nonnull LinkedList<Archive<?>>            archive_list;
-  private final @Nonnull Map<PathVirtual, Calendar>        directories;
-  private final @Nonnull Map<PathVirtual, UpdateTimeEntry> time_updates;
+  private final LogUsableType                     log;
+  private final LogUsableType                     log_directory;
+  private final LogUsableType                     log_mount;
+  private final LogUsableType                     log_lookup;
+  private final OptionType<PathReal>              archives;
+  private final List<ArchiveHandler<?>>           handlers;
+  private final Deque<Archive<?>>                 archive_list;
+  private final Map<PathVirtual, Calendar>        directories;
+  private final Map<PathVirtual, UpdateTimeEntry> time_updates;
 
   private Filesystem(
-    final @Nonnull Log log,
-    final @CheckForNull PathReal archives)
-    throws ConstraintError
+    final LogUsableType in_log,
+    final @Nullable PathReal in_archives)
   {
-    this.log =
-      new Log(
-        Constraints.constrainNotNull(log, "Log interface"),
-        "filesystem");
-    this.log_directory = new Log(this.log, "directory");
-    this.log_mount = new Log(this.log, "mount");
-    this.log_lookup = new Log(this.log, "lookup");
-
-    this.archives =
-      archives == null
-        ? new Option.None<PathReal>()
-        : new Option.Some<PathReal>(archives);
+    this.log = NullCheck.notNull(in_log, "Log").with("filesystem");
+    this.log_directory = this.log.with("directory");
+    this.log_mount = this.log.with("mount");
+    this.log_lookup = this.log.with("lookup");
+    this.archives = Option.of(in_archives);
 
     this.handlers = new ArrayList<ArchiveHandler<?>>();
     this.handlers.add(new ArchiveDirectoryHandler());
@@ -212,8 +223,7 @@ public final class Filesystem implements FSCapabilityAll
   }
 
   @Override public void close()
-    throws ConstraintError,
-      FilesystemError
+    throws FilesystemError
   {
     for (final Archive<?> a : this.archive_list) {
       a.close();
@@ -226,15 +236,14 @@ public final class Filesystem implements FSCapabilityAll
   }
 
   @Override public void createDirectory(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+    final PathVirtual path)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(path, "Path");
+    NullCheck.notNull(path, "Path");
 
     this.log_directory.info("create-directory: " + path.toString());
 
-    final PathVirtualEnum e = new PathVirtualEnum(path);
+    final PathVirtualEnum e = PathVirtualEnum.enumerate(path);
     while (e.hasMoreElements()) {
       final PathVirtual ancestor = e.nextElement();
       this.createDirectoryDirect(ancestor);
@@ -248,112 +257,150 @@ public final class Filesystem implements FSCapabilityAll
    * fail. Otherwise, mark it as explicitly created.
    */
 
-  private void createDirectoryDirect(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError,
-      FilesystemError
+  private <T extends FSReference> void createDirectoryDirect(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    final Option<? extends FSReference> r = this.lookup(path);
-    switch (r.type) {
-      case OPTION_NONE:
-      {
-        this.directories.put(path, Filesystem.getUTCTimeNow());
-        break;
-      }
-      case OPTION_SOME:
-      {
-        final Some<? extends FSReference> s =
-          (Option.Some<? extends FSReference>) r;
+    final OptionType<T> r = this.lookup(path);
 
-        switch (s.value.type) {
+    r.acceptPartial(new OptionPartialVisitorType<T, Unit, FilesystemError>() {
+      @Override public Unit none(
+        final None<T> n)
+        throws FilesystemError
+      {
+        Filesystem.this.directories.put(path, Filesystem.getUTCTimeNow());
+        return Unit.unit();
+      }
+
+      @Override public Unit some(
+        final Some<T> s)
+        throws FilesystemError
+      {
+        final T rf = s.get();
+        switch (rf.getType()) {
           case FS_REF_ARCHIVE:
           {
-            final FSReferenceArchive ra = (FSReferenceArchive) s.value;
-            switch (ra.ref.type) {
+            final FSReferenceArchive ra = (FSReferenceArchive) rf;
+            switch (ra.ref.getType()) {
               case TYPE_DIRECTORY:
               {
-                this.directories.put(path, Filesystem.getUTCTimeNow());
-                return;
+                Filesystem.this.directories.put(
+                  path,
+                  Filesystem.getUTCTimeNow());
+                break;
               }
               case TYPE_FILE:
               {
                 throw FilesystemError.notDirectory(path.toString());
               }
             }
-
-            throw new UnreachableCodeException();
+            break;
           }
           case FS_REF_VIRTUAL_DIRECTORY:
           {
             break;
           }
         }
+
+        return Unit.unit();
       }
-    }
+    });
   }
 
   @Override public boolean exists(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError,
-      FilesystemError
+    final PathVirtual path)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(path, "Path");
-    return this.lookup(path).isSome();
+    NullCheck.notNull(path, "Path");
+    final Boolean r =
+      this.lookup(path).accept(
+        new OptionVisitorType<Filesystem.FSReference, Boolean>() {
+          @SuppressWarnings("null") @Override public Boolean none(
+            final None<FSReference> n)
+          {
+            return Boolean.FALSE;
+          }
+
+          @SuppressWarnings("null") @Override public Boolean some(
+            final Some<FSReference> s)
+          {
+            return Boolean.TRUE;
+          }
+        });
+    return r.booleanValue();
   }
 
   @Override public long getFileSize(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+    final PathVirtual path)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(path, "Path");
-
-    final Option<? extends FSReference> r = this.lookup(path);
-    switch (r.type) {
-      case OPTION_NONE:
-      {
-        throw FilesystemError.fileNotFound(path.toString());
-      }
-      case OPTION_SOME:
-      {
-        final Some<? extends FSReference> s =
-          (Option.Some<? extends FSReference>) r;
-
-        switch (s.value.type) {
-          case FS_REF_ARCHIVE:
-          {
-            final FSReferenceArchive ra = (FSReferenceArchive) s.value;
-            switch (ra.ref.type) {
-              case TYPE_DIRECTORY:
-              {
-                throw FilesystemError.notFile(path.toString());
-              }
-              case TYPE_FILE:
-              {
-                final Archive<?> a = ra.ref.archive;
-                return a.getFileSize(path.subtract(a.getMountPath()));
-              }
-            }
-
-            throw new UnreachableCodeException();
-          }
-          case FS_REF_VIRTUAL_DIRECTORY:
-          {
-            throw FilesystemError.notFile(path.toString());
-          }
-        }
-      }
-    }
-
-    throw new UnreachableCodeException();
+    NullCheck.notNull(path, "Path");
+    return this.getFileSizeActual(path).longValue();
   }
 
-  @Override public @Nonnull Calendar getModificationTime(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+  private <T extends FSReference> Long getFileSizeActual(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(path, "Path");
+    final OptionType<T> r = this.lookup(path);
+    return r
+      .acceptPartial(new OptionPartialVisitorType<T, Long, FilesystemError>() {
+        @Override public Long none(
+          final None<T> n)
+          throws FilesystemError
+        {
+          throw FilesystemError.fileNotFound(path.toString());
+        }
+
+        @Override public Long some(
+          final Some<T> s)
+          throws FilesystemError
+        {
+          final T rr = s.get();
+          switch (rr.getType()) {
+            case FS_REF_ARCHIVE:
+            {
+              final FSReferenceArchive ra = (FSReferenceArchive) rr;
+              switch (ra.ref.getType()) {
+                case TYPE_DIRECTORY:
+                {
+                  throw FilesystemError.notFile(path.toString());
+                }
+                case TYPE_FILE:
+                {
+                  final Archive<?> a = ra.ref.getArchive();
+
+                  /*
+                   * XXX: Under what conditions will an archive be null?
+                   */
+
+                  assert a != null;
+
+                  final Long q =
+                    Long.valueOf(a.getFileSize(path.subtract(a.getMountPath())));
+                  assert q != null;
+                  return q;
+                }
+              }
+
+              throw new UnreachableCodeException();
+            }
+            case FS_REF_VIRTUAL_DIRECTORY:
+            {
+              throw FilesystemError.notFile(path.toString());
+            }
+          }
+
+          throw new UnreachableCodeException();
+        }
+      });
+  }
+
+  @Override public Calendar getModificationTime(
+    final PathVirtual path)
+    throws FilesystemError
+  {
+    NullCheck.notNull(path, "Path");
     final Calendar t_in_archive = this.getModificationTimeActual(path);
     if (this.time_updates.containsKey(path)) {
       final UpdateTimeEntry u = this.time_updates.get(path);
@@ -374,45 +421,50 @@ public final class Filesystem implements FSCapabilityAll
    * @see #time_updates
    */
 
-  private @Nonnull Calendar getModificationTimeActual(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+  private <T extends FSReference> Calendar getModificationTimeActual(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    final Option<? extends FSReference> r = this.lookup(path);
-    switch (r.type) {
-      case OPTION_NONE:
-      {
-        throw FilesystemError.fileNotFound(path.toString());
-      }
-      case OPTION_SOME:
-      {
-        final Some<? extends FSReference> s =
-          (Option.Some<? extends FSReference>) r;
-
-        switch (s.value.type) {
-          case FS_REF_ARCHIVE:
-          {
-            final FSReferenceArchive ra = (FSReferenceArchive) s.value;
-            final Archive<?> a = ra.ref.archive;
-            return a.getModificationTime(path.subtract(a.getMountPath()));
-          }
-          case FS_REF_VIRTUAL_DIRECTORY:
-          {
-            final FSReferenceVirtualDirectory rvd =
-              (FSReferenceVirtualDirectory) s.value;
-            return rvd.mtime;
-          }
+    final OptionType<T> r = this.lookup(path);
+    return r
+      .acceptPartial(new OptionPartialVisitorType<T, Calendar, FilesystemError>() {
+        @Override public Calendar none(
+          final None<T> n)
+          throws FilesystemError
+        {
+          throw FilesystemError.fileNotFound(path.toString());
         }
-      }
-    }
 
-    throw new UnreachableCodeException();
+        @Override public Calendar some(
+          final Some<T> s)
+          throws FilesystemError
+        {
+          final T rr = s.get();
+          switch (rr.getType()) {
+            case FS_REF_ARCHIVE:
+            {
+              final FSReferenceArchive ra = (FSReferenceArchive) rr;
+              final Archive<?> a = ra.ref.getArchive();
+              /*
+               * XXX: Under what conditions can getArchive() return null?
+               */
+              assert a != null;
+              return a.getModificationTime(path.subtract(a.getMountPath()));
+            }
+            case FS_REF_VIRTUAL_DIRECTORY:
+            {
+              final FSReferenceVirtualDirectory rvd =
+                (FSReferenceVirtualDirectory) rr;
+              return rvd.mtime;
+            }
+          }
+
+          throw new UnreachableCodeException();
+        }
+      });
   }
 
-  @Override public @Nonnull
-    Deque<Pair<PathReal, PathVirtual>>
-    getMountedArchives()
+  @Override public Deque<Pair<PathReal, PathVirtual>> getMountedArchives()
   {
     final Deque<Pair<PathReal, PathVirtual>> result =
       new ArrayDeque<Pair<PathReal, PathVirtual>>();
@@ -421,7 +473,7 @@ public final class Filesystem implements FSCapabilityAll
     while (iter.hasNext()) {
       final Archive<?> a = iter.next();
       final Pair<PathReal, PathVirtual> p =
-        new Pair<PathReal, PathVirtual>(a.getRealPath(), a.getMountPath());
+        Pair.pair(a.getRealPath(), a.getMountPath());
       result.push(p);
     }
 
@@ -429,121 +481,148 @@ public final class Filesystem implements FSCapabilityAll
   }
 
   @Override public boolean isDirectory(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError,
-      FilesystemError
+    final PathVirtual path)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(path, "Path");
+    NullCheck.notNull(path, "Path");
+    return this.isDirectoryActual(path).booleanValue();
+  }
 
-    final Option<? extends FSReference> r = this.lookup(path);
-    switch (r.type) {
-      case OPTION_NONE:
-      {
-        return false;
-      }
-      case OPTION_SOME:
-      {
-        final Some<? extends FSReference> s =
-          (Option.Some<? extends FSReference>) r;
-
-        switch (s.value.type) {
-          case FS_REF_ARCHIVE:
-          {
-            final FSReferenceArchive ra = (FSReferenceArchive) s.value;
-            return ra.ref.type == Type.TYPE_DIRECTORY;
-          }
-          case FS_REF_VIRTUAL_DIRECTORY:
-          {
-            return true;
-          }
+  private <T extends FSReference> Boolean isDirectoryActual(
+    final PathVirtual path)
+    throws FilesystemError
+  {
+    final OptionType<T> r = this.lookup(path);
+    return r
+      .acceptPartial(new OptionPartialVisitorType<T, Boolean, FilesystemError>() {
+        @Override public Boolean none(
+          final None<T> n)
+          throws FilesystemError
+        {
+          return Filesystem.FALSE_NOT_NULL;
         }
-      }
-    }
 
-    throw new UnreachableCodeException();
+        @Override public Boolean some(
+          final Some<T> s)
+          throws FilesystemError
+        {
+          final T q = s.get();
+          switch (q.getType()) {
+            case FS_REF_ARCHIVE:
+            {
+              final FSReferenceArchive ra = (FSReferenceArchive) q;
+              final Boolean rq =
+                Boolean.valueOf(ra.ref.getType() == Type.TYPE_DIRECTORY);
+              assert rq != null;
+              return rq;
+            }
+            case FS_REF_VIRTUAL_DIRECTORY:
+            {
+              return Filesystem.TRUE_NOT_NULL;
+            }
+          }
+
+          throw new UnreachableCodeException();
+        }
+      });
   }
 
   @Override public boolean isFile(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError,
-      FilesystemError
+    final PathVirtual path)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(path, "Path");
-
+    NullCheck.notNull(path, "Path");
     this.log_lookup.info("is-file: " + path);
-
-    final Option<? extends FSReference> r = this.lookup(path);
-    switch (r.type) {
-      case OPTION_NONE:
-      {
-        return false;
-      }
-      case OPTION_SOME:
-      {
-        final Some<? extends FSReference> s =
-          (Option.Some<? extends FSReference>) r;
-
-        switch (s.value.type) {
-          case FS_REF_ARCHIVE:
-          {
-            final FSReferenceArchive ra = (FSReferenceArchive) s.value;
-            return ra.ref.type == Type.TYPE_FILE;
-          }
-          case FS_REF_VIRTUAL_DIRECTORY:
-          {
-            return false;
-          }
-        }
-      }
-    }
-
-    throw new UnreachableCodeException();
+    return this.isFileActual(path).booleanValue();
   }
 
-  @Override public @Nonnull SortedSet<String> listDirectory(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+  private <T extends FSReference> Boolean isFileActual(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(path, "Path");
+    final OptionType<T> r = this.lookup(path);
+    return r
+      .acceptPartial(new OptionPartialVisitorType<T, Boolean, FilesystemError>() {
+        @Override public Boolean none(
+          final None<T> n)
+          throws FilesystemError
+        {
+          return Filesystem.FALSE_NOT_NULL;
+        }
+
+        @Override public Boolean some(
+          final Some<T> s)
+          throws FilesystemError
+        {
+          final T rr = s.get();
+          switch (rr.getType()) {
+            case FS_REF_ARCHIVE:
+            {
+              final FSReferenceArchive ra = (FSReferenceArchive) rr;
+              final Boolean b =
+                Boolean.valueOf(ra.ref.getType() == Type.TYPE_FILE);
+              assert b != null;
+              return b;
+            }
+            case FS_REF_VIRTUAL_DIRECTORY:
+            {
+              return Filesystem.FALSE_NOT_NULL;
+            }
+          }
+
+          throw new UnreachableCodeException();
+        }
+      });
+  }
+
+  @Override public SortedSet<String> listDirectory(
+    final PathVirtual path)
+    throws FilesystemError
+  {
+    NullCheck.notNull(path, "Path");
 
     this.log_lookup.info("is-directory: " + path);
 
-    final Option<FSReference> ro = this.lookup(path);
-    switch (ro.type) {
-      case OPTION_NONE:
-      {
-        throw FilesystemError.fileNotFound(path.toString());
-      }
-      case OPTION_SOME:
-      {
-        final FSReference ref = ((Option.Some<FSReference>) ro).value;
-        switch (ref.type) {
-          case FS_REF_ARCHIVE:
-          {
-            final FSReferenceArchive ra = (FSReferenceArchive) ref;
-            if (ra.ref.type != Type.TYPE_DIRECTORY) {
-              throw FilesystemError.notDirectory(path.toString());
-            }
-            return this.listDirectoryInternal(path);
-          }
-          case FS_REF_VIRTUAL_DIRECTORY:
-          {
-            return this.listDirectoryInternal(path);
-          }
+    final OptionType<FSReference> ro = this.lookup(path);
+    return ro
+      .acceptPartial(new OptionPartialVisitorType<Filesystem.FSReference, SortedSet<String>, FilesystemError>() {
+        @Override public SortedSet<String> none(
+          final None<FSReference> n)
+          throws FilesystemError
+        {
+          throw FilesystemError.fileNotFound(path.toString());
         }
-      }
-    }
 
-    throw new UnreachableCodeException();
+        @Override public SortedSet<String> some(
+          final Some<FSReference> s)
+          throws FilesystemError
+        {
+          final FSReference ref = s.get();
+          switch (ref.getType()) {
+            case FS_REF_ARCHIVE:
+            {
+              final FSReferenceArchive ra = (FSReferenceArchive) ref;
+              if (ra.ref.getType() != Type.TYPE_DIRECTORY) {
+                throw FilesystemError.notDirectory(path.toString());
+              }
+              return Filesystem.this.listDirectoryInternal(path);
+            }
+            case FS_REF_VIRTUAL_DIRECTORY:
+            {
+              return Filesystem.this.listDirectoryInternal(path);
+            }
+          }
+
+          throw new UnreachableCodeException();
+        }
+      });
   }
 
-  private @Nonnull SortedSet<String> listDirectoryInternal(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError,
-      FilesystemError
+  private SortedSet<String> listDirectoryInternal(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    final TreeSet<String> items = new TreeSet<String>();
+    final SortedSet<String> items = new TreeSet<String>();
 
     /**
      * Take the union of the sets of unshadowed files in the archive stack.
@@ -587,10 +666,13 @@ public final class Filesystem implements FSCapabilityAll
      */
 
     for (final PathVirtual d : this.directories.keySet()) {
+      assert d != null;
+
       if (path.isParentOf(d)) {
-        final Option<String> name_o = d.getBaseName();
-        switch (name_o.type) {
-          case OPTION_NONE:
+        final OptionType<String> name_o = d.getBaseName();
+        name_o.accept(new OptionVisitorType<String, Unit>() {
+          @Override public Unit none(
+            final None<String> n)
           {
             /**
              * If path is a parent of d, then d cannot be root.
@@ -598,11 +680,14 @@ public final class Filesystem implements FSCapabilityAll
 
             throw new UnreachableCodeException();
           }
-          case OPTION_SOME:
+
+          @Override public Unit some(
+            final Some<String> s)
           {
-            items.add(((Option.Some<String>) name_o).value);
+            items.add(s.get());
+            return Unit.unit();
           }
-        }
+        });
       }
     }
 
@@ -619,10 +704,9 @@ public final class Filesystem implements FSCapabilityAll
    * </p>
    */
 
-  private <T extends FSReference> Option<T> lookup(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError,
-      FilesystemError
+  private <T extends FSReference> OptionType<T> lookup(
+    final PathVirtual path)
+    throws FilesystemError
   {
     this.log_lookup.debug(path.toString());
 
@@ -631,7 +715,7 @@ public final class Filesystem implements FSCapabilityAll
      * directories.
      */
 
-    final PathVirtualEnum e = new PathVirtualEnum(path);
+    final PathVirtualEnum e = PathVirtualEnum.enumerate(path);
     while (e.hasMoreElements()) {
       final PathVirtual ancestor = e.nextElement();
       this.lookupDirectAssertIsDirectory(ancestor);
@@ -644,10 +728,9 @@ public final class Filesystem implements FSCapabilityAll
     return this.lookupDirect(path);
   }
 
-  private <T extends FSReference> Option<T> lookupDirect(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+  private <T extends FSReference> OptionType<T> lookupDirect(
+    final PathVirtual path)
+    throws FilesystemError
   {
     /**
      * Check the list of archives for <code>path</code>.
@@ -664,30 +747,32 @@ public final class Filesystem implements FSCapabilityAll
         final PathVirtual a_path = path.subtract(mount);
 
         try {
-          final Option<FileReference<?>> r =
+          final OptionType<FileReference<?>> r =
             Filesystem.lookupDirectInArchive(a, a_path);
 
-          switch (r.type) {
-            case OPTION_NONE:
-            {
-              /**
-               * This archive did not contain the requested path.
-               */
-              break;
-            }
-            case OPTION_SOME:
-            {
-              /**
-               * This archive contained the requested path, return it.
-               */
+          if (r.isSome()) {
 
-              final Some<FileReference<?>> s =
-                (Option.Some<FileReference<?>>) r;
-              @SuppressWarnings("unchecked") final T f =
-                (T) new FSReferenceArchive(s.value);
-              return new Option.Some<T>(f);
-            }
+            /**
+             * This archive contained the requested path, return it.
+             */
+
+            return r
+              .mapPartial(new PartialFunctionType<FileReference<?>, T, FilesystemError>() {
+                @Override public T call(
+                  final FileReference<?> x)
+                  throws FilesystemError
+                {
+                  @SuppressWarnings("unchecked") final T y =
+                    (T) new FSReferenceArchive(x);
+                  return y;
+                }
+              });
           }
+
+          /**
+           * This archive did not contain the requested path.
+           */
+
         } catch (final FilesystemError e) {
 
           /**
@@ -714,18 +799,20 @@ public final class Filesystem implements FSCapabilityAll
      */
 
     if (this.directories.containsKey(path)) {
+      final Calendar d = this.directories.get(path);
+      assert d != null;
       final FSReferenceVirtualDirectory r =
-        new FSReferenceVirtualDirectory(path, this.directories.get(path));
-      @SuppressWarnings("unchecked") final Some<T> ro =
-        new Option.Some<T>((T) r);
-      return ro;
+        new FSReferenceVirtualDirectory(path, d);
+      @SuppressWarnings("unchecked") final OptionType<T> rt =
+        (OptionType<T>) Option.some(r);
+      return rt;
     }
 
     /**
      * No object exists at <code>path</code>.
      */
 
-    return new Option.None<T>();
+    return Option.none();
   }
 
   /**
@@ -745,25 +832,27 @@ public final class Filesystem implements FSCapabilityAll
 
   private <T extends FSReference> void lookupDirectAssertIsDirectory(
     final PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+    throws FilesystemError
   {
-    final Option<T> r = this.lookupDirect(path);
-    switch (r.type) {
-      case OPTION_NONE:
+    final OptionType<T> r = this.lookupDirect(path);
+    r.acceptPartial(new OptionPartialVisitorType<T, Unit, FilesystemError>() {
+      @Override public Unit none(
+        final None<T> n)
+        throws FilesystemError
       {
         throw FilesystemError.fileNotFound(path.toString());
       }
-      case OPTION_SOME:
-      {
-        final Some<? extends FSReference> s =
-          (Option.Some<? extends FSReference>) r;
 
-        switch (s.value.type) {
+      @Override public Unit some(
+        final Some<T> s)
+        throws FilesystemError
+      {
+        final T x = s.get();
+        switch (x.getType()) {
           case FS_REF_ARCHIVE:
           {
-            final FSReferenceArchive ra = (FSReferenceArchive) s.value;
-            if (ra.ref.type != Type.TYPE_DIRECTORY) {
+            final FSReferenceArchive ra = (FSReferenceArchive) x;
+            if (ra.ref.getType() != Type.TYPE_DIRECTORY) {
               throw FilesystemError.notDirectory(path.toString());
             }
             break;
@@ -773,64 +862,75 @@ public final class Filesystem implements FSCapabilityAll
             break;
           }
         }
+
+        return Unit.unit();
       }
-    }
+    });
   }
 
   @Override public void mountArchive(
-    final @Nonnull String archive,
-    final @Nonnull PathVirtual mount)
-    throws ConstraintError,
-      FilesystemError
+    final String archive,
+    final PathVirtual mount)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(archive, "Archive name");
-    Constraints.constrainNotNull(mount, "Mount path");
-    Constraints.constrainArbitrary(
-      Name.isValid(archive),
-      "Archive name is valid");
+    NullCheck.notNull(archive, "Archive name");
+    NullCheck.notNull(mount, "Mount path");
+
+    if (Name.isValid(archive) == false) {
+      throw new FilesystemError(
+        Code.FS_ERROR_CONSTRAINT_ERROR,
+        "Archive name is not valid");
+    }
 
     this.log_mount.info("mount-archive: " + archive + " - " + mount);
 
-    switch (this.archives.type) {
-      case OPTION_NONE:
-      {
-        throw FilesystemError.archiveNoDirectory(archive);
-      }
-      case OPTION_SOME:
-      {
-        final Some<PathReal> base = (Option.Some<PathReal>) this.archives;
-        final File real = new File(new File(base.value.toString()), archive);
-
-        if (real.exists() == false) {
-          throw FilesystemError.archiveNonexistent(archive.toString());
+    this.archives
+      .acceptPartial(new OptionPartialVisitorType<PathReal, Unit, FilesystemError>() {
+        @Override public Unit none(
+          final None<PathReal> n)
+          throws FilesystemError
+        {
+          throw FilesystemError.archiveNoDirectory(archive);
         }
 
-        this.mountInternal(new PathReal(real.toString()), mount);
-      }
-    }
+        @Override public Unit some(
+          final Some<PathReal> s)
+          throws FilesystemError
+        {
+          final File real = new File(new File(s.get().toString()), archive);
+
+          if (real.exists() == false) {
+            throw FilesystemError.archiveNonexistent(archive);
+          }
+
+          Filesystem.this.mountInternal(new PathReal(real), mount);
+          return Unit.unit();
+        }
+      });
   }
 
   @Override public void mountArchiveFromAnywhere(
-    final @Nonnull File archive,
-    final @Nonnull PathVirtual mount)
-    throws ConstraintError,
-      FilesystemError
+    final File archive,
+    final PathVirtual mount)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(archive, "Archive path");
-    Constraints.constrainNotNull(mount, "Mount path");
+    NullCheck.notNull(archive, "Archive path");
+    NullCheck.notNull(mount, "Mount path");
 
     this.log_mount.info("mount-archive: " + archive + " - " + mount);
 
     if (archive.exists() == false) {
-      throw FilesystemError.archiveNonexistent(archive.toString());
+      final String as = archive.toString();
+      assert as != null;
+      throw FilesystemError.archiveNonexistent(as);
     }
 
-    this.mountInternal(new PathReal(archive.toString()), mount);
+    this.mountInternal(new PathReal(archive), mount);
   }
 
   private void mountCheckArchiveStack(
-    final @Nonnull PathReal archive,
-    final @Nonnull PathVirtual mount)
+    final PathReal archive,
+    final PathVirtual mount)
     throws FilesystemError
   {
     for (final Archive<?> a : this.archive_list) {
@@ -840,81 +940,88 @@ public final class Filesystem implements FSCapabilityAll
       if (a_p.equals(archive) && a_m.equals(mount)) {
         final String a_name = archive.toFile().getName();
         final String m_name = mount.toString();
+        assert a_name != null;
         throw FilesystemError.archiveAlreadyMounted(a_name, m_name);
       }
     }
   }
 
   @Override public void mountClasspathArchive(
-    final @Nonnull Class<?> c,
-    final @Nonnull PathVirtual mount)
-    throws ConstraintError,
-      FilesystemError
+    final Class<?> c,
+    final PathVirtual mount)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(c, "Class");
-    Constraints.constrainNotNull(mount, "Mount path");
+    NullCheck.notNull(c, "Class");
+    NullCheck.notNull(mount, "Mount path");
 
     this.log_mount.info("mount-classpath-archive: " + c + " - " + mount);
 
-    Constraints.constrainNotNull(c, "Class");
+    NullCheck.notNull(c, "Class");
     final String cname = c.getCanonicalName();
-    Constraints.constrainNotNull(cname, "Class canonical name");
+    NullCheck.notNull(cname, "Class canonical name");
 
     final String cname_s = cname.replace('.', '/');
     final String cname_k = cname_s + ".class";
 
     final ClassLoader loader = c.getClassLoader();
     final URL url = loader.getResource(cname_k);
-
     this.log_mount.debug("mount-classpath-archive: url " + url);
+
     final String mount_path =
-      ClassURIHandling.getClassContainerPath(url, cname_k);
+      ClassURIHandling.getClassContainerPath(
+        NullCheck.notNull(url, "URL from ClassLoader"),
+        cname_k);
     this.log_mount.debug("mount-classpath-archive: actual " + mount_path);
 
     this.mountInternal(new PathReal(mount_path), mount);
   }
 
-  private void mountInternal(
-    final @Nonnull PathReal archive,
-    final @Nonnull PathVirtual mount)
-    throws FilesystemError,
-      ConstraintError
+  private <T extends FSReference> void mountInternal(
+    final PathReal archive,
+    final PathVirtual mount)
+    throws FilesystemError
   {
     this.mountCheckArchiveStack(archive, mount);
 
     final ArchiveHandler<?> handler = this.mountInternalCheckHandler(archive);
-    final Option<FSReference> r = this.lookup(mount);
-    switch (r.type) {
-      case OPTION_NONE:
+    final OptionType<T> r = this.lookup(mount);
+
+    r.acceptPartial(new OptionPartialVisitorType<T, Unit, FilesystemError>() {
+      @Override public Unit none(
+        final None<T> n)
+        throws FilesystemError
       {
         throw FilesystemError.fileNotFound(mount.toString());
       }
-      case OPTION_SOME:
+
+      @Override public Unit some(
+        final Some<T> s)
+        throws FilesystemError
       {
-        final Some<FSReference> s = (Option.Some<FSReference>) r;
-        switch (s.value.type) {
+        switch (s.get().getType()) {
           case FS_REF_ARCHIVE:
           {
-            this.createDirectory(mount);
-            this.mountInternalActual(handler, archive, mount);
-            return;
+            Filesystem.this.createDirectory(mount);
+            Filesystem.this.mountInternalActual(handler, archive, mount);
+            return Unit.unit();
           }
           case FS_REF_VIRTUAL_DIRECTORY:
           {
-            this.mountInternalActual(handler, archive, mount);
-            return;
+            Filesystem.this.mountInternalActual(handler, archive, mount);
+            return Unit.unit();
           }
         }
+
+        throw new UnreachableCodeException();
       }
-    }
+    });
   }
 
   private void mountInternalActual(
-    final @Nonnull ArchiveHandler<?> handler,
-    final @Nonnull PathReal archive,
-    final @Nonnull PathVirtual mount)
-    throws FilesystemError,
-      ConstraintError
+    final ArchiveHandler<?> handler,
+    final PathReal archive,
+    final PathVirtual mount)
+    throws FilesystemError
   {
     final Archive<?> a = handler.load(this.log, archive, mount);
     this.archive_list.addFirst(a);
@@ -925,8 +1032,8 @@ public final class Filesystem implements FSCapabilityAll
    * error.
    */
 
-  private @Nonnull ArchiveHandler<?> mountInternalCheckHandler(
-    final @Nonnull PathReal archive)
+  private ArchiveHandler<?> mountInternalCheckHandler(
+    final PathReal archive)
     throws FilesystemError
   {
     for (final ArchiveHandler<?> handler : this.handlers) {
@@ -938,59 +1045,72 @@ public final class Filesystem implements FSCapabilityAll
     throw FilesystemError.archiveTypeUnsupported(archive.toString());
   }
 
-  @Override public @Nonnull InputStream openFile(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+  @Override public InputStream openFile(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(path, "Path");
+    NullCheck.notNull(path, "Path");
+    return this.openFileActual(path);
+  }
 
-    final Option<? extends FSReference> r = this.lookup(path);
-    switch (r.type) {
-      case OPTION_NONE:
-      {
-        throw FilesystemError.fileNotFound(path.toString());
-      }
-      case OPTION_SOME:
-      {
-        final Some<? extends FSReference> s =
-          (Option.Some<? extends FSReference>) r;
-
-        switch (s.value.type) {
-          case FS_REF_ARCHIVE:
-          {
-            final FSReferenceArchive ra = (FSReferenceArchive) s.value;
-            switch (ra.ref.type) {
-              case TYPE_DIRECTORY:
-              {
-                throw FilesystemError.notFile(path.toString());
-              }
-              case TYPE_FILE:
-              {
-                final Archive<?> a = ra.ref.archive;
-                return a.openFile(path.subtract(a.getMountPath()));
-              }
-            }
-
-            throw new UnreachableCodeException();
-          }
-          case FS_REF_VIRTUAL_DIRECTORY:
-          {
-            throw FilesystemError.notFile(path.toString());
-          }
+  private <T extends FSReference> InputStream openFileActual(
+    final PathVirtual path)
+    throws FilesystemError
+  {
+    final OptionType<T> r = this.lookup(path);
+    return r
+      .acceptPartial(new OptionPartialVisitorType<T, InputStream, FilesystemError>() {
+        @Override public InputStream none(
+          final None<T> n)
+          throws FilesystemError
+        {
+          throw FilesystemError.fileNotFound(path.toString());
         }
-      }
-    }
 
-    throw new UnreachableCodeException();
+        @Override public InputStream some(
+          final Some<T> s)
+          throws FilesystemError
+        {
+          switch (s.get().getType()) {
+            case FS_REF_ARCHIVE:
+            {
+              final FSReferenceArchive ra = (FSReferenceArchive) s.get();
+              switch (ra.ref.getType()) {
+                case TYPE_DIRECTORY:
+                {
+                  throw FilesystemError.notFile(path.toString());
+                }
+                case TYPE_FILE:
+                {
+                  final Archive<?> a = ra.ref.getArchive();
+
+                  /*
+                   * XXX: Under what conditions can getArchive() return null?
+                   */
+
+                  assert a != null;
+                  return a.openFile(path.subtract(a.getMountPath()));
+                }
+              }
+
+              throw new UnreachableCodeException();
+            }
+            case FS_REF_VIRTUAL_DIRECTORY:
+            {
+              throw FilesystemError.notFile(path.toString());
+            }
+          }
+
+          throw new UnreachableCodeException();
+        }
+      });
   }
 
   @Override public void unmount(
-    final @Nonnull PathVirtual mount)
-    throws ConstraintError,
-      FilesystemError
+    final PathVirtual mount)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(mount, "Path");
+    NullCheck.notNull(mount, "Path");
 
     this.log_mount.info("unmount: " + mount);
 
@@ -1016,12 +1136,11 @@ public final class Filesystem implements FSCapabilityAll
   }
 
   @Override public void updateModificationTime(
-    final @Nonnull PathVirtual path,
-    final @Nonnull Calendar t)
-    throws ConstraintError,
-      FilesystemError
+    final PathVirtual path,
+    final Calendar t)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(path, "Path");
+    NullCheck.notNull(path, "Path");
 
     final Calendar ct = this.getModificationTimeActual(path);
     this.time_updates.put(path, new UpdateTimeEntry(ct, t));

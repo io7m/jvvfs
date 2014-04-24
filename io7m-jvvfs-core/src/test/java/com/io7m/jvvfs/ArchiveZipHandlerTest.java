@@ -23,14 +23,11 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.io7m.jaux.Constraints.ConstraintError;
-
 public final class ArchiveZipHandlerTest
 {
   @SuppressWarnings("static-method") @Test public void testHandleJar()
     throws FileNotFoundException,
-      IOException,
-      ConstraintError
+      IOException
   {
     final ArchiveZipHandler h = new ArchiveZipHandler();
     final File tempdir = TestData.getTestDataDirectory();
@@ -41,8 +38,7 @@ public final class ArchiveZipHandlerTest
 
   @SuppressWarnings("static-method") @Test public void testHandleUnknown()
     throws FileNotFoundException,
-      IOException,
-      ConstraintError
+      IOException
   {
     final ArchiveZipHandler h = new ArchiveZipHandler();
     final File tempdir = TestData.getTestDataDirectory();
@@ -53,8 +49,7 @@ public final class ArchiveZipHandlerTest
 
   @SuppressWarnings("static-method") @Test public void testHandleZip()
     throws FileNotFoundException,
-      IOException,
-      ConstraintError
+      IOException
   {
     final ArchiveZipHandler h = new ArchiveZipHandler();
     final File tempdir = TestData.getTestDataDirectory();

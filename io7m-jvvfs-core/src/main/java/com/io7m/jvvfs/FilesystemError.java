@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,8 +16,6 @@
 
 package com.io7m.jvvfs;
 
-import javax.annotation.Nonnull;
-
 /**
  * <p>
  * Exception type raised during filesystem operations.
@@ -32,6 +30,12 @@ public final class FilesystemError extends Exception
 
   public static enum Code
   {
+    /**
+     * The user tried to load an archive twice at the same location.
+     */
+
+    FS_ERROR_ARCHIVE_ALREADY_MOUNTED,
+
     /**
      * An archive appeared to be corrupt and could not be loaded.
      */
@@ -59,12 +63,6 @@ public final class FilesystemError extends Exception
     FS_ERROR_ARCHIVE_TYPE_UNSUPPORTED,
 
     /**
-     * The user tried to load an archive twice at the same location.
-     */
-
-    FS_ERROR_ARCHIVE_ALREADY_MOUNTED,
-
-    /**
      * An internal constraint error occurred; this indicates a bug in
      * <code>jvvfs</code>.
      */
@@ -78,11 +76,10 @@ public final class FilesystemError extends Exception
     FS_ERROR_IO_ERROR,
 
     /**
-     * The object in question was expected to be a file, but was a something
-     * else instead.
+     * The object in question does not exist.
      */
 
-    FS_ERROR_NOT_A_FILE,
+    FS_ERROR_NONEXISTENT,
 
     /**
      * The object in question was expected to be a directory, but was a
@@ -92,15 +89,16 @@ public final class FilesystemError extends Exception
     FS_ERROR_NOT_A_DIRECTORY,
 
     /**
-     * The object in question does not exist.
+     * The object in question was expected to be a file, but was a something
+     * else instead.
      */
 
-    FS_ERROR_NONEXISTENT
+    FS_ERROR_NOT_A_FILE
   }
 
   private static final long serialVersionUID = -2828062375812503115L;
 
-  static @Nonnull FilesystemError archiveAlreadyMounted(
+  static FilesystemError archiveAlreadyMounted(
     final String archive,
     final String mount)
   {
@@ -109,7 +107,7 @@ public final class FilesystemError extends Exception
       "archive '" + archive + "' is already mounted at '" + mount + "'");
   }
 
-  static @Nonnull FilesystemError archiveDamaged(
+  static FilesystemError archiveDamaged(
     final String archive,
     final String message)
   {
@@ -119,7 +117,7 @@ public final class FilesystemError extends Exception
       + message);
   }
 
-  static @Nonnull FilesystemError archiveNoDirectory(
+  static FilesystemError archiveNoDirectory(
     final String file)
   {
     return new FilesystemError(
@@ -129,7 +127,7 @@ public final class FilesystemError extends Exception
         + "' but no archive directory was specified");
   }
 
-  static @Nonnull FilesystemError archiveNonexistent(
+  static FilesystemError archiveNonexistent(
     final String file)
   {
     return new FilesystemError(Code.FS_ERROR_ARCHIVE_NONEXISTENT, "archive '"
@@ -137,7 +135,7 @@ public final class FilesystemError extends Exception
       + "' does not exist");
   }
 
-  static @Nonnull FilesystemError archiveTypeUnsupported(
+  static FilesystemError archiveTypeUnsupported(
     final String file)
   {
     return new FilesystemError(
@@ -145,7 +143,7 @@ public final class FilesystemError extends Exception
       "no handler for file '" + file + "'");
   }
 
-  static @Nonnull FilesystemError fileNotFound(
+  static FilesystemError fileNotFound(
     final String name)
   {
     return new FilesystemError(Code.FS_ERROR_NONEXISTENT, "file not found '"
@@ -153,13 +151,13 @@ public final class FilesystemError extends Exception
       + "'");
   }
 
-  static @Nonnull FilesystemError ioError(
-    final @Nonnull Exception e)
+  static FilesystemError ioError(
+    final Exception e)
   {
     return new FilesystemError(e);
   }
 
-  static @Nonnull FilesystemError notDirectory(
+  static FilesystemError notDirectory(
     final String path)
   {
     return new FilesystemError(Code.FS_ERROR_NOT_A_DIRECTORY, "file '"
@@ -167,7 +165,7 @@ public final class FilesystemError extends Exception
       + "' is not a directory");
   }
 
-  static @Nonnull FilesystemError notFile(
+  static FilesystemError notFile(
     final String path)
   {
     return new FilesystemError(Code.FS_ERROR_NOT_A_FILE, "directory '"
@@ -175,28 +173,28 @@ public final class FilesystemError extends Exception
       + "' is not a file");
   }
 
-  private final @Nonnull Code code;
+  private final Code code;
 
   FilesystemError(
-    final @Nonnull Code code,
-    final @Nonnull String message)
+    final Code in_code,
+    final String message)
   {
     super(message);
-    this.code = code;
+    this.code = in_code;
   }
 
   FilesystemError(
-    final @Nonnull Exception cause)
+    final Exception cause)
   {
     super(cause);
     this.code = Code.FS_ERROR_IO_ERROR;
   }
 
   /**
-   * Retrieve the error code associated with the exception.
+   * @return The error code associated with the exception.
    */
 
-  public @Nonnull Code getCode()
+  public Code getCode()
   {
     return this.code;
   }

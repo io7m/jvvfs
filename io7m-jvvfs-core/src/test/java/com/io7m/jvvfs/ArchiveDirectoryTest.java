@@ -20,12 +20,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.annotation.Nonnull;
-
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.io7m.jaux.Constraints.ConstraintError;
 import com.io7m.jvvfs.ArchiveDirectory.ArchiveDirectoryReference;
 import com.io7m.jvvfs.FileReference.Type;
 import com.io7m.jvvfs.FilesystemError.Code;
@@ -33,12 +30,11 @@ import com.io7m.jvvfs.FilesystemError.Code;
 public final class ArchiveDirectoryTest extends
   ArchiveContract<ArchiveDirectoryKind>
 {
-  @Override @Nonnull Archive<ArchiveDirectoryKind> getArchive(
-    final @Nonnull String basename,
-    final @Nonnull PathVirtual mount)
+  @Override Archive<ArchiveDirectoryKind> getArchive(
+    final String basename,
+    final PathVirtual mount)
     throws FileNotFoundException,
-      IOException,
-      ConstraintError
+      IOException
   {
     final File tempdir = TestData.getTestDataDirectory();
     final PathReal r = new PathReal(new File(tempdir, basename).toString());
@@ -48,7 +44,6 @@ public final class ArchiveDirectoryTest extends
   @Test(expected = FilesystemError.class) public void testFileVanished()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<ArchiveDirectoryKind> a =

@@ -28,8 +28,6 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
-
 import net.java.quickcheck.Characteristic;
 import net.java.quickcheck.QuickCheck;
 import net.java.quickcheck.characteristic.AbstractCharacteristic;
@@ -37,20 +35,256 @@ import net.java.quickcheck.characteristic.AbstractCharacteristic;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnreachableCodeException;
-import com.io7m.jaux.functional.Pair;
+import com.io7m.jfunctional.Pair;
+import com.io7m.jlog.LogUsableType;
+import com.io7m.jnull.NullCheckException;
+import com.io7m.junreachable.UnreachableCodeException;
 import com.io7m.jvvfs.FilesystemError.Code;
+import com.io7m.jvvfs.tests.PathVirtualTest;
+import com.io7m.jvvfs.tests.TestUtilities;
+import com.io7m.jvvfs.tests.ValidNameGenerator;
 
-public class FilesystemTest
+@SuppressWarnings("static-method") public class FilesystemTest
 {
-  private static @Nonnull Filesystem makeFS()
+  /**
+   * Passing <code>null</code> to {@link Filesystem#exists(PathVirtual)}
+   * fails.
+   */
+
+  @Test(expected = NullCheckException.class) public void testExistsNull()
+    throws IOException,
+      FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.exists((PathVirtual) TestUtilities.actuallyNull());
+  }
+
+  /**
+   * Passing <code>null</code> to {@link Filesystem#isDirectory(PathVirtual)}
+   * fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testIsDirectoryNull()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.isDirectory((PathVirtual) TestUtilities.actuallyNull());
+  }
+
+  /**
+   * Passing <code>null</code> to {@link Filesystem#isFile(PathVirtual)}
+   * fails.
+   */
+
+  @Test(expected = NullCheckException.class) public void testIsFileNull()
+    throws IOException,
+      FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.isFile((PathVirtual) TestUtilities.actuallyNull());
+  }
+
+  /**
+   * Listing null fails.
+   */
+
+  @Test(expected = NullCheckException.class) public void testListNull()
+    throws IOException,
+      FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.listDirectory((PathVirtual) TestUtilities.actuallyNull());
+  }
+
+  /**
+   * Passing <code>null</code> as an archive directory fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMakeWithArchivesNullDirectory()
+      throws IOException
+  {
+    Filesystem.makeWithArchiveDirectory(
+      TestData.getLog(),
+      (PathReal) TestUtilities.actuallyNull());
+  }
+
+  /**
+   * Passing <code>null</code> as a log interface fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMakeWithArchivesNullLog()
+  {
+    Filesystem.makeWithArchiveDirectory(
+      (LogUsableType) TestUtilities.actuallyNull(),
+      new PathReal("nonexistent"));
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountArchiveClasspathNullArchive()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountClasspathArchive(
+      (Class<?>) TestUtilities.actuallyNull(),
+      PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountArchiveClasspathNullMount()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountClasspathArchive(
+      FilesystemTest.class,
+      (PathVirtual) TestUtilities.actuallyNull());
+  }
+
+  /**
+   * Passing an invalid archive name fails.
+   */
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testMountArchiveInvalidArchiveName()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("..", PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchive(String, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountArchiveNullArchive()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.mountArchive((String) TestUtilities.actuallyNull(), PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchive(String, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountArchiveNullMount()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.mountArchive("xyz", (PathVirtual) TestUtilities.actuallyNull());
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountClasspathArchiveNullClass()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountClasspathArchive(
+      (Class<?>) TestUtilities.actuallyNull(),
+      PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountClasspathArchiveNullMount()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountClasspathArchive(
+      FilesystemTest.class,
+      (PathVirtual) TestUtilities.actuallyNull());
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountFromAnywhereNullArchive()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountArchiveFromAnywhere(
+      (File) TestUtilities.actuallyNull(),
+      PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountFromAnywhereNullPath()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountArchiveFromAnywhere(
+      new File("nonexistent"),
+      (PathVirtual) TestUtilities.actuallyNull());
+  }
+
+  public static FSCapabilityAllType makeFS()
     throws FileNotFoundException,
-      IOException,
-      ConstraintError
+      IOException
   {
     final File dir = TestData.getTestDataDirectory();
-    final Filesystem fs =
+    final FSCapabilityAllType fs =
       Filesystem.makeWithArchiveDirectory(
         TestData.getLog(),
         new PathReal(dir.toString()));
@@ -60,19 +294,18 @@ public class FilesystemTest
   static void runWithNameGenerator(
     final Characteristic<String> c)
   {
-    QuickCheck.forAll(new NameTest.ValidNameGenerator(), c);
+    QuickCheck.forAll(new ValidNameGenerator(), c);
   }
 
   /**
    * Closing a filesystem with directories removes the directories.
    */
 
-  @SuppressWarnings("static-method") @Test public void testCloseDirectories()
+  @Test public void testCloseDirectories()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.createDirectory(PathVirtual.ofString("/a"));
     fs.createDirectory(PathVirtual.ofString("/b"));
@@ -91,12 +324,11 @@ public class FilesystemTest
    * Closing an empty filesystem has no observable effect.
    */
 
-  @SuppressWarnings("static-method") @Test public void testCloseEmpty()
+  @Test public void testCloseEmpty()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
     fs.close();
   }
 
@@ -104,12 +336,11 @@ public class FilesystemTest
    * Closing a filesystem with mounted archives removes the mounts.
    */
 
-  @SuppressWarnings("static-method") @Test public void testCloseMounted()
+  @Test public void testCloseMounted()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("files1-3.zip", PathVirtual.ROOT);
     Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
@@ -130,12 +361,11 @@ public class FilesystemTest
    * map).
    */
 
-  @SuppressWarnings("static-method") @Test public void testCloseMountedMap()
+  @Test public void testCloseMountedMap()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.createDirectory(PathVirtual.ofString("/a"));
     fs.createDirectory(PathVirtual.ofString("/b"));
@@ -155,17 +385,14 @@ public class FilesystemTest
    * Creating otherwise nonexistent directories works.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testCreateDirectoryNonexistent()
-      throws IOException,
-        ConstraintError
+  @Test public void testCreateDirectoryNonexistent()
+    throws IOException
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     FilesystemTest.runWithNameGenerator(new AbstractCharacteristic<String>() {
       @Override protected void doSpecify(
-        final @Nonnull String name)
+        final String name)
         throws Throwable
       {
         final PathVirtual path = PathVirtual.ofString("/" + name);
@@ -182,23 +409,20 @@ public class FilesystemTest
    * directories.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testCreateDirectorySubdirectoriesNonexistent()
-      throws IOException,
-        ConstraintError
+  @Test public void testCreateDirectorySubdirectoriesNonexistent()
+    throws IOException
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     PathVirtualTest
       .runWithGenerator(new AbstractCharacteristic<PathVirtual>() {
         @Override protected void doSpecify(
-          final @Nonnull PathVirtual path)
+          final PathVirtual path)
           throws Throwable
         {
           fs.createDirectory(path);
 
-          final PathVirtualEnum e = new PathVirtualEnum(path);
+          final PathVirtualEnum e = PathVirtualEnum.enumerate(path);
           while (e.hasMoreElements()) {
             final PathVirtual ancestor = e.nextElement();
             Assert.assertTrue(fs.isDirectory(ancestor));
@@ -217,17 +441,14 @@ public class FilesystemTest
    * Nonexistent objects do not exist.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testExistsNonexistent()
-      throws IOException,
-        ConstraintError
+  @Test public void testExistsNonexistent()
+    throws IOException
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     FilesystemTest.runWithNameGenerator(new AbstractCharacteristic<String>() {
       @Override protected void doSpecify(
-        final @Nonnull String name)
+        final String name)
         throws Throwable
       {
         Assert.assertFalse(fs.exists(PathVirtual.ofString("/" + name)));
@@ -239,14 +460,13 @@ public class FilesystemTest
    * Nonexistent parents are signalled when checking existence.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testExistsNonexistentParent()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
     try {
       fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
     } catch (final FilesystemError e) {
@@ -262,31 +482,14 @@ public class FilesystemTest
   }
 
   /**
-   * Passing <code>null</code> to {@link Filesystem#exists(PathVirtual)}
-   * fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testExistsNull()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-    fs.exists(null);
-  }
-
-  /**
    * Opening a file works.
    */
 
-  @SuppressWarnings("static-method") @Test public void testFileOpenCorrect()
+  @Test public void testFileOpenCorrect()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("single-file.zip", PathVirtual.ROOT);
 
@@ -305,14 +508,11 @@ public class FilesystemTest
    * Opening a directory fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
-    void
-    testFileOpenDirectory()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test(expected = FilesystemError.class) public void testFileOpenDirectory()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
@@ -332,14 +532,13 @@ public class FilesystemTest
    * Opening a virtual directory fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testFileOpenDirectoryVirtual()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.createDirectory(PathVirtual.ofString("/bin"));
@@ -359,14 +558,13 @@ public class FilesystemTest
    * Opening a file with a file ancestor fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testFileOpenFileAncestor()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
@@ -386,14 +584,13 @@ public class FilesystemTest
    * Opening a nonexistent file fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testFileOpenNonexistent()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.openFile(PathVirtual.ofString("/nonexistent"));
@@ -407,14 +604,11 @@ public class FilesystemTest
    * Opening root within an archive, fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
-    void
-    testFileOpenRootZip()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test(expected = FilesystemError.class) public void testFileOpenRootZip()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("complex.zip", PathVirtual.ROOT);
@@ -434,12 +628,11 @@ public class FilesystemTest
    * Retrieving the size of a file works.
    */
 
-  @SuppressWarnings("static-method") @Test public void testFileSizeCorrect()
+  @Test public void testFileSizeCorrect()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("single-file.zip", PathVirtual.ROOT);
 
@@ -453,14 +646,11 @@ public class FilesystemTest
    * Retrieving the size of a directory fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
-    void
-    testFileSizeDirectory()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test(expected = FilesystemError.class) public void testFileSizeDirectory()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
@@ -480,14 +670,13 @@ public class FilesystemTest
    * Retrieving the size of a virtual directory fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testFileSizeDirectoryVirtual()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.createDirectory(PathVirtual.ofString("/bin"));
@@ -507,14 +696,13 @@ public class FilesystemTest
    * Retrieving the size of a file with a file ancestor fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testFileSizeFileAncestor()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
@@ -534,14 +722,13 @@ public class FilesystemTest
    * Retrieving the size of a nonexistent file fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testFileSizeNonexistent()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.getFileSize(PathVirtual.ofString("/nonexistent"));
@@ -555,14 +742,13 @@ public class FilesystemTest
    * Checking if an object is a directory with a file ancestor fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testIsDirectoryFileAncestor()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
@@ -582,17 +768,14 @@ public class FilesystemTest
    * Nonexistent objects are not directories.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testIsDirectoryNonexistent()
-      throws IOException,
-        ConstraintError
+  @Test public void testIsDirectoryNonexistent()
+    throws IOException
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     FilesystemTest.runWithNameGenerator(new AbstractCharacteristic<String>() {
       @Override protected void doSpecify(
-        final @Nonnull String name)
+        final String name)
         throws Throwable
       {
         Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/" + name)));
@@ -604,14 +787,13 @@ public class FilesystemTest
    * Nonexistent ancestors are signalled when checking directories.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testIsDirectoryNonexistentParent()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
     try {
       fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
     } catch (final FilesystemError e) {
@@ -630,44 +812,24 @@ public class FilesystemTest
    * Files are not directories.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testIsDirectoryNotDirectory()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testIsDirectoryNotDirectory()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
     fs.mountArchive("single-file.zip", PathVirtual.ROOT);
     Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/file.txt")));
-  }
-
-  /**
-   * Passing <code>null</code> to {@link Filesystem#isDirectory(PathVirtual)}
-   * fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testIsDirectoryNull()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-    fs.isDirectory(null);
   }
 
   /**
    * Files in archives are files.
    */
 
-  @SuppressWarnings("static-method") @Test public void testIsFileFile()
+  @Test public void testIsFileFile()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
     fs.mountArchive("single-file.zip", PathVirtual.ROOT);
     Assert.assertTrue(fs.isFile(PathVirtual.ofString("/file.txt")));
   }
@@ -676,17 +838,14 @@ public class FilesystemTest
    * Nonexistent objects are not files.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testIsFileNonexistent()
-      throws IOException,
-        ConstraintError
+  @Test public void testIsFileNonexistent()
+    throws IOException
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     FilesystemTest.runWithNameGenerator(new AbstractCharacteristic<String>() {
       @Override protected void doSpecify(
-        final @Nonnull String name)
+        final String name)
         throws Throwable
       {
         Assert.assertFalse(fs.isFile(PathVirtual.ofString("/" + name)));
@@ -698,14 +857,13 @@ public class FilesystemTest
    * Nonexistent ancestors are signalled when checking files.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testIsFileNonexistentParent()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
     try {
       fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
     } catch (final FilesystemError e) {
@@ -724,44 +882,24 @@ public class FilesystemTest
    * Directories are not files.
    */
 
-  @SuppressWarnings("static-method") @Test public void testIsFileNotFile()
+  @Test public void testIsFileNotFile()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
     fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
     Assert.assertFalse(fs.isFile(PathVirtual.ofString("/subdir")));
-  }
-
-  /**
-   * Passing <code>null</code> to {@link Filesystem#isFile(PathVirtual)}
-   * fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testIsFileNull()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-    fs.isFile(null);
   }
 
   /**
    * Listing a created directory returns nothing.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testListCreatedDirectory()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testListCreatedDirectory()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.createDirectory(PathVirtual.ofString("/a"));
 
@@ -795,14 +933,11 @@ public class FilesystemTest
    * Listing a file fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
-    void
-    testListFile()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test(expected = FilesystemError.class) public void testListFile()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
     try {
       fs.mountArchive("single-file.zip", PathVirtual.ROOT);
     } catch (final FilesystemError e) {
@@ -821,14 +956,11 @@ public class FilesystemTest
    * Listing a nonexistent object fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
-    void
-    testListNonexistent()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test(expected = FilesystemError.class) public void testListNonexistent()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.listDirectory(PathVirtual.ofString("/nonexistent"));
@@ -839,30 +971,14 @@ public class FilesystemTest
   }
 
   /**
-   * Listing null fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testListNull()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-    fs.listDirectory(null);
-  }
-
-  /**
    * Listing the root directory with a mounted archive works.
    */
 
-  @SuppressWarnings("static-method") @Test public void testListRootBase()
+  @Test public void testListRootBase()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("complex.zip", PathVirtual.ROOT);
 
@@ -876,12 +992,11 @@ public class FilesystemTest
    * Listing the root directory of an empty filesystem returns nothing.
    */
 
-  @SuppressWarnings("static-method") @Test public void testListRootEmpty()
+  @Test public void testListRootEmpty()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     final SortedSet<String> items = fs.listDirectory(PathVirtual.ROOT);
     Assert.assertTrue(items.isEmpty());
@@ -891,14 +1006,11 @@ public class FilesystemTest
    * Complicated shadowing is respected.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testListShadowComplex0()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testListShadowComplex0()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     /**
      * <ol>
@@ -973,12 +1085,11 @@ public class FilesystemTest
    * respect to mounted archives.
    */
 
-  @SuppressWarnings("static-method") @Test public void testListUnion()
+  @Test public void testListUnion()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("files1-3.zip", PathVirtual.ROOT);
     fs.mountArchive("files4-6.zip", PathVirtual.ROOT);
@@ -997,12 +1108,11 @@ public class FilesystemTest
    * Listing a directory shows virtual directories.
    */
 
-  @SuppressWarnings("static-method") @Test public void testListVirtual()
+  @Test public void testListVirtual()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("complex.zip", PathVirtual.ROOT);
     fs.mountArchive("complex.zip", PathVirtual.ofString("/a/b"));
@@ -1023,42 +1133,14 @@ public class FilesystemTest
   }
 
   /**
-   * Passing <code>null</code> as an archive directory fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testMakeWithArchivesNullDirectory()
-      throws ConstraintError,
-        IOException
-  {
-    Filesystem.makeWithArchiveDirectory(TestData.getLog(), null);
-  }
-
-  /**
-   * Passing <code>null</code> as a log interface fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testMakeWithArchivesNullLog()
-      throws ConstraintError
-  {
-    Filesystem.makeWithArchiveDirectory(null, new PathReal("nonexistent"));
-  }
-
-  /**
    * Retrieving the modification time of a directory works.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testModificationTimeDirectoryCorrect()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testModificationTimeDirectoryCorrect()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
 
@@ -1076,14 +1158,11 @@ public class FilesystemTest
    * Retrieving the modification time of a created directory works.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testModificationTimeDirectoryVirtualCorrect()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testModificationTimeDirectoryVirtualCorrect()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     final Calendar cnow = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
     final long cnow_t = cnow.getTime().getTime();
@@ -1101,14 +1180,13 @@ public class FilesystemTest
    * Retrieving the size of a file with a file ancestor fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testModificationTimeFileAncestor()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
@@ -1128,14 +1206,11 @@ public class FilesystemTest
    * Retrieving the modification time of a file works.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testModificationTimeFileCorrect()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testModificationTimeFileCorrect()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("single-file.zip", PathVirtual.ROOT);
 
@@ -1153,14 +1228,13 @@ public class FilesystemTest
    * Retrieving the modification time of a nonexistent file fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testModificationTimeNonexistent()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
@@ -1180,14 +1254,11 @@ public class FilesystemTest
    * Retrieving the modification time of root within an archive, works.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testModificationTimeRootZip()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testModificationTimeRootZip()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
     final File dir = TestData.getTestDataDirectory();
     final File zip = new File(dir, "complex.zip");
 
@@ -1204,14 +1275,11 @@ public class FilesystemTest
    * archives, and display their contents correctly.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountArchiveAtArchiveDirectory()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testMountArchiveAtArchiveDirectory()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
 
@@ -1232,14 +1300,13 @@ public class FilesystemTest
    * Attempting to mount an archive at a path that denotes a file, fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testMountArchiveAtFile()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("single-file.zip", PathVirtual.ROOT);
@@ -1260,14 +1327,13 @@ public class FilesystemTest
    * file, fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testMountArchiveAtFileAncestor()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("single-file.zip", PathVirtual.ROOT);
@@ -1286,52 +1352,15 @@ public class FilesystemTest
   }
 
   /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testMountArchiveClasspathNullArchive()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountClasspathArchive(null, PathVirtual.ROOT);
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testMountArchiveClasspathNullMount()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountClasspathArchive(FilesystemTest.class, null);
-  }
-
-  /**
    * Mounting an archive that hides an existing directory with a file, makes
    * the hidden directory inaccessible.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountArchiveFileShadows()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testMountArchiveFileShadows()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
 
@@ -1355,14 +1384,11 @@ public class FilesystemTest
    * mounted archives inaccessible.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountArchiveFileShadowsMounts()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testMountArchiveFileShadowsMounts()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
     Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
@@ -1401,14 +1427,11 @@ public class FilesystemTest
    * the hidden file inaccessible.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountArchiveFileShadowsReverse()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testMountArchiveFileShadowsReverse()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
 
@@ -1422,33 +1445,16 @@ public class FilesystemTest
   }
 
   /**
-   * Passing an invalid archive name fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testMountArchiveInvalidArchiveName()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountArchive("..", PathVirtual.ROOT);
-  }
-
-  /**
    * Trying to mount an archive of an unsupported type fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testMountArchiveInvalidArchiveType()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("unknown.unknown", PathVirtual.ROOT);
@@ -1463,17 +1469,14 @@ public class FilesystemTest
    * Trying to mount a nonexistent archive fails.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountArchiveNonexistentArchive()
-      throws IOException,
-        ConstraintError
+  @Test public void testMountArchiveNonexistentArchive()
+    throws IOException
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     FilesystemTest.runWithNameGenerator(new AbstractCharacteristic<String>() {
       @Override protected void doSpecify(
-        final @Nonnull String a)
+        final String a)
         throws Throwable
       {
         try {
@@ -1489,17 +1492,14 @@ public class FilesystemTest
    * Trying to mount an archive at a nonexistent directory fails.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountArchiveNonexistentDirectory()
-      throws IOException,
-        ConstraintError
+  @Test public void testMountArchiveNonexistentDirectory()
+    throws IOException
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     FilesystemTest.runWithNameGenerator(new AbstractCharacteristic<String>() {
       @Override protected void doSpecify(
-        final @Nonnull String name)
+        final String name)
         throws Throwable
       {
         try {
@@ -1512,51 +1512,16 @@ public class FilesystemTest
   }
 
   /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountArchive(String, PathVirtual)} fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testMountArchiveNullArchive()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountArchive(null, PathVirtual.ROOT);
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountArchive(String, PathVirtual)} fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testMountArchiveNullMount()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountArchive("xyz", null);
-  }
-
-  /**
    * Trying to mount an archive twice at the same location fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testMountArchiveTwiceDuplicate()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     try {
       fs.mountArchive("single-file.zip", PathVirtual.ROOT);
@@ -1576,14 +1541,11 @@ public class FilesystemTest
    * Trying to mount different archives at the same location succeeds.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountArchiveTwiceNotDuplicate()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testMountArchiveTwiceNotDuplicate()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("files1-3.zip", PathVirtual.ROOT);
 
@@ -1608,18 +1570,15 @@ public class FilesystemTest
    * Trying to any archive if a directory has not been specified fails.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountArchiveWithoutArchives()
-      throws IOException,
-        ConstraintError
+  @Test public void testMountArchiveWithoutArchives()
+    throws IOException
   {
-    final Filesystem fs =
+    final FSCapabilityAllType fs =
       Filesystem.makeWithoutArchiveDirectory(TestData.getLog());
 
     FilesystemTest.runWithNameGenerator(new AbstractCharacteristic<String>() {
       @Override protected void doSpecify(
-        final @Nonnull String a)
+        final String a)
         throws Throwable
       {
         try {
@@ -1635,14 +1594,11 @@ public class FilesystemTest
    * Mounting an item on the classpath works.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountClasspathArchive()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testMountClasspathArchive()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountClasspathArchive(FilesystemTest.class, PathVirtual.ROOT);
     Assert.assertTrue(fs.isFile(PathVirtual
@@ -1650,88 +1606,19 @@ public class FilesystemTest
   }
 
   /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testMountClasspathArchiveNullClass()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountClasspathArchive(null, PathVirtual.ROOT);
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testMountClasspathArchiveNullMount()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountClasspathArchive(FilesystemTest.class, null);
-  }
-
-  /**
    * Mounting a nonexistent archive using
    * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
    */
 
-  @SuppressWarnings("static-method") @Test(expected = FilesystemError.class) public
+  @Test(expected = FilesystemError.class) public
     void
     testMountFromAnywhereNonexistentArchive()
       throws IOException,
-        ConstraintError,
         FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchiveFromAnywhere(new File("nonexistent"), PathVirtual.ROOT);
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testMountFromAnywhereNullArchive()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountArchiveFromAnywhere(null, PathVirtual.ROOT);
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
-   */
-
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testMountFromAnywhereNullPath()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
-  {
-    final Filesystem fs = FilesystemTest.makeFS();
-
-    fs.mountArchiveFromAnywhere(new File("nonexistent"), null);
   }
 
   /**
@@ -1739,15 +1626,12 @@ public class FilesystemTest
    * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)} works.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountFromAnywhereWorks()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testMountFromAnywhereWorks()
+    throws IOException,
+      FilesystemError
   {
     final File td = TestData.getTestDataDirectory();
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchiveFromAnywhere(td, PathVirtual.ROOT);
     fs.exists(PathVirtual.ofString("/single-file.zip"));
@@ -1757,14 +1641,11 @@ public class FilesystemTest
    * Complicated shadowing works.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountShadowComplex0()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testMountShadowComplex0()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     /**
      * <ol>
@@ -1813,13 +1694,10 @@ public class FilesystemTest
    * empty list.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountSnapshotEmpty()
-      throws IOException,
-        ConstraintError
+  @Test public void testMountSnapshotEmpty()
+    throws IOException
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
     Assert.assertTrue(fs.getMountedArchives().isEmpty());
   }
 
@@ -1827,14 +1705,11 @@ public class FilesystemTest
    * Asking for a snapshot of the mounts of filesystem works.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testMountSnapshotMounts()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testMountSnapshotMounts()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.createDirectory(PathVirtual.ofString("/a"));
     fs.createDirectory(PathVirtual.ofString("/b"));
@@ -1851,34 +1726,35 @@ public class FilesystemTest
 
     {
       final Pair<PathReal, PathVirtual> p = mounts.pop();
-      Assert.assertEquals("single-file-and-subdir.zip", p.first
+      Assert.assertEquals("single-file-and-subdir.zip", p
+        .getLeft()
         .toFile()
         .getName());
-      Assert.assertEquals(PathVirtual.ofString("/c"), p.second);
+      Assert.assertEquals(PathVirtual.ofString("/c"), p.getRight());
     }
 
     {
       final Pair<PathReal, PathVirtual> p = mounts.pop();
-      Assert.assertEquals("single-file.zip", p.first.toFile().getName());
-      Assert.assertEquals(PathVirtual.ofString("/c"), p.second);
+      Assert.assertEquals("single-file.zip", p.getLeft().toFile().getName());
+      Assert.assertEquals(PathVirtual.ofString("/c"), p.getRight());
     }
 
     {
       final Pair<PathReal, PathVirtual> p = mounts.pop();
-      Assert.assertEquals("single-file.zip", p.first.toFile().getName());
-      Assert.assertEquals(PathVirtual.ofString("/b"), p.second);
+      Assert.assertEquals("single-file.zip", p.getLeft().toFile().getName());
+      Assert.assertEquals(PathVirtual.ofString("/b"), p.getRight());
     }
 
     {
       final Pair<PathReal, PathVirtual> p = mounts.pop();
-      Assert.assertEquals("complex.zip", p.first.toFile().getName());
-      Assert.assertEquals(PathVirtual.ofString("/a"), p.second);
+      Assert.assertEquals("complex.zip", p.getLeft().toFile().getName());
+      Assert.assertEquals(PathVirtual.ofString("/a"), p.getRight());
     }
 
     {
       final Pair<PathReal, PathVirtual> p = mounts.pop();
-      Assert.assertEquals("single-file.zip", p.first.toFile().getName());
-      Assert.assertEquals(PathVirtual.ofString("/a"), p.second);
+      Assert.assertEquals("single-file.zip", p.getLeft().toFile().getName());
+      Assert.assertEquals(PathVirtual.ofString("/a"), p.getRight());
     }
   }
 
@@ -1886,12 +1762,11 @@ public class FilesystemTest
    * The root directory always exists and is a directory.
    */
 
-  @SuppressWarnings("static-method") @Test public void testRootExists()
+  @Test public void testRootExists()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     Assert.assertTrue(fs.exists(PathVirtual.ROOT));
     Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
@@ -1902,14 +1777,11 @@ public class FilesystemTest
    * @see #testShadowEdgeCaseShadowSameMount()
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testShadowEdgeCaseReverseShadowSameMount()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testShadowEdgeCaseReverseShadowSameMount()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
     Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
@@ -1926,14 +1798,11 @@ public class FilesystemTest
    * mounted at an ancestor of the shadowed directory.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testShadowEdgeCaseShadowIsAncestor()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testShadowEdgeCaseShadowIsAncestor()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.createDirectory(PathVirtual.ofString("/subdir"));
     fs.mountArchive(
@@ -1955,14 +1824,11 @@ public class FilesystemTest
    * archive mounted at a child of <code>MA</code>.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testShadowEdgeCaseShadowIsChild()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testShadowEdgeCaseShadowIsChild()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("single-file-in-subdir-subdir.zip", PathVirtual.ROOT);
     Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
@@ -1986,14 +1852,11 @@ public class FilesystemTest
    * directory.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testShadowEdgeCaseShadowSameMount()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testShadowEdgeCaseShadowSameMount()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("subdir-shadow.zip", PathVirtual.ROOT);
     Assert.assertFalse(fs.isDirectory(PathVirtual.ofString("/subdir")));
@@ -2003,12 +1866,11 @@ public class FilesystemTest
       .assertFalse(fs.exists(PathVirtual.ofString("/subdir/nonexistent")));
   }
 
-  @SuppressWarnings("static-method") @Test public void testShadowExample()
+  @Test public void testShadowExample()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.createDirectory(PathVirtual.ofString("/subdir"));
     Assert.assertTrue(fs.isDirectory(PathVirtual.ofString("/subdir")));
@@ -2039,14 +1901,11 @@ public class FilesystemTest
    * then unmounting A, means B is still accessible.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testUnmountMountArchiveDirectoryAccessible()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testUnmountMountArchiveDirectoryAccessible()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("complex.zip", PathVirtual.ROOT);
     Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
@@ -2091,14 +1950,11 @@ public class FilesystemTest
    * stacking semantics.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testUnmountMountMultiple()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testUnmountMountMultiple()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("files1-3.zip", PathVirtual.ROOT);
     Assert.assertTrue(fs.isDirectory(PathVirtual.ROOT));
@@ -2141,12 +1997,11 @@ public class FilesystemTest
    * Mounting reveals filesystem objects, unmounting hides them again.
    */
 
-  @SuppressWarnings("static-method") @Test public void testUnmountMountOne()
+  @Test public void testUnmountMountOne()
     throws IOException,
-      ConstraintError,
       FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchive("files1-3.zip", PathVirtual.ROOT);
 
@@ -2167,14 +2022,11 @@ public class FilesystemTest
    * Unmounting the root directory does nothing.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testUnmountNotMounted()
-      throws IOException,
-        ConstraintError,
-        FilesystemError
+  @Test public void testUnmountNotMounted()
+    throws IOException,
+      FilesystemError
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.unmount(PathVirtual.ROOT);
     fs.unmount(PathVirtual.ROOT);
@@ -2188,15 +2040,12 @@ public class FilesystemTest
    * instead of any explicitly given updated time.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testUpdateTimeChangesPreferred()
-      throws IOException,
-        ConstraintError,
-        FilesystemError,
-        InterruptedException
+  @Test public void testUpdateTimeChangesPreferred()
+    throws IOException,
+      FilesystemError,
+      InterruptedException
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
     final File d = TestData.getTestDataDirectory();
     final File sd = new File(d, "single-file");
     final File sdf = new File(sd, "file.txt");
@@ -2270,15 +2119,12 @@ public class FilesystemTest
    * Updating the time of an object works.
    */
 
-  @SuppressWarnings("static-method") @Test public
-    void
-    testUpdateTimeCorrect()
-      throws IOException,
-        ConstraintError,
-        FilesystemError,
-        InterruptedException
+  @Test public void testUpdateTimeCorrect()
+    throws IOException,
+      FilesystemError,
+      InterruptedException
   {
-    final Filesystem fs = FilesystemTest.makeFS();
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     final Calendar t0 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 

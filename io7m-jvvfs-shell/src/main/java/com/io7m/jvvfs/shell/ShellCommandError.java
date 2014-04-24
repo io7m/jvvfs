@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,20 +16,18 @@
 
 package com.io7m.jvvfs.shell;
 
-import javax.annotation.Nonnull;
-
-import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jvvfs.FilesystemError;
 
 abstract class ShellCommandError extends Exception
 {
-  static final class ShellCommandConstraintError extends ShellCommandError
+  static final class ShellCommandFilesystemError extends ShellCommandError
   {
     private static final long serialVersionUID = -6219730618277127807L;
 
-    ShellCommandConstraintError(
-      final @Nonnull ConstraintError error)
+    ShellCommandFilesystemError(
+      final FilesystemError error)
     {
-      super(Type.SHELL_COMMAND_CONSTRAINT_ERROR, error);
+      super(Type.SHELL_COMMAND_FILESYSTEM_ERROR, error);
     }
   }
 
@@ -38,7 +36,7 @@ abstract class ShellCommandError extends Exception
     private static final long serialVersionUID = 4582339751775592743L;
 
     ShellCommandParseError(
-      final @Nonnull String message)
+      final String message)
     {
       super(Type.SHELL_COMMAND_PARSE_ERROR, message);
     }
@@ -49,7 +47,7 @@ abstract class ShellCommandError extends Exception
     private static final long serialVersionUID = 4582339751775592743L;
 
     ShellCommandUnknown(
-      final @Nonnull String command)
+      final String command)
     {
       super(Type.SHELL_COMMAND_UNKNOWN, command);
     }
@@ -58,31 +56,30 @@ abstract class ShellCommandError extends Exception
   static enum Type
   {
     SHELL_COMMAND_PARSE_ERROR,
-    SHELL_COMMAND_CONSTRAINT_ERROR,
+    SHELL_COMMAND_FILESYSTEM_ERROR,
     SHELL_COMMAND_UNKNOWN
   }
 
-  private static final long   serialVersionUID = -6668513869286909183L;
-
-  private final @Nonnull Type type;
+  private static final long serialVersionUID = -6668513869286909183L;
+  private final Type        type;
 
   protected ShellCommandError(
-    final @Nonnull Type type,
-    final @Nonnull String message)
+    final Type in_type,
+    final String message)
   {
     super(message);
-    this.type = type;
+    this.type = in_type;
   }
 
   protected ShellCommandError(
-    final @Nonnull Type type,
-    final @Nonnull Throwable error)
+    final Type in_type,
+    final Throwable error)
   {
     super(error);
-    this.type = type;
+    this.type = in_type;
   }
 
-  @Nonnull Type getType()
+  Type getType()
   {
     return this.type;
   }

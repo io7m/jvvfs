@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,10 +18,7 @@ package com.io7m.jvvfs;
 
 import java.io.File;
 
-import javax.annotation.Nonnull;
-
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jlog.Log;
+import com.io7m.jlog.LogUsableType;
 
 /**
  * The handler responsible for loading directory archives.
@@ -30,18 +27,22 @@ import com.io7m.jlog.Log;
 final class ArchiveDirectoryHandler extends
   ArchiveHandler<ArchiveDirectoryKind>
 {
+  ArchiveDirectoryHandler()
+  {
+    super();
+  }
+
   @Override boolean canHandle(
-    final @Nonnull PathReal name)
+    final PathReal name)
   {
     return new File(name.toString()).isDirectory();
   }
 
-  @Override @Nonnull Archive<ArchiveDirectoryKind> load(
-    final @Nonnull Log log,
-    final @Nonnull PathReal name,
-    final @Nonnull PathVirtual mount)
-    throws ConstraintError,
-      FilesystemError
+  @Override Archive<ArchiveDirectoryKind> load(
+    final LogUsableType log,
+    final PathReal name,
+    final PathVirtual mount)
+    throws FilesystemError
   {
     return new ArchiveDirectory(log, name, mount);
   }

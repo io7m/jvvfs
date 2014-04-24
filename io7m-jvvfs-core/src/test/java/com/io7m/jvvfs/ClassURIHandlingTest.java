@@ -22,8 +22,9 @@ import java.net.URL;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jnull.NullCheckException;
 import com.io7m.jvvfs.FilesystemError.Code;
+import com.io7m.jvvfs.tests.TestUtilities;
 
 public class ClassURIHandlingTest
 {
@@ -49,8 +50,7 @@ public class ClassURIHandlingTest
 
   @SuppressWarnings("static-method") @Test public void testFileNormal()
     throws MalformedURLException,
-      FilesystemError,
-      ConstraintError
+      FilesystemError
   {
     final URL url = new URL("file:/a/b/c/x/y/z/C.class");
     final String path = "/x/y/z/C.class";
@@ -72,8 +72,7 @@ public class ClassURIHandlingTest
 
   @SuppressWarnings("static-method") @Test public void testFileSpaces()
     throws MalformedURLException,
-      FilesystemError,
-      ConstraintError
+      FilesystemError
   {
     final URL url = new URL("file:/a a/b b/c c/x x/y y/z z/C.class");
     final String path = "/x x/y y/z z/C.class";
@@ -97,8 +96,7 @@ public class ClassURIHandlingTest
     void
     testFileSpacesEncoded()
       throws MalformedURLException,
-        FilesystemError,
-        ConstraintError
+        FilesystemError
   {
     final URL url =
       new URL("file:/a%20a/b%20b/c%20c/x%20x/y%20y/z%20z/C.class");
@@ -121,8 +119,7 @@ public class ClassURIHandlingTest
 
   @SuppressWarnings("static-method") @Test public void testJarNormal()
     throws MalformedURLException,
-      FilesystemError,
-      ConstraintError
+      FilesystemError
   {
     final URL url = new URL("jar:file:/a/b/c/j.jar!/x/y/z/C.class");
     final String path = "/x/y/z/C.class";
@@ -144,8 +141,7 @@ public class ClassURIHandlingTest
 
   @SuppressWarnings("static-method") @Test public void testJarSpaces()
     throws MalformedURLException,
-      FilesystemError,
-      ConstraintError
+      FilesystemError
   {
     final URL url =
       new URL("jar:file:/a a/b b/c c/j.jar!/x x/y y/z z/C.class");
@@ -168,8 +164,7 @@ public class ClassURIHandlingTest
 
   @SuppressWarnings("static-method") @Test public void testJarSpacesEncoded()
     throws MalformedURLException,
-      FilesystemError,
-      ConstraintError
+      FilesystemError
   {
     final URL url =
       new URL("jar:file:/a%20a/b%20b/c%20c/j.jar!/x%20x/y%20y/z%20z/C.class");
@@ -194,8 +189,7 @@ public class ClassURIHandlingTest
     void
     testNotFileNotJar()
       throws MalformedURLException,
-        FilesystemError,
-        ConstraintError
+        FilesystemError
   {
     try {
       final URL url = new URL("http://example.org/z/C.class");
@@ -208,33 +202,33 @@ public class ClassURIHandlingTest
     }
   }
 
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testNullNull()
-      throws FilesystemError,
-        ConstraintError
+  @SuppressWarnings("static-method") @Test(
+    expected = NullCheckException.class) public void testNullNull()
+    throws FilesystemError
   {
-    ClassURIHandling.getClassContainerPath(null, null);
+    ClassURIHandling.getClassContainerPath(
+      (URL) TestUtilities.actuallyNull(),
+      (String) TestUtilities.actuallyNull());
   }
 
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testNullPath()
-      throws MalformedURLException,
-        FilesystemError,
-        ConstraintError
+  @SuppressWarnings("static-method") @Test(
+    expected = NullCheckException.class) public void testNullPath()
+    throws MalformedURLException,
+      FilesystemError
   {
     final URL url = new URL("file:/a/b/c/x/y/z/C.class");
-    ClassURIHandling.getClassContainerPath(url, null);
+    ClassURIHandling.getClassContainerPath(
+      url,
+      (String) TestUtilities.actuallyNull());
   }
 
-  @SuppressWarnings("static-method") @Test(expected = ConstraintError.class) public
-    void
-    testNullURI()
-      throws FilesystemError,
-        ConstraintError
+  @SuppressWarnings("static-method") @Test(
+    expected = NullCheckException.class) public void testNullURI()
+    throws FilesystemError
   {
     final String path = "/x/y/z/C.class";
-    ClassURIHandling.getClassContainerPath(null, path);
+    ClassURIHandling.getClassContainerPath(
+      (URL) TestUtilities.actuallyNull(),
+      path);
   }
 }

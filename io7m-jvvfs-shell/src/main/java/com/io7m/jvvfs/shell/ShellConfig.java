@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,28 +18,26 @@ package com.io7m.jvvfs.shell;
 
 import java.util.Properties;
 
-import javax.annotation.Nonnull;
-
 import com.io7m.jvvfs.PathReal;
 
 final class ShellConfig
 {
-  static @Nonnull ShellConfig loadFromProperties(
-    final @Nonnull Properties p,
-    final @Nonnull PathReal archive_directory)
+  static ShellConfig loadFromProperties(
+    final Properties p,
+    final PathReal archive_directory)
   {
     return new ShellConfig(archive_directory);
   }
 
-  private final @Nonnull PathReal archive_directory;
+  private final PathReal archive_directory;
 
   private ShellConfig(
-    final @Nonnull PathReal archive_directory)
+    final PathReal in_archive_directory)
   {
-    this.archive_directory = archive_directory;
+    this.archive_directory = in_archive_directory;
   }
 
-  @Nonnull PathReal getArchiveDirectory()
+  PathReal getArchiveDirectory()
   {
     return this.archive_directory;
   }

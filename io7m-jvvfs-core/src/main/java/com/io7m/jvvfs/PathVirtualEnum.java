@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,13 +18,10 @@ package com.io7m.jvvfs;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import com.io7m.jaux.Constraints;
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnreachableCodeException;
+import com.io7m.jnull.NullCheck;
+import com.io7m.junreachable.UnreachableCodeException;
 
 /**
  * <p>
@@ -38,18 +35,30 @@ import com.io7m.jaux.UnreachableCodeException;
  * </p>
  */
 
-@NotThreadSafe public final class PathVirtualEnum implements
-  Enumeration<PathVirtual>
+public final class PathVirtualEnum implements Enumeration<PathVirtual>
 {
-  private final @Nonnull PathVirtual       path;
-  private final @Nonnull ArrayList<String> names;
-  private int                              index = -1;
+  /**
+   * Construct a new path enumeration.
+   * 
+   * @param p
+   *          The path
+   * @return A new enumeration.
+   */
 
-  PathVirtualEnum(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError
+  public static PathVirtualEnum enumerate(
+    final PathVirtual p)
   {
-    this.path = Constraints.constrainNotNull(path, "Path");
+    return new PathVirtualEnum(p);
+  }
+
+  private int                index = -1;
+  private final List<String> names;
+  private final PathVirtual  path;
+
+  private PathVirtualEnum(
+    final PathVirtual in_path)
+  {
+    this.path = NullCheck.notNull(in_path, "Path");
     this.names = new ArrayList<String>();
   }
 
@@ -67,8 +76,13 @@ import com.io7m.jaux.UnreachableCodeException;
 
       this.names.add(this.path.getUnsafe(this.index));
       return PathVirtual.ofNames(this.names);
-    } catch (final ConstraintError e) {
-      throw new UnreachableCodeException();
+    } catch (final FilesystemError e) {
+      /**
+       * Unreachable because this error can only occur on invalid names, and
+       * an invalid name should never have been allowed into a virtual path in
+       * the first place.
+       */
+      throw new UnreachableCodeException(e);
     } finally {
       ++this.index;
     }
