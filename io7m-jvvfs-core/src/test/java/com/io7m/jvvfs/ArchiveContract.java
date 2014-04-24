@@ -23,14 +23,11 @@ import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.functional.Option;
-import com.io7m.jaux.functional.Option.Some;
+import com.io7m.jfunctional.OptionType;
+import com.io7m.jfunctional.Some;
 import com.io7m.jvvfs.FileReference.Type;
 import com.io7m.jvvfs.FilesystemError.Code;
 
@@ -48,18 +45,16 @@ public abstract class ArchiveContract<T extends ArchiveKind>
    * @throws FilesystemError
    */
 
-  abstract @Nonnull Archive<T> getArchive(
-    final @Nonnull String basename,
-    final @Nonnull PathVirtual mount)
+  abstract Archive<T> getArchive(
+    final String basename,
+    final PathVirtual mount)
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError;
 
   @Test public void testFileSizeFile()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<T> a =
@@ -78,7 +73,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     testFileSizeNonexistent()
       throws FileNotFoundException,
         IOException,
-        ConstraintError,
         FilesystemError
   {
     final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
@@ -100,7 +94,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     testFileSizeNonexistentParent()
       throws FileNotFoundException,
         IOException,
-        ConstraintError,
         FilesystemError
   {
     final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
@@ -120,7 +113,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
   @Test(expected = FilesystemError.class) public void testFileSizeNotFile()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<T> a =
@@ -143,7 +135,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     testFileSizeParentNotDirectory()
       throws FileNotFoundException,
         IOException,
-        ConstraintError,
         FilesystemError
   {
     final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
@@ -163,7 +154,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
   @Test public void testFileTimeDirectory()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<T> a =
@@ -187,7 +177,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
   @Test public void testFileTimeFile()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<T> a =
@@ -213,7 +202,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     testFileTimeNonexistent()
       throws FileNotFoundException,
         IOException,
-        ConstraintError,
         FilesystemError
   {
     final Archive<T> a =
@@ -232,7 +220,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
   @Test public void testGetRealPath()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<T> a =
@@ -247,7 +234,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
   @Test public void testListDirectory()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<T> a =
@@ -265,7 +251,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
   @Test public void testListDirectoryComplex()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<T> a = this.getArchive("complex", PathVirtual.ROOT);
@@ -364,7 +349,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
   @Test(expected = FilesystemError.class) public void testListDirectoryFile()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<T> a =
@@ -385,7 +369,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     testListDirectoryNonexistent()
       throws FileNotFoundException,
         IOException,
-        ConstraintError,
         FilesystemError
   {
     final Archive<T> a =
@@ -406,7 +389,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     testListDirectoryParentFile()
       throws FileNotFoundException,
         IOException,
-        ConstraintError,
         FilesystemError
   {
     final Archive<T> a =
@@ -424,7 +406,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
   @Test public void testLookupSingleDirectory()
     throws FilesystemError,
-      ConstraintError,
       FileNotFoundException,
       IOException
   {
@@ -433,13 +414,13 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
     try {
       final PathVirtual p = PathVirtual.ofString("/subdir");
-      final Option<FileReference<T>> r = a.lookup(p);
+      final OptionType<FileReference<T>> r = a.lookup(p);
 
       Assert.assertTrue(r.isSome());
-      final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) r;
-      Assert.assertTrue(s.value.type == Type.TYPE_DIRECTORY);
-      Assert.assertTrue(s.value.path.equals(p));
-      Assert.assertTrue(s.value.archive == a);
+      final Some<FileReference<T>> s = (Some<FileReference<T>>) r;
+      Assert.assertTrue(s.get().getType() == Type.TYPE_DIRECTORY);
+      Assert.assertTrue(s.get().getPath().equals(p));
+      Assert.assertTrue(s.get().getArchive() == a);
     } finally {
       a.close();
     }
@@ -447,7 +428,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
   @Test public void testLookupSingleFile()
     throws FilesystemError,
-      ConstraintError,
       FileNotFoundException,
       IOException
   {
@@ -455,13 +435,13 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
     try {
       final PathVirtual p = PathVirtual.ofString("/file.txt");
-      final Option<FileReference<T>> r = a.lookup(p);
+      final OptionType<FileReference<T>> r = a.lookup(p);
 
       Assert.assertTrue(r.isSome());
-      final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) r;
-      Assert.assertTrue(s.value.type == Type.TYPE_FILE);
-      Assert.assertTrue(s.value.path.equals(p));
-      Assert.assertTrue(s.value.archive == a);
+      final Some<FileReference<T>> s = (Some<FileReference<T>>) r;
+      Assert.assertTrue(s.get().getType() == Type.TYPE_FILE);
+      Assert.assertTrue(s.get().getPath().equals(p));
+      Assert.assertTrue(s.get().getArchive() == a);
     } finally {
       a.close();
     }
@@ -469,14 +449,13 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
   @Test public void testLookupSingleFileNonexistent()
     throws FilesystemError,
-      ConstraintError,
       FileNotFoundException,
       IOException
   {
     final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
     try {
       final PathVirtual p = PathVirtual.ofString("/nonexistent");
-      final Option<FileReference<T>> r = a.lookup(p);
+      final OptionType<FileReference<T>> r = a.lookup(p);
 
       Assert.assertTrue(r.isNone());
     } finally {
@@ -486,14 +465,13 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
   @Test public void testLookupSingleFileNonexistentAncestor()
     throws FilesystemError,
-      ConstraintError,
       FileNotFoundException,
       IOException
   {
     final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
     try {
       final PathVirtual p = PathVirtual.ofString("/nonexistent/file.txt");
-      final Option<FileReference<T>> r = a.lookup(p);
+      final OptionType<FileReference<T>> r = a.lookup(p);
       Assert.assertTrue(r.isNone());
     } finally {
       a.close();
@@ -504,7 +482,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     void
     testLookupSingleFileNotDirectory()
       throws FilesystemError,
-        ConstraintError,
         FileNotFoundException,
         IOException
   {
@@ -525,7 +502,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
   @Test public void testLookupSingleFileSubdirectory()
     throws FilesystemError,
-      ConstraintError,
       FileNotFoundException,
       IOException
   {
@@ -534,21 +510,20 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
     try {
       final PathVirtual p = PathVirtual.ofString("/subdir/file.txt");
-      final Option<FileReference<T>> r = a.lookup(p);
+      final OptionType<FileReference<T>> r = a.lookup(p);
 
       Assert.assertTrue(r.isSome());
-      final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) r;
-      Assert.assertTrue(s.value.type == Type.TYPE_FILE);
-      Assert.assertTrue(s.value.path.equals(p));
-      Assert.assertTrue(s.value.archive == a);
+      final Some<FileReference<T>> s = (Some<FileReference<T>>) r;
+      Assert.assertTrue(s.get().getType() == Type.TYPE_FILE);
+      Assert.assertTrue(s.get().getPath().equals(p));
+      Assert.assertTrue(s.get().getArchive() == a);
     } finally {
       a.close();
     }
   }
 
   @Test public void testMountPath()
-    throws ConstraintError,
-      FileNotFoundException,
+    throws FileNotFoundException,
       IOException,
       FilesystemError
   {
@@ -563,7 +538,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
   @Test public void testOpenFile()
     throws FilesystemError,
-      ConstraintError,
       FileNotFoundException,
       IOException
   {
@@ -587,7 +561,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     void
     testOpenFileNonexistent()
       throws FilesystemError,
-        ConstraintError,
         FileNotFoundException,
         IOException
   {
@@ -606,7 +579,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
   @Test(expected = FilesystemError.class) public void testOpenFileNotAFile()
     throws FilesystemError,
-      ConstraintError,
       FileNotFoundException,
       IOException
   {
@@ -628,7 +600,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
     void
     testOpenFileParentNotDirectory()
       throws FilesystemError,
-        ConstraintError,
         FileNotFoundException,
         IOException
   {
@@ -648,7 +619,6 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
   @Test public void testOpenFileSubdirectory()
     throws FilesystemError,
-      ConstraintError,
       FileNotFoundException,
       IOException
   {
@@ -671,24 +641,22 @@ public abstract class ArchiveContract<T extends ArchiveKind>
 
   @Test public void testRoot()
     throws FilesystemError,
-      ConstraintError,
       FileNotFoundException,
       IOException
   {
     final Archive<T> a = this.getArchive("single-file", PathVirtual.ROOT);
-    final Option<FileReference<T>> r = a.lookup(PathVirtual.ROOT);
+    final OptionType<FileReference<T>> r = a.lookup(PathVirtual.ROOT);
 
     Assert.assertTrue(r.isSome());
-    final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) r;
-    Assert.assertTrue(s.value.type == Type.TYPE_DIRECTORY);
-    Assert.assertTrue(s.value.path.equals(PathVirtual.ROOT));
-    Assert.assertTrue(s.value.archive == a);
+    final Some<FileReference<T>> s = (Some<FileReference<T>>) r;
+    Assert.assertTrue(s.get().getType() == Type.TYPE_DIRECTORY);
+    Assert.assertTrue(s.get().getPath().equals(PathVirtual.ROOT));
+    Assert.assertTrue(s.get().getArchive() == a);
   }
 
   @Test public void testString()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<T> a =

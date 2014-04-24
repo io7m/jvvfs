@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,11 +16,8 @@
 
 package com.io7m.jvvfs;
 
-import javax.annotation.Nonnull;
-
-import com.io7m.jaux.Constraints;
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnreachableCodeException;
+import com.io7m.jnull.NullCheck;
+import com.io7m.junreachable.UnreachableCodeException;
 
 /**
  * <p>
@@ -53,15 +50,15 @@ public final class Name
    * Empty strings are not considered to be valid names.
    * </p>
    * 
-   * @throws ConstraintError
-   *           Iff <code>name == null</code>.
+   * @param name
+   *          The name.
+   * @return <code>true</code> if the name is valid.
    */
 
   public static boolean isValid(
-    final @Nonnull String name)
-    throws ConstraintError
+    final String name)
   {
-    Constraints.constrainNotNull(name, "Name is not null");
+    NullCheck.notNull(name, "Name");
 
     if (name.length() == 0) {
       return false;

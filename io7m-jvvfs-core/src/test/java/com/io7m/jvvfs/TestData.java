@@ -33,20 +33,22 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
 import com.io7m.jlog.Log;
+import com.io7m.jlog.LogLevel;
+import com.io7m.jlog.LogPolicyAllOn;
+import com.io7m.jlog.LogPolicyType;
+import com.io7m.jlog.LogType;
+import com.io7m.jnull.Nullable;
 
 /**
  * Functions for unpacking test data during unit tests.
  */
 
-final class TestData
+public final class TestData
 {
   static class TemporaryDirectory
   {
-    private final @Nonnull File file;
+    private final File file;
 
     /**
      * Request a new temporary directory, create it, tell the JVM to remove it
@@ -94,7 +96,7 @@ final class TestData
       TestData.deleteOnExit(this.file);
     }
 
-    public @Nonnull File getFile()
+    public File getFile()
     {
       return this.file;
     }
@@ -104,17 +106,18 @@ final class TestData
    * A list of zip files that should be copied to the filesystem.
    */
 
-  private static @Nonnull Set<String>             zip_list;
+  private static Set<String>                  zip_list       =
+                                                               new HashSet<String>();
 
   /**
    * A mapping from zip file names to the names of the directories to which
    * they will be unpacked.
    */
 
-  private static @Nonnull Map<String, String>     zip_unpack_map;
+  private static Map<String, String>          zip_unpack_map =
+                                                               new HashMap<String, String>();
 
   static {
-    TestData.zip_list = new HashSet<String>();
     TestData.zip_list.add("single-file.zip");
     TestData.zip_list.add("single-file.jar");
     TestData.zip_list.add("single-file-and-subdir.zip");
@@ -128,7 +131,6 @@ final class TestData
     TestData.zip_list.add("files4-6.zip");
     TestData.zip_list.add("unknown.unknown");
 
-    TestData.zip_unpack_map = new HashMap<String, String>();
     TestData.zip_unpack_map.put("single-file.zip", "single-file");
     TestData.zip_unpack_map.put(
       "single-file-and-subdir.zip",
@@ -150,15 +152,15 @@ final class TestData
    * {@link #getTestDataDirectory()}.
    */
 
-  private static @CheckForNull TemporaryDirectory test_data_directory;
+  private static @Nullable TemporaryDirectory test_data_directory;
 
   /**
    * Copy the resource <code>name</code> to the file <code>out</code>.
    */
 
-  @SuppressWarnings("resource") private static void copyResourceOut(
-    final @Nonnull String name,
-    final @Nonnull File out)
+  private static void copyResourceOut(
+    final String name,
+    final File out)
     throws FileNotFoundException,
       IOException
   {
@@ -182,8 +184,8 @@ final class TestData
    */
 
   private static void copyStreamOut(
-    final @Nonnull InputStream input,
-    final @Nonnull File out)
+    final InputStream input,
+    final File out)
     throws FileNotFoundException,
       IOException
   {
@@ -204,8 +206,8 @@ final class TestData
    */
 
   private static void copyStreams(
-    final @Nonnull InputStream input,
-    final @Nonnull OutputStream output)
+    final InputStream input,
+    final OutputStream output)
     throws IOException
   {
     final byte buffer[] = new byte[8192];
@@ -226,8 +228,8 @@ final class TestData
    */
 
   private static void copyZipStreamUnpack(
-    final @Nonnull ZipInputStream zip_stream,
-    final @Nonnull File outdir)
+    final ZipInputStream zip_stream,
+    final File outdir)
     throws IOException
   {
     for (;;) {
@@ -296,13 +298,13 @@ final class TestData
   }
 
   static void deleteOnExit(
-    final @Nonnull File file)
+    final File file)
   {
     System.err.println("test-data: Marking for deletion: " + file);
     file.deleteOnExit();
   }
 
-  @SuppressWarnings("resource") static Log getLog()
+  public static LogType getLog()
     throws IOException
   {
     InputStream stream = null;
@@ -314,7 +316,10 @@ final class TestData
 
       final Properties properties = new Properties();
       properties.load(stream);
-      return new Log(properties, "com.io7m.jvvfs", "main");
+
+      final LogPolicyType policy =
+        LogPolicyAllOn.newPolicy(LogLevel.LOG_DEBUG);
+      return Log.newLog(policy, "main");
     } finally {
       if (stream != null) {
         stream.close();
@@ -327,18 +332,20 @@ final class TestData
    * unpacking test data into it, if necessary.
    */
 
-  public static @Nonnull File getTestDataDirectory()
+  public static File getTestDataDirectory()
     throws FileNotFoundException,
       IOException
   {
     if (TestData.test_data_directory == null) {
       TestData.test_data_directory = TestData.unpackTestData();
     }
+
+    assert TestData.test_data_directory != null;
     return TestData.test_data_directory.getFile();
   }
 
-  private static @Nonnull String resourcePath(
-    final @Nonnull String file)
+  private static String resourcePath(
+    final String file)
   {
     return "/com/io7m/jvvfs/" + file;
   }
@@ -348,7 +355,7 @@ final class TestData
    * directory prior to test execution.
    */
 
-  static @Nonnull TemporaryDirectory unpackTestData()
+  static TemporaryDirectory unpackTestData()
     throws FileNotFoundException,
       IOException
   {
@@ -356,6 +363,7 @@ final class TestData
     final File outdir = d.getFile();
 
     for (final String file : TestData.zip_list) {
+      assert file != null;
       final File outfile = new File(outdir, file);
       System.err.println("test-data: Unpacking " + file + " to " + outfile);
       TestData.copyResourceOut(file, outfile);

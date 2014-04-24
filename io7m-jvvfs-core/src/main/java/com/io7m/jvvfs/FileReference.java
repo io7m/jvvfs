@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,12 +16,8 @@
 
 package com.io7m.jvvfs;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import com.io7m.jaux.Constraints;
-import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jnull.NullCheck;
+import com.io7m.jnull.Nullable;
 
 /**
  * <p>
@@ -38,7 +34,7 @@ import com.io7m.jaux.Constraints.ConstraintError;
  * </p>
  */
 
-@NotThreadSafe abstract class FileReference<T extends ArchiveKind>
+abstract class FileReference<T extends ArchiveKind>
 {
   static enum Type
   {
@@ -46,19 +42,33 @@ import com.io7m.jaux.Constraints.ConstraintError;
     TYPE_DIRECTORY
   }
 
-  final @CheckForNull Archive<T>    archive;
-  final @Nonnull PathVirtual        path;
-  final @Nonnull FileReference.Type type;
+  private final @Nullable Archive<T> archive;
+  private final PathVirtual          path;
+  private final FileReference.Type   type;
+
+  final @Nullable Archive<T> getArchive()
+  {
+    return this.archive;
+  }
+
+  final PathVirtual getPath()
+  {
+    return this.path;
+  }
+
+  final FileReference.Type getType()
+  {
+    return this.type;
+  }
 
   FileReference(
-    final @CheckForNull Archive<T> in_archive,
-    final @Nonnull PathVirtual in_path,
-    final @Nonnull FileReference.Type in_type)
-    throws ConstraintError
+    final @Nullable Archive<T> in_archive,
+    final PathVirtual in_path,
+    final FileReference.Type in_type)
   {
     this.archive = in_archive;
-    this.path = Constraints.constrainNotNull(in_path, "path");
-    this.type = Constraints.constrainNotNull(in_type, "type");
+    this.path = NullCheck.notNull(in_path, "Path");
+    this.type = NullCheck.notNull(in_type, "type");
   }
 
   @Override public final String toString()
@@ -69,6 +79,6 @@ import com.io7m.jaux.Constraints.ConstraintError;
     builder.append(" ");
     builder.append(this.path);
     builder.append("]");
-    return builder.toString();
+    return NullCheck.notNull(builder.toString());
   }
 }

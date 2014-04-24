@@ -16,26 +16,23 @@
 
 package com.io7m.jvvfs;
 
-import javax.annotation.Nonnull;
-
 import net.java.quickcheck.characteristic.AbstractCharacteristic;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.functional.Pair;
+import com.io7m.jfunctional.Pair;
 import com.io7m.jvvfs.FileReference.Type;
+import com.io7m.jvvfs.tests.PathVirtualTest;
 
 public final class FileReferenceTest
 {
   static final class FileReferenceId extends FileReference<ArchiveKind>
   {
     FileReferenceId(
-      final @Nonnull Archive<ArchiveKind> in_archive,
-      final @Nonnull PathVirtual in_path,
-      final @Nonnull Type in_type)
-      throws ConstraintError
+      final Archive<ArchiveKind> in_archive,
+      final PathVirtual in_path,
+      final Type in_type)
     {
       super(in_archive, in_path, in_type);
     }
@@ -46,14 +43,16 @@ public final class FileReferenceTest
     PathVirtualTest
       .runWithPairGenerator(new AbstractCharacteristic<Pair<PathVirtual, PathVirtual>>() {
         @Override protected void doSpecify(
-          final @Nonnull Pair<PathVirtual, PathVirtual> pair)
+          final Pair<PathVirtual, PathVirtual> pair)
           throws Throwable
         {
           final FileReference<ArchiveKind> r0 =
-            new FileReferenceId(new ArchiveIdentity(), pair.first
+            new FileReferenceId(new ArchiveIdentity(), pair
+              .getLeft()
               .appendName("xyz"), Type.TYPE_FILE);
           final FileReference<ArchiveKind> r1 =
-            new FileReferenceId(new ArchiveIdentity(), pair.second
+            new FileReferenceId(new ArchiveIdentity(), pair
+              .getRight()
               .appendName("abc"), Type.TYPE_FILE);
 
           Assert.assertFalse(r0.toString().equals(r1.toString()));

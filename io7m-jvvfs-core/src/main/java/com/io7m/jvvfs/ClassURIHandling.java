@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,15 +21,17 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.ThreadSafe;
-
-import com.io7m.jaux.Constraints;
-import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jnull.NullCheck;
+import com.io7m.junreachable.UnreachableCodeException;
 import com.io7m.jvvfs.FilesystemError.Code;
 
-@ThreadSafe final class ClassURIHandling
+final class ClassURIHandling
 {
+  private ClassURIHandling()
+  {
+    throw new UnreachableCodeException();
+  }
+
   /**
    * For a given URL returned by a classloader <code>url</code>, and the given
    * <code>file</code>, return the filesystem path that contains
@@ -56,22 +58,21 @@ import com.io7m.jvvfs.FilesystemError.Code;
    */
 
   static String getClassContainerPath(
-    final @Nonnull URL url,
-    final @Nonnull String file)
-    throws ConstraintError,
-      FilesystemError
+    final URL url,
+    final String file)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(url, "URL");
-    Constraints.constrainNotNull(file, "File");
+    NullCheck.notNull(url, "URL");
+    NullCheck.notNull(file, "File");
 
     final String proto = url.getProtocol();
-    if ((proto.equals("file") == false) && (proto.equals("jar") == false)) {
+    if (("file".equals(proto) == false) && ("jar".equals(proto) == false)) {
       throw new FilesystemError(
         Code.FS_ERROR_ARCHIVE_TYPE_UNSUPPORTED,
         "Cannot handle non-file or non-jar URLs");
     }
 
-    if (proto.equals("file")) {
+    if ("file".equals(proto)) {
       return ClassURIHandling.getClassContainerPathForFile(url, file);
     }
 
@@ -79,8 +80,8 @@ import com.io7m.jvvfs.FilesystemError.Code;
   }
 
   private static String getClassContainerPathForFile(
-    final @Nonnull URL url,
-    final @Nonnull String file)
+    final URL url,
+    final String file)
   {
     /**
      * URL is of the form "file:/path/to/file.class"
@@ -94,11 +95,12 @@ import com.io7m.jvvfs.FilesystemError.Code;
     }
 
     final String path = f.getAbsolutePath();
-    return path.substring(0, path.length() - file.length());
+    return NullCheck
+      .notNull(path.substring(0, path.length() - file.length()));
   }
 
   private static String getClassContainerPathForJar(
-    final @Nonnull URL url)
+    final URL url)
     throws FilesystemError
   {
     try {
@@ -117,7 +119,7 @@ import com.io7m.jvvfs.FilesystemError.Code;
         f = new File(base_url.getPath());
       }
 
-      return f.getAbsolutePath();
+      return NullCheck.notNull(f.getAbsolutePath());
     } catch (final MalformedURLException e) {
       throw new FilesystemError(
         Code.FS_ERROR_CONSTRAINT_ERROR,

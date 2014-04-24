@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -20,12 +20,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-
-import com.io7m.jaux.Constraints;
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.functional.Option;
+import com.io7m.jfunctional.Option;
+import com.io7m.jfunctional.OptionType;
+import com.io7m.jnull.NullCheck;
+import com.io7m.jnull.Nullable;
+import com.io7m.jvvfs.FilesystemError.Code;
 
 /**
  * <p>
@@ -50,19 +49,15 @@ import com.io7m.jaux.functional.Option;
  * @see Name#isValid(String)
  */
 
-@Immutable public final class PathVirtual implements Comparable<PathVirtual>
+public final class PathVirtual implements Comparable<PathVirtual>
 {
-  private final @Nonnull List<String>      names;
-  private final @Nonnull String            image;
-
   /**
    * <p>
    * A virtual path representing the root directory.
    * </p>
    */
 
-  public static final @Nonnull PathVirtual ROOT;
-
+  public static final PathVirtual ROOT;
   static {
     ROOT = new PathVirtual();
   }
@@ -75,18 +70,35 @@ import com.io7m.jaux.functional.Option;
    * order.
    * </p>
    * 
-   * @throws ConstraintError
-   *           Iff any of the values in <code>names</code> are not valid.
+   * @param names
+   *          The list of names
+   * @return A new virtual path
+   * @throws FilesystemError
+   *           If any of the given names are not valid
    * @see Name#isValid(String)
    */
 
-  public static @Nonnull PathVirtual ofNames(
-    final @Nonnull List<String> names)
-    throws ConstraintError
+  public static PathVirtual ofNames(
+    final List<String> names)
+    throws FilesystemError
   {
-    Constraints.constrainNotNull(names, "Names not null");
-    for (final String name : names) {
-      Constraints.constrainArbitrary(Name.isValid(name), "Name is valid");
+    NullCheck.notNull(names, "Names");
+
+    for (int index = 0; index < names.size(); ++index) {
+      final String name =
+        NullCheck.notNull(names.get(index), "Names(" + index + ")");
+
+      if (Name.isValid(name) == false) {
+        final StringBuilder m = new StringBuilder();
+        m.append("Name ");
+        m.append(index);
+        m.append(" (");
+        m.append(name);
+        m.append(") is not valid");
+        final String r = m.toString();
+        assert r != null;
+        throw new FilesystemError(Code.FS_ERROR_CONSTRAINT_ERROR, r);
+      }
     }
 
     return new PathVirtual(names);
@@ -98,7 +110,10 @@ import com.io7m.jaux.functional.Option;
    * the start of this file, and produce a virtual path.
    * </p>
    * 
-   * @throws ConstraintError
+   * @return A new virtual path
+   * @param path
+   *          The path to be parsed
+   * @throws FilesystemError
    *           If the given path does not conform to the given grammar (such
    *           as being empty, not absolute, or containing a name that is not
    *           valid).
@@ -106,24 +121,43 @@ import com.io7m.jaux.functional.Option;
    * @see Name#isValid(String)
    */
 
-  public static @Nonnull PathVirtual ofString(
-    final @Nonnull String path)
-    throws ConstraintError
+  public static PathVirtual ofString(
+    final String path)
+    throws FilesystemError
   {
-    Constraints.constrainArbitrary(path.length() > 0, "Path is not empty");
-    Constraints.constrainArbitrary(
-      path.charAt(0) == '/',
-      "Path begins with slash");
-
-    if (path.equals("/")) {
+    if (path.length() == 0) {
+      throw new FilesystemError(
+        Code.FS_ERROR_CONSTRAINT_ERROR,
+        "Path is empty");
+    }
+    if (path.charAt(0) != '/') {
+      throw new FilesystemError(
+        Code.FS_ERROR_CONSTRAINT_ERROR,
+        "Path does not begin with slash (U+002F)");
+    }
+    if ("/".equals(path)) {
       return PathVirtual.ROOT;
     }
 
     final String[] elements = path.substring(1).split("/");
-    final ArrayList<String> names = new ArrayList<String>();
+    final List<String> names = new ArrayList<String>();
 
-    for (final String name : elements) {
-      Constraints.constrainArbitrary(Name.isValid(name), "Name is valid");
+    for (int index = 0; index < elements.length; ++index) {
+      final String name =
+        NullCheck.notNull(elements[index], "Elements(" + index + ")");
+
+      if (Name.isValid(name) == false) {
+        final StringBuilder m = new StringBuilder();
+        m.append("Name ");
+        m.append(index);
+        m.append(" (");
+        m.append(name);
+        m.append(") is not valid");
+        final String r = m.toString();
+        assert r != null;
+        throw new FilesystemError(Code.FS_ERROR_CONSTRAINT_ERROR, r);
+      }
+
       names.add(name);
     }
 
@@ -136,29 +170,39 @@ import com.io7m.jaux.functional.Option;
    * multiple consecutive slashes, and then pass the result to
    * {@link #ofString(String)}.
    * </p>
+   * 
+   * @return A new virtual path
+   * @param path
+   *          The path to be parsed
+   * @throws FilesystemError
+   *           If the path is not valid
    */
 
-  public static @Nonnull PathVirtual ofStringLax(
-    final @Nonnull String path)
-    throws ConstraintError
+  public static PathVirtual ofStringLax(
+    final String path)
+    throws FilesystemError
   {
     final String result = PathVirtual.ofStringLaxScrub(path);
-    if (result.equals("/")) {
+    if ("/".equals(result)) {
       return PathVirtual.ROOT;
     }
     return PathVirtual.ofString(result);
   }
 
-  static @Nonnull String ofStringLaxScrub(
-    final @Nonnull String path)
+  static String ofStringLaxScrub(
+    final String path)
   {
     final String result =
       path.replaceAll("/+", "/").replaceAll("/+$", "").replaceAll("^/", "");
-    if (result.equals("")) {
+    if ("".equals(result)) {
       return "/";
     }
     return "/" + result;
   }
+
+  private final String       image;
+
+  private final List<String> names;
 
   private PathVirtual()
   {
@@ -167,7 +211,7 @@ import com.io7m.jaux.functional.Option;
   }
 
   private PathVirtual(
-    final @Nonnull List<String> p)
+    final List<String> p)
   {
     final int size = p.size();
     final StringBuilder b = new StringBuilder("/");
@@ -184,7 +228,7 @@ import com.io7m.jaux.functional.Option;
     }
 
     this.names = p;
-    this.image = b.toString();
+    this.image = NullCheck.notNull(b.toString());
   }
 
   /**
@@ -192,12 +236,18 @@ import com.io7m.jaux.functional.Option;
    * Append all elements of <code>p</code> to the current path, returning a
    * new path.
    * </p>
+   * 
+   * @param p
+   *          The other path
+   * @return The current path with the elements of the other path appended.
    */
 
-  public @Nonnull PathVirtual append(
-    final @Nonnull PathVirtual p)
+  public PathVirtual append(
+    final PathVirtual p)
   {
-    final ArrayList<String> new_names = new ArrayList<String>(this.names);
+    NullCheck.notNull(p, "Path");
+
+    final List<String> new_names = new ArrayList<String>(this.names);
     new_names.addAll(p.names);
     return new PathVirtual(new_names);
   }
@@ -208,19 +258,28 @@ import com.io7m.jaux.functional.Option;
    * path.
    * </p>
    * 
-   * @throws ConstraintError
-   *           Iff <code>name</code> is not valid.
+   * @param name
+   *          The name to append
+   * @return The current path with <code>name</code> appended
+   * @throws FilesystemError
+   *           If the given name is not valid
+   * 
    * @see Name#isValid(String)
    */
 
-  public @Nonnull PathVirtual appendName(
-    final @Nonnull String name)
-    throws ConstraintError
+  public PathVirtual appendName(
+    final String name)
+    throws FilesystemError
   {
-    Constraints.constrainArbitrary(Name.isValid(name), "Name is valid");
+    final String actual = NullCheck.notNull(name, "Name");
+    if (Name.isValid(actual) == false) {
+      throw new FilesystemError(
+        Code.FS_ERROR_CONSTRAINT_ERROR,
+        "Name is not valid");
+    }
 
-    final ArrayList<String> new_names = new ArrayList<String>(this.names);
-    new_names.add(name);
+    final List<String> new_names = new ArrayList<String>(this.names);
+    new_names.add(actual);
     return new PathVirtual(new_names);
   }
 
@@ -243,6 +302,11 @@ import com.io7m.jaux.functional.Option;
    * </li>
    * </ul>
    * </p>
+   * 
+   * @param o
+   *          The other path
+   * @return A negative integer, zero, or a positive integer as this path is
+   *         less than, equal to, or greater than the specified path.
    */
 
   @Override public int compareTo(
@@ -269,7 +333,7 @@ import com.io7m.jaux.functional.Option;
   }
 
   @Override public boolean equals(
-    final Object obj)
+    final @Nullable Object obj)
   {
     if (this == obj) {
       return true;
@@ -290,12 +354,14 @@ import com.io7m.jaux.functional.Option;
    * @return <code>None</code> iff this path is empty.
    */
 
-  public @Nonnull Option<String> getBaseName()
+  public OptionType<String> getBaseName()
   {
     if (this.names.isEmpty() == false) {
-      return new Option.Some<String>(this.names.get(this.names.size() - 1));
+      final String x = this.names.get(this.names.size() - 1);
+      assert x != null;
+      return Option.some(x);
     }
-    return new Option.None<String>();
+    return Option.none();
   }
 
   /**
@@ -305,7 +371,9 @@ import com.io7m.jaux.functional.Option;
   String getUnsafe(
     final int index)
   {
-    return this.names.get(index);
+    final String r = this.names.get(index);
+    assert r != null;
+    return r;
   }
 
   @Override public int hashCode()
@@ -315,7 +383,7 @@ import com.io7m.jaux.functional.Option;
 
   /**
    * <p>
-   * Determine whether <code>p</code> is an ancestor of the current path.
+   * Determine whether the current path is an ancestor of <code>p</code>.
    * </p>
    * <p>
    * <code>p0</code> is an ancestor of <code>p1</code> iff:
@@ -324,11 +392,18 @@ import com.io7m.jaux.functional.Option;
    * <pre>
    * p0 != p1 /\ ∃ p : PathVirtual. p0.append(p) == p1
    * </pre>
+   * 
+   * @param p
+   *          The path that may be an ancestor of the current path
+   * @return <code>true</code> if the current path is an ancestor of
+   *         <code>p</code>.
    */
 
   public boolean isAncestorOf(
-    final @Nonnull PathVirtual p)
+    final PathVirtual p)
   {
+    NullCheck.notNull(p, "Path");
+
     /**
      * Early exit: the paths are equal and therefore one cannot be the
      * ancestor of the other.
@@ -380,7 +455,7 @@ import com.io7m.jaux.functional.Option;
 
   /**
    * <p>
-   * Determine whether <code>p0</code> is the parent of <code>p1</code>.
+   * Determine whether the current path is the parent of <code>p</code>.
    * </p>
    * <p>
    * <code>p0</code> is the parent of <code>p1</code> iff:
@@ -389,10 +464,15 @@ import com.io7m.jaux.functional.Option;
    * <pre>
    * ∃ n : String. p0.appendName(n) == p1
    * </pre>
+   * 
+   * @param p
+   *          The path that may be an ancestor of the current path
+   * @return <code>true</code> if the current path is the parent of
+   *         <code>p</code>.
    */
 
   public boolean isParentOf(
-    final @Nonnull PathVirtual p)
+    final PathVirtual p)
   {
     if (this.image.equals(p.image)) {
       return false;
@@ -417,39 +497,47 @@ import com.io7m.jaux.functional.Option;
     return false;
   }
 
-  boolean isRoot()
+  /**
+   * @return <code>true</code> if this path is the root path.
+   */
+
+  public boolean isRoot()
   {
     return this.names.size() == 0;
   }
 
   /**
-   * Return the number of components in the current path.
+   * @return The number of components in the current path.
    */
 
-  int length()
+  public int length()
   {
     return this.names.size();
   }
 
   /**
    * <p>
-   * "Subtract" the path <code>p</code> from the current path.
+   * "Subtract" the path <code>other</code> from the current path.
    * </p>
    * <p>
    * The subtraction of <code>p1</code> from <code>p0</code> is defined as
    * removing the first <code>p1.length</code> elements of <code>p0</code>, if
    * <code>p0</code> is an ancestor of or is equal to <code>p1</code>.
    * </p>
+   * 
+   * @param other
+   *          The other path
+   * @return The current path with <code>other</code> subtracted.
    */
 
-  public @Nonnull PathVirtual subtract(
-    final @Nonnull PathVirtual other)
+  public PathVirtual subtract(
+    final PathVirtual other)
   {
     final boolean ancestor = other.isAncestorOf(this);
-    final boolean equal = other.equals(this);
+    final boolean equal = this.equals(other);
 
     if (ancestor || equal) {
-      final LinkedList<String> new_names = new LinkedList<String>(this.names);
+      final List<String> new_names = new LinkedList<String>(this.names);
       for (int index = 0; index < other.names.size(); ++index) {
         new_names.remove(0);
       }
@@ -459,7 +547,7 @@ import com.io7m.jaux.functional.Option;
     return this;
   }
 
-  @Override public @Nonnull String toString()
+  @Override public String toString()
   {
     return this.image;
   }

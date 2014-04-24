@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,16 +18,16 @@ package com.io7m.jvvfs;
 
 import java.io.InputStream;
 import java.util.Calendar;
-import java.util.Set;
+import java.util.SortedSet;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnreachableCodeException;
-import com.io7m.jaux.functional.Option;
-import com.io7m.jaux.functional.Option.Some;
-import com.io7m.jlog.Log;
+import com.io7m.jfunctional.None;
+import com.io7m.jfunctional.Option;
+import com.io7m.jfunctional.OptionPartialVisitorType;
+import com.io7m.jfunctional.OptionType;
+import com.io7m.jfunctional.Some;
+import com.io7m.jlog.LogUsableType;
+import com.io7m.jnull.Nullable;
+import com.io7m.junreachable.UnreachableCodeException;
 
 /**
  * <p>
@@ -74,36 +74,43 @@ abstract class Archive<T extends ArchiveKind>
    */
 
   final long getFileSize(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+    final PathVirtual path)
+    throws FilesystemError
   {
-    final Option<FileReference<T>> ro = this.lookup(path);
-    switch (ro.type) {
-      case OPTION_NONE:
-      {
-        throw FilesystemError.fileNotFound(path.toString());
-      }
-      case OPTION_SOME:
-      {
-        final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) ro;
-        final FileReference<T> ar = s.value;
-
-        switch (s.value.type) {
-          case TYPE_DIRECTORY:
+    final OptionType<FileReference<T>> ro = this.lookup(path);
+    return ro
+      .acceptPartial(
+        new OptionPartialVisitorType<FileReference<T>, Long, FilesystemError>() {
+          @Override public Long none(
+            final None<FileReference<T>> n)
+            throws FilesystemError
           {
-            throw FilesystemError.notFile(path.toString());
+            throw FilesystemError.fileNotFound(path.toString());
           }
-          case TYPE_FILE:
-          {
-            return this.getFileSizeActual(ar);
-          }
-        }
-        break;
-      }
-    }
 
-    throw new UnreachableCodeException();
+          @Override public Long some(
+            final Some<FileReference<T>> s)
+            throws FilesystemError
+          {
+            final FileReference<T> r = s.get();
+            switch (r.getType()) {
+              case TYPE_DIRECTORY:
+              {
+                throw FilesystemError.notFile(path.toString());
+              }
+              case TYPE_FILE:
+              {
+                final Long k =
+                  Long.valueOf(Archive.this.getFileSizeActual(r));
+                assert k != null;
+                return k;
+              }
+            }
+
+            throw new UnreachableCodeException();
+          }
+        })
+      .longValue();
   }
 
   /**
@@ -121,11 +128,10 @@ abstract class Archive<T extends ArchiveKind>
    */
 
   abstract protected long getFileSizeActual(
-    final @Nonnull FileReference<T> r)
-    throws FilesystemError,
-      ConstraintError;
+    final FileReference<T> r)
+    throws FilesystemError;
 
-  abstract protected @Nonnull Log getLogLookup();
+  abstract protected LogUsableType getLogLookup();
 
   /**
    * <p>
@@ -141,25 +147,27 @@ abstract class Archive<T extends ArchiveKind>
    *           </ul>
    */
 
-  final @Nonnull Calendar getModificationTime(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+  final Calendar getModificationTime(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    final Option<FileReference<T>> ro = this.lookup(path);
-    switch (ro.type) {
-      case OPTION_NONE:
-      {
-        throw FilesystemError.fileNotFound(path.toString());
-      }
-      case OPTION_SOME:
-      {
-        final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) ro;
-        return this.getModificationTimeActual(s.value);
-      }
-    }
+    final OptionType<FileReference<T>> ro = this.lookup(path);
+    return ro
+      .acceptPartial(new OptionPartialVisitorType<FileReference<T>, Calendar, FilesystemError>() {
+        @Override public Calendar none(
+          final None<FileReference<T>> n)
+          throws FilesystemError
+        {
+          throw FilesystemError.fileNotFound(path.toString());
+        }
 
-    throw new UnreachableCodeException();
+        @Override public Calendar some(
+          final Some<FileReference<T>> s)
+          throws FilesystemError
+        {
+          return Archive.this.getModificationTimeActual(s.get());
+        }
+      });
   }
 
   /**
@@ -176,8 +184,8 @@ abstract class Archive<T extends ArchiveKind>
    *           </ul>
    */
 
-  abstract protected @Nonnull Calendar getModificationTimeActual(
-    final @Nonnull FileReference<T> r);
+  abstract protected Calendar getModificationTimeActual(
+    final FileReference<T> r);
 
   /**
    * <p>
@@ -185,7 +193,7 @@ abstract class Archive<T extends ArchiveKind>
    * </p>
    */
 
-  abstract @Nonnull PathVirtual getMountPath();
+  abstract PathVirtual getMountPath();
 
   /**
    * <p>
@@ -193,7 +201,7 @@ abstract class Archive<T extends ArchiveKind>
    * </p>
    */
 
-  abstract @Nonnull PathReal getRealPath();
+  abstract PathReal getRealPath();
 
   /**
    * <p>
@@ -209,10 +217,9 @@ abstract class Archive<T extends ArchiveKind>
    *           </ul>
    */
 
-  abstract @Nonnull Set<String> listDirectory(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError;
+  abstract SortedSet<String> listDirectory(
+    final PathVirtual path)
+    throws FilesystemError;
 
   /**
    * <p>
@@ -225,24 +232,21 @@ abstract class Archive<T extends ArchiveKind>
    *           If <code>path == null</code>.
    */
 
-  final @Nonnull Option<FileReference<T>> lookup(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+  final OptionType<FileReference<T>> lookup(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    final Log log = this.getLogLookup();
-    if (log.enabledByConfiguration()) {
-      log.debug(path.toString());
-    }
+    final LogUsableType log = this.getLogLookup();
+    log.debug(path.toString());
 
-    final PathVirtualEnum e = new PathVirtualEnum(path);
+    final PathVirtualEnum e = PathVirtualEnum.enumerate(path);
     while (e.hasMoreElements()) {
       final PathVirtual p = e.nextElement();
       final FileReference<T> r = this.lookupActual(p);
       if (r == null) {
-        return new Option.None<FileReference<T>>();
+        return Option.none();
       }
-      switch (r.type) {
+      switch (r.getType()) {
         case TYPE_DIRECTORY:
         {
           break;
@@ -256,10 +260,10 @@ abstract class Archive<T extends ArchiveKind>
 
     final FileReference<T> r = this.lookupActual(path);
     if (r == null) {
-      return new Option.None<FileReference<T>>();
+      return Option.none();
     }
 
-    return new Option.Some<FileReference<T>>(r);
+    return Option.some(r);
   }
 
   /**
@@ -270,13 +274,13 @@ abstract class Archive<T extends ArchiveKind>
    * 
    * @return A reference to the filesystem object at <code>path</code>,
    *         <code>null</code> if no object exists at <code>path</code>.
-   * @throws ConstraintError
-   *           If <code>path == null</code>.
+   * @throws FilesystemError
+   *           If a filesystem error occurs.
    */
 
-  abstract protected @CheckForNull FileReference<T> lookupActual(
-    final @Nonnull PathVirtual path)
-    throws ConstraintError;
+  abstract protected @Nullable FileReference<T> lookupActual(
+    final PathVirtual path)
+    throws FilesystemError;
 
   /**
    * <p>
@@ -292,37 +296,40 @@ abstract class Archive<T extends ArchiveKind>
    *           </ul>
    */
 
-  final @Nonnull InputStream openFile(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+  final InputStream openFile(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    final Option<FileReference<T>> ro = this.lookup(path);
-    switch (ro.type) {
-      case OPTION_NONE:
-      {
-        throw FilesystemError.fileNotFound(path.toString());
-      }
-      case OPTION_SOME:
-      {
-        final Some<FileReference<T>> s = (Option.Some<FileReference<T>>) ro;
-        final FileReference<T> ar = s.value;
+    final OptionType<FileReference<T>> ro = this.lookup(path);
 
-        switch (s.value.type) {
-          case TYPE_DIRECTORY:
-          {
-            throw FilesystemError.notFile(path.toString());
-          }
-          case TYPE_FILE:
-          {
-            return this.openFileActual(ar);
-          }
+    return ro
+      .acceptPartial(new OptionPartialVisitorType<FileReference<T>, InputStream, FilesystemError>() {
+        @Override public InputStream none(
+          final None<FileReference<T>> n)
+          throws FilesystemError
+        {
+          throw FilesystemError.fileNotFound(path.toString());
         }
-        break;
-      }
-    }
 
-    throw new UnreachableCodeException();
+        @Override public InputStream some(
+          final Some<FileReference<T>> s)
+          throws FilesystemError
+        {
+          final FileReference<T> r = s.get();
+          switch (r.getType()) {
+            case TYPE_DIRECTORY:
+            {
+              throw FilesystemError.notFile(path.toString());
+            }
+            case TYPE_FILE:
+            {
+              return Archive.this.openFileActual(r);
+            }
+          }
+
+          throw new UnreachableCodeException();
+        }
+      });
   }
 
   /**
@@ -339,8 +346,7 @@ abstract class Archive<T extends ArchiveKind>
    *           </ul>
    */
 
-  abstract protected @Nonnull InputStream openFileActual(
-    final @Nonnull FileReference<T> r)
-    throws FilesystemError,
-      ConstraintError;
+  abstract protected InputStream openFileActual(
+    final FileReference<T> r)
+    throws FilesystemError;
 }

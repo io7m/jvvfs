@@ -21,25 +21,21 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.functional.Option;
-import com.io7m.jaux.functional.Option.Some;
+import com.io7m.jfunctional.OptionType;
+import com.io7m.jfunctional.Some;
 import com.io7m.jvvfs.FileReference.Type;
 import com.io7m.jvvfs.FilesystemError.Code;
 
 public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
 {
-  @Override @Nonnull Archive<ArchiveZipKind> getArchive(
-    final @Nonnull String basename,
-    final @Nonnull PathVirtual mount)
+  @Override Archive<ArchiveZipKind> getArchive(
+    final String basename,
+    final PathVirtual mount)
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final File tempdir = TestData.getTestDataDirectory();
@@ -49,8 +45,7 @@ public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
   }
 
   @Test(expected = FilesystemError.class) public void testCorrupt()
-    throws ConstraintError,
-      FileNotFoundException,
+    throws FileNotFoundException,
       IOException,
       FilesystemError
   {
@@ -65,7 +60,6 @@ public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
   @Test public void testListDirectoryImplicit()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<ArchiveZipKind> a =
@@ -83,7 +77,6 @@ public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
   @Test public void testListDirectoryImplicitImplicit()
     throws FileNotFoundException,
       IOException,
-      ConstraintError,
       FilesystemError
   {
     final Archive<ArchiveZipKind> a =
@@ -100,7 +93,6 @@ public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
 
   @Test public void testLookupSingleDirectoryImplicit()
     throws FilesystemError,
-      ConstraintError,
       FileNotFoundException,
       IOException
   {
@@ -109,14 +101,14 @@ public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
 
     try {
       final PathVirtual p = PathVirtual.ofString("/subdir");
-      final Option<FileReference<ArchiveZipKind>> r = a.lookup(p);
+      final OptionType<FileReference<ArchiveZipKind>> r = a.lookup(p);
 
       Assert.assertTrue(r.isSome());
       final Some<FileReference<ArchiveZipKind>> s =
-        (Option.Some<FileReference<ArchiveZipKind>>) r;
-      Assert.assertTrue(s.value.type == Type.TYPE_DIRECTORY);
-      Assert.assertTrue(s.value.path.equals(p));
-      Assert.assertTrue(s.value.archive == a);
+        (Some<FileReference<ArchiveZipKind>>) r;
+      Assert.assertTrue(s.get().getType() == Type.TYPE_DIRECTORY);
+      Assert.assertTrue(s.get().getPath().equals(p));
+      Assert.assertTrue(s.get().getArchive() == a);
     } finally {
       a.close();
     }
@@ -124,7 +116,6 @@ public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
 
   @Test public void testLookupSingleFileDirectoryImplicit()
     throws FilesystemError,
-      ConstraintError,
       FileNotFoundException,
       IOException
   {
@@ -133,14 +124,14 @@ public final class ArchiveZipTest extends ArchiveContract<ArchiveZipKind>
 
     try {
       final PathVirtual p = PathVirtual.ofString("/subdir/file.txt");
-      final Option<FileReference<ArchiveZipKind>> r = a.lookup(p);
+      final OptionType<FileReference<ArchiveZipKind>> r = a.lookup(p);
 
       Assert.assertTrue(r.isSome());
       final Some<FileReference<ArchiveZipKind>> s =
-        (Option.Some<FileReference<ArchiveZipKind>>) r;
-      Assert.assertTrue(s.value.type == Type.TYPE_FILE);
-      Assert.assertTrue(s.value.path.equals(p));
-      Assert.assertTrue(s.value.archive == a);
+        (Some<FileReference<ArchiveZipKind>>) r;
+      Assert.assertTrue(s.get().getType() == Type.TYPE_FILE);
+      Assert.assertTrue(s.get().getPath().equals(p));
+      Assert.assertTrue(s.get().getArchive() == a);
     } finally {
       a.close();
     }

@@ -1,8 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<c:changelog xmlns:c="http://www.io7m.com/schemas/changelog/1.0.0">
+<c:changelog xmlns:c="http://schemas.io7m.com/changelog/2.0.0">
   <c:project>io7m-jvvfs</c:project>
 
-  <c:release ticket-system="com.io7m.fossil.jvvfs">
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2014-04-23</c:date>
+    <c:version>4.0.0</c:version>
+
+    <c:item>
+      <c:date>2014-04-23</c:date>
+      <c:type-code-change/>
+      <c:summary>Rename each interface type S to SType, to follow new naming conventions.</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2014-04-23</c:date>
+      <c:type-code-change/>
+      <c:summary>Use io7m-jlog 3.0.0.</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2014-04-23</c:date>
+      <c:type-code-change/>
+      <c:summary>Use io7m-jfunctional, io7m-jnull, etc. Remove ConstraintError from all interfaces.</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2014-04-24</c:date>
+      <c:type-code-change/>
+      <c:summary>All packages now exist under a common groupId (com.io7m.jvvfs).</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2014-04-24</c:date>
+      <c:type-code-change/>
+      <c:summary>Filesystem.make*() now returns FilesystemType.</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2014-04-24</c:date>
+      <c:type-code-new/>
+      <c:summary>Added FilesystemType mainly for aesthetic reasons (more pleasant to read than the capability types it extends).</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2014-01-04</c:date>
     <c:version>3.1.1</c:version>
 
@@ -13,7 +49,7 @@
     </c:item>
   </c:release>
 
-  <c:release ticket-system="com.io7m.fossil.jvvfs">
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2013-07-13</c:date>
     <c:version>3.1.0</c:version>
 
@@ -30,7 +66,7 @@
     </c:item>
   </c:release>
 
-  <c:release ticket-system="com.io7m.fossil.jvvfs">
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2013-06-30</c:date>
     <c:version>3.0.0</c:version>
 
@@ -41,7 +77,7 @@
     </c:item>
   </c:release>
 
-  <c:release ticket-system="com.io7m.fossil.jvvfs">
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2013-04-06</c:date>
     <c:version>2.4.0</c:version>
 
@@ -58,7 +94,7 @@
     </c:item>
   </c:release>
 
-  <c:release ticket-system="com.io7m.fossil.jvvfs">
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2012-11-22</c:date>
     <c:version>2.3.0</c:version>
 
@@ -105,7 +141,7 @@
     </c:item>
   </c:release>
 
-  <c:release ticket-system="com.io7m.fossil.jvvfs">
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2012-07-25</c:date>
     <c:version>2.2.0</c:version>
 
@@ -128,7 +164,7 @@
     </c:item>
   </c:release>
 
-  <c:release ticket-system="com.io7m.fossil.jvvfs">
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2012-07-14</c:date>
     <c:version>2.1.0</c:version>
 
@@ -145,7 +181,7 @@
     </c:item>
   </c:release>
 
-  <c:release ticket-system="com.io7m.fossil.jvvfs">
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2012-06-28</c:date>
     <c:version>2.0.0</c:version>
     <c:item>
@@ -155,7 +191,7 @@
     </c:item>
   </c:release>
 
-  <c:release ticket-system="com.io7m.fossil.jvvfs">
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2012-04-20</c:date>
     <c:version>1.1.0</c:version>
     <c:item>
@@ -180,17 +216,17 @@
     </c:item>
   </c:release>
 
-  <c:release ticket-system="com.io7m.fossil.jvvfs">
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2012-03-21</c:date>
     <c:version>1.0.1</c:version>
     <c:item>
       <c:date>2012-03-21</c:date>
-      <c:type-platform-new/>
+      <c:type-code-new/>
       <c:summary>Add FreeBSD 8.2 as supported</c:summary>
     </c:item>
   </c:release>
 
-  <c:release ticket-system="com.io7m.fossil.jvvfs">
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
     <c:date>2012-03-15</c:date>
     <c:version>1.0.0</c:version>
     <c:item>
@@ -200,7 +236,7 @@
     </c:item>
     <c:item>
       <c:date>2012-02-08</c:date>
-      <c:type-platform-new/>
+      <c:type-code-new/>
       <c:summary>Add SunOS supported</c:summary>
     </c:item>
   </c:release>

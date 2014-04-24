@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,24 +21,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Enumeration;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import com.io7m.jaux.Constraints;
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnreachableCodeException;
-import com.io7m.jaux.functional.Option;
-import com.io7m.jaux.functional.Option.Some;
-import com.io7m.jlog.Log;
+import com.io7m.jfunctional.None;
+import com.io7m.jfunctional.Option;
+import com.io7m.jfunctional.OptionPartialVisitorType;
+import com.io7m.jfunctional.OptionType;
+import com.io7m.jfunctional.OptionVisitorType;
+import com.io7m.jfunctional.Some;
+import com.io7m.jlog.LogLevel;
+import com.io7m.jlog.LogType;
+import com.io7m.jlog.LogUsableType;
+import com.io7m.jnull.NullCheck;
+import com.io7m.jnull.Nullable;
+import com.io7m.junreachable.UnreachableCodeException;
 import com.io7m.jvvfs.FileReference.Type;
+import com.io7m.jvvfs.FilesystemError.Code;
 
 /**
  * <p>
@@ -51,53 +54,65 @@ import com.io7m.jvvfs.FileReference.Type;
  * </p>
  */
 
-@NotThreadSafe final class ArchiveZip extends Archive<ArchiveZipKind>
+final class ArchiveZip extends Archive<ArchiveZipKind>
 {
   static final class ArchiveZipReference extends
     FileReference<ArchiveZipKind>
   {
-    /** <code>None</code> iff <code>path.isRoot()</code>. */
-    final @Nonnull Option<ZipEntry> zip_entry_opt;
+    /**
+     * <code>None</code> iff <code>path.isRoot()</code>.
+     */
+
+    private final OptionType<ZipEntry> zip_entry_opt;
+
+    /**
+     * @return <code>None</code> iff <code>path.isRoot()</code>.
+     */
+
+    OptionType<ZipEntry> getZipEntryOption()
+    {
+      return this.zip_entry_opt;
+    }
 
     ArchiveZipReference(
-      final @Nonnull Archive<ArchiveZipKind> in_archive,
-      final @Nonnull PathVirtual in_path,
-      final @Nonnull Type in_type,
-      final @Nonnull ZipEntry actual)
-      throws ConstraintError
+      final Archive<ArchiveZipKind> in_archive,
+      final PathVirtual in_path,
+      final Type in_type,
+      final @Nullable ZipEntry actual)
+      throws FilesystemError
     {
       super(in_archive, in_path, in_type);
 
       if (actual == null) {
-        Constraints.constrainArbitrary(
-          in_path.isRoot(),
-          "Path must be root for null zip entry");
-        this.zip_entry_opt = new Option.None<ZipEntry>();
+        if (in_path.isRoot() == false) {
+          throw new FilesystemError(
+            Code.FS_ERROR_CONSTRAINT_ERROR,
+            "Path must be root for null zip entry");
+        }
+        this.zip_entry_opt = Option.none();
       } else {
-        this.zip_entry_opt = new Option.Some<ZipEntry>(actual);
+        this.zip_entry_opt = Option.some(actual);
       }
     }
   }
 
-  private final @Nonnull ZipFile     zip;
-  private final @Nonnull PathVirtual mount;
-  private final @Nonnull PathReal    real;
-  private final @Nonnull Log         log;
-  private final @Nonnull Log         log_lookup;
+  private final ZipFile     zip;
+  private final PathVirtual mount;
+  private final PathReal    real;
+  private final LogType     log;
+  private final LogType     log_lookup;
 
   ArchiveZip(
-    final @Nonnull Log in_log,
-    final @Nonnull PathReal base_path,
-    final @Nonnull PathVirtual in_mount)
-    throws ConstraintError,
-      IOException,
+    final LogUsableType in_log,
+    final PathReal base_path,
+    final PathVirtual in_mount)
+    throws IOException,
       FilesystemError
   {
     try {
-      this.log = new Log(in_log, "zip");
-      this.log_lookup = new Log(this.log, "lookup");
-
-      this.mount = Constraints.constrainNotNull(in_mount, "Mount path");
+      this.log = NullCheck.notNull(in_log, "Log").with("zip");
+      this.log_lookup = this.log.with("lookup");
+      this.mount = NullCheck.notNull(in_mount, "Mount path");
       this.zip = new ZipFile(base_path.toString());
       this.real = new PathReal(base_path.toString());
     } catch (final ZipException e) {
@@ -117,8 +132,8 @@ import com.io7m.jvvfs.FileReference.Type;
     }
   }
 
-  private @CheckForNull ZipEntry expensiveDirectoryLookup(
-    final @Nonnull String name)
+  private @Nullable ZipEntry expensiveDirectoryLookup(
+    final String name)
   {
     final Enumeration<? extends ZipEntry> entries = this.zip.entries();
 
@@ -134,115 +149,126 @@ import com.io7m.jvvfs.FileReference.Type;
   }
 
   @Override protected long getFileSizeActual(
-    final @Nonnull FileReference<ArchiveZipKind> r)
-    throws FilesystemError,
-      ConstraintError
+    final FileReference<ArchiveZipKind> r)
+    throws FilesystemError
   {
     final ArchiveZipReference ra = (ArchiveZipReference) r;
-    assert ra.type == Type.TYPE_FILE;
+    assert ra.getType() == Type.TYPE_FILE;
 
-    switch (ra.zip_entry_opt.type) {
-      case OPTION_NONE:
-      {
-        /**
-         * The zip entry can only be <code>None</code> if the given path was
-         * root. If the given path is root, it must be a directory, and
-         * <code>getFileSizeActual</code> will never be called by
-         * <code>Archive#getFileSize(PathVirtual)</code> with a reference to a
-         * directory.
-         */
+    return ra
+      .getZipEntryOption()
+      .accept(new OptionVisitorType<ZipEntry, Long>() {
+        @Override public Long none(
+          final None<ZipEntry> n)
+        {
+          /**
+           * The zip entry can only be <code>None</code> if the given path was
+           * root. If the given path is root, it must be a directory, and
+           * <code>getFileSizeActual</code> will never be called by
+           * <code>Archive#getFileSize(PathVirtual)</code> with a reference to
+           * a directory.
+           */
 
-        throw new UnreachableCodeException();
-      }
-      case OPTION_SOME:
-      {
-        final ZipEntry ze = ((Option.Some<ZipEntry>) ra.zip_entry_opt).value;
-        return ze.getSize();
-      }
-    }
+          throw new UnreachableCodeException();
+        }
 
-    throw new UnreachableCodeException();
+        @Override public Long some(
+          final Some<ZipEntry> s)
+        {
+          final Long rs = Long.valueOf(s.get().getSize());
+          assert rs != null;
+          return rs;
+        }
+      })
+      .longValue();
   }
 
-  @Override protected @Nonnull Log getLogLookup()
+  @Override protected LogType getLogLookup()
   {
     return this.log_lookup;
   }
 
-  @Override protected @Nonnull Calendar getModificationTimeActual(
-    final @Nonnull FileReference<ArchiveZipKind> r)
+  @Override protected Calendar getModificationTimeActual(
+    final FileReference<ArchiveZipKind> r)
   {
     final ArchiveZipReference ra = (ArchiveZipReference) r;
     final Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-    switch (ra.zip_entry_opt.type) {
-      case OPTION_NONE:
-      {
-        final File file = new File(this.real.toString());
-        c.setTimeInMillis(file.lastModified());
-        return c;
-      }
-      case OPTION_SOME:
-      {
-        final ZipEntry ze = ((Option.Some<ZipEntry>) ra.zip_entry_opt).value;
-        c.setTimeInMillis(ze.getTime());
-        return c;
-      }
-    }
+    return ra.getZipEntryOption().accept(
+      new OptionVisitorType<ZipEntry, Calendar>() {
+        @SuppressWarnings("synthetic-access") @Override public Calendar none(
+          final None<ZipEntry> n)
+        {
+          final File file = new File(ArchiveZip.this.real.toString());
+          c.setTimeInMillis(file.lastModified());
+          return c;
+        }
 
-    throw new UnreachableCodeException();
+        @Override public Calendar some(
+          final Some<ZipEntry> s)
+        {
+          c.setTimeInMillis(s.get().getTime());
+          return c;
+        }
+      });
   }
 
-  @Override @Nonnull PathVirtual getMountPath()
+  @Override PathVirtual getMountPath()
   {
     return this.mount;
   }
 
-  @Override @Nonnull PathReal getRealPath()
+  @Override PathReal getRealPath()
   {
     return this.real;
   }
 
-  @Override @Nonnull Set<String> listDirectory(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+  @Override SortedSet<String> listDirectory(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    final Option<FileReference<ArchiveZipKind>> r = this.lookup(path);
-    switch (r.type) {
-      case OPTION_NONE:
-      {
-        throw FilesystemError.fileNotFound(path.toString());
-      }
-      case OPTION_SOME:
-      {
-        final Some<FileReference<ArchiveZipKind>> s =
-          (Option.Some<FileReference<ArchiveZipKind>>) r;
-        final FileReference<ArchiveZipKind> ar = s.value;
-        final ArchiveZipReference ra = (ArchiveZipReference) ar;
-
-        switch (s.value.type) {
-          case TYPE_DIRECTORY:
-          {
-            return this.listDirectoryInternal(ra);
-          }
-          case TYPE_FILE:
-          {
-            throw FilesystemError.notDirectory(path.toString());
-          }
+    final OptionType<FileReference<ArchiveZipKind>> r = this.lookup(path);
+    return r
+      .acceptPartial(new OptionPartialVisitorType<FileReference<ArchiveZipKind>, SortedSet<String>, FilesystemError>() {
+        @Override public SortedSet<String> none(
+          final None<FileReference<ArchiveZipKind>> n)
+          throws FilesystemError
+        {
+          throw FilesystemError.fileNotFound(path.toString());
         }
-      }
-    }
 
-    throw new UnreachableCodeException();
+        @SuppressWarnings("synthetic-access") @Override public
+          SortedSet<String>
+          some(
+            final Some<FileReference<ArchiveZipKind>> s)
+            throws FilesystemError
+        {
+          final FileReference<ArchiveZipKind> ar = s.get();
+          final ArchiveZipReference ra = (ArchiveZipReference) ar;
+
+          switch (ra.getType()) {
+            case TYPE_DIRECTORY:
+            {
+              return ArchiveZip.this.listDirectoryInternal(ra);
+            }
+            case TYPE_FILE:
+            {
+              throw FilesystemError.notDirectory(path.toString());
+            }
+          }
+
+          throw new UnreachableCodeException();
+        }
+      });
   }
 
-  private Set<String> listDirectoryInternal(
-    final @Nonnull ArchiveZipReference ra)
+  private SortedSet<String> listDirectoryInternal(
+    final ArchiveZipReference ra)
   {
-    final TreeSet<String> items = new TreeSet<String>();
+    final SortedSet<String> items = new TreeSet<String>();
     final Enumeration<? extends ZipEntry> entries = this.zip.entries();
-    final String ps = ra.path.toString() + (ra.path.isRoot() ? "" : "/");
+    final String ps =
+      ra.getPath().toString() + (ra.getPath().isRoot() ? "" : "/");
 
     while (entries.hasMoreElements()) {
       final ZipEntry e = entries.nextElement();
@@ -268,16 +294,18 @@ import com.io7m.jvvfs.FileReference.Type;
     return items;
   }
 
-  @Override protected @CheckForNull
-    FileReference<ArchiveZipKind>
-    lookupActual(
-      final @Nonnull PathVirtual path)
-      throws ConstraintError
+  @Override protected @Nullable FileReference<ArchiveZipKind> lookupActual(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    if (this.log_lookup.enabledByConfiguration()) {
-      this.log_lookup.debug(this.real.toFile().getName()
-        + ": "
-        + path.toString());
+    if (this.log_lookup.wouldLog(LogLevel.LOG_DEBUG)) {
+      final StringBuilder m = new StringBuilder();
+      m.append(this.real.toFile().getName());
+      m.append(": ");
+      m.append(path.toString());
+      final String r = m.toString();
+      assert r != null;
+      this.log_lookup.debug(r);
     }
 
     if (path.isRoot()) {
@@ -312,49 +340,58 @@ import com.io7m.jvvfs.FileReference.Type;
       }
     }
 
-    if (this.log_lookup.enabledByConfiguration()) {
-      this.log_lookup.debug(this.real.toFile().getName()
-        + ": "
-        + path.toString()
-        + " is nonexistent");
+    if (this.log_lookup.wouldLog(LogLevel.LOG_DEBUG)) {
+      final StringBuilder m = new StringBuilder();
+      m.append(this.real.toFile().getName());
+      m.append(": ");
+      m.append(path.toString());
+      m.append(" is nonexistent");
+      final String r = m.toString();
+      assert r != null;
+      this.log_lookup.debug(r);
     }
     return null;
   }
 
-  @Override protected @Nonnull InputStream openFileActual(
-    final @Nonnull FileReference<ArchiveZipKind> r)
-    throws FilesystemError,
-      ConstraintError
+  @Override protected InputStream openFileActual(
+    final FileReference<ArchiveZipKind> r)
+    throws FilesystemError
   {
     final ArchiveZipReference ra = (ArchiveZipReference) r;
-    assert ra.type == Type.TYPE_FILE;
+    assert ra.getType() == Type.TYPE_FILE;
 
     try {
-      switch (ra.zip_entry_opt.type) {
-        case OPTION_NONE:
-        {
-          /**
-           * The zip entry can only be <code>None</code> if the given path was
-           * root. If the given path is root, it must be a directory, and
-           * <code>openFileActual</code> will never be called by
-           * <code>Archive#openFile(PathVirtual)</code> with a reference to a
-           * directory.
-           */
+      return ra.getZipEntryOption().acceptPartial(
+        new OptionPartialVisitorType<ZipEntry, InputStream, IOException>() {
+          @Override public InputStream none(
+            final None<ZipEntry> n)
+          {
+            /**
+             * The zip entry can only be <code>None</code> if the given path
+             * was root. If the given path is root, it must be a directory,
+             * and <code>openFileActual</code> will never be called by
+             * <code>Archive#openFile(PathVirtual)</code> with a reference to
+             * a directory.
+             */
 
-          throw new UnreachableCodeException();
-        }
-        case OPTION_SOME:
-        {
-          final ZipEntry ze =
-            ((Option.Some<ZipEntry>) ra.zip_entry_opt).value;
-          return this.zip.getInputStream(ze);
-        }
-      }
+            throw new UnreachableCodeException();
+          }
+
+          @SuppressWarnings("synthetic-access") @Override public
+            InputStream
+            some(
+              final Some<ZipEntry> s)
+              throws IOException
+          {
+            final InputStream ri =
+              ArchiveZip.this.zip.getInputStream(s.get());
+            assert ri != null;
+            return ri;
+          }
+        });
     } catch (final IOException e) {
       throw FilesystemError.ioError(e);
     }
-
-    throw new UnreachableCodeException();
   }
 
   @Override public String toString()

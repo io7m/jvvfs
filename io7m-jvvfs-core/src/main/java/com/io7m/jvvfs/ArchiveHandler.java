@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,10 +16,7 @@
 
 package com.io7m.jvvfs;
 
-import javax.annotation.Nonnull;
-
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jlog.Log;
+import com.io7m.jlog.LogUsableType;
 
 /**
  * The interface exposed by archive handlers.
@@ -34,17 +31,16 @@ abstract class ArchiveHandler<T extends ArchiveKind>
    */
 
   abstract boolean canHandle(
-    final @Nonnull PathReal name);
+    final PathReal name);
 
   /**
    * Load the archive at <code>name</code>, setting the mount path of the
    * archive to <code>mount</code>.
    */
 
-  abstract @Nonnull Archive<T> load(
-    final @Nonnull Log log,
-    final @Nonnull PathReal name,
-    final @Nonnull PathVirtual mount)
-    throws ConstraintError,
-      FilesystemError;
+  abstract Archive<T> load(
+    final LogUsableType log,
+    final PathReal name,
+    final PathVirtual mount)
+    throws FilesystemError;
 }

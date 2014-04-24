@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,20 +21,18 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Calendar;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import com.io7m.jaux.Constraints;
-import com.io7m.jaux.Constraints.ConstraintError;
-import com.io7m.jaux.UnreachableCodeException;
-import com.io7m.jaux.functional.Option;
-import com.io7m.jaux.functional.Option.Some;
-import com.io7m.jlog.Log;
+import com.io7m.jfunctional.None;
+import com.io7m.jfunctional.OptionPartialVisitorType;
+import com.io7m.jfunctional.OptionType;
+import com.io7m.jfunctional.Some;
+import com.io7m.jlog.LogUsableType;
+import com.io7m.jnull.NullCheck;
+import com.io7m.jnull.Nullable;
+import com.io7m.junreachable.UnreachableCodeException;
 import com.io7m.jvvfs.FileReference.Type;
 
 /**
@@ -48,41 +46,45 @@ import com.io7m.jvvfs.FileReference.Type;
  * </p>
  */
 
-@NotThreadSafe final class ArchiveDirectory extends
-  Archive<ArchiveDirectoryKind>
+final class ArchiveDirectory extends Archive<ArchiveDirectoryKind>
 {
   static final class ArchiveDirectoryReference extends
     FileReference<ArchiveDirectoryKind>
   {
-    final @Nonnull File actual;
+    private final File actual;
 
     ArchiveDirectoryReference(
-      final @Nonnull Archive<ArchiveDirectoryKind> in_archive,
-      final @Nonnull PathVirtual in_path,
-      final @Nonnull Type in_type,
-      final @Nonnull File in_actual)
-      throws ConstraintError
+      final Archive<ArchiveDirectoryKind> in_archive,
+      final PathVirtual in_path,
+      final Type in_type,
+      final File in_actual)
     {
       super(in_archive, in_path, in_type);
       this.actual = in_actual;
     }
+
+    File getActual()
+    {
+      return this.actual;
+    }
   }
 
-  private final @Nonnull File        base;
-  private final @Nonnull PathVirtual mount;
-  private final @Nonnull PathReal    real;
-  private final @Nonnull Log         log;
+  private final File          base;
+  private final PathVirtual   mount;
+  private final PathReal      real;
+  private final LogUsableType log;
 
   ArchiveDirectory(
-    final @Nonnull Log in_log,
-    final @Nonnull PathReal base_path,
-    final @Nonnull PathVirtual in_mount)
-    throws ConstraintError
+    final LogUsableType in_log,
+    final PathReal base_path,
+    final PathVirtual in_mount)
   {
-    this.log = new Log(in_log, "directory");
-    this.mount = Constraints.constrainNotNull(in_mount, "Mount path");
+    this.log = NullCheck.notNull(in_log, "Log").with("directory");
+    this.mount = NullCheck.notNull(in_mount, "Mount path");
     this.base = new File(base_path.toString());
-    this.real = new PathReal(this.base.toString());
+    final String r = this.base.toString();
+    assert r != null;
+    this.real = new PathReal(r);
   }
 
   @Override void close()
@@ -92,82 +94,84 @@ import com.io7m.jvvfs.FileReference.Type;
   }
 
   @Override protected long getFileSizeActual(
-    final @Nonnull FileReference<ArchiveDirectoryKind> r)
-    throws FilesystemError,
-      ConstraintError
+    final FileReference<ArchiveDirectoryKind> r)
+    throws FilesystemError
   {
     final ArchiveDirectoryReference ra = (ArchiveDirectoryReference) r;
-    return ra.actual.length();
+    return ra.getActual().length();
   }
 
-  @Override protected @Nonnull Log getLogLookup()
+  @Override protected LogUsableType getLogLookup()
   {
     return this.log;
   }
 
-  @Override protected @Nonnull Calendar getModificationTimeActual(
-    final @Nonnull FileReference<ArchiveDirectoryKind> r)
+  @Override protected Calendar getModificationTimeActual(
+    final FileReference<ArchiveDirectoryKind> r)
   {
     final ArchiveDirectoryReference ra = (ArchiveDirectoryReference) r;
     final Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-    c.setTimeInMillis(ra.actual.lastModified());
+    c.setTimeInMillis(ra.getActual().lastModified());
     return c;
   }
 
-  @Override @Nonnull PathVirtual getMountPath()
+  @Override PathVirtual getMountPath()
   {
     return this.mount;
   }
 
-  @Override @Nonnull PathReal getRealPath()
+  @Override PathReal getRealPath()
   {
     return this.real;
   }
 
-  @Override @Nonnull Set<String> listDirectory(
-    final @Nonnull PathVirtual path)
-    throws FilesystemError,
-      ConstraintError
+  @Override SortedSet<String> listDirectory(
+    final PathVirtual path)
+    throws FilesystemError
   {
-    final Option<FileReference<ArchiveDirectoryKind>> r = this.lookup(path);
-    switch (r.type) {
-      case OPTION_NONE:
-      {
-        throw FilesystemError.fileNotFound(path.toString());
-      }
-      case OPTION_SOME:
-      {
-        final Some<FileReference<ArchiveDirectoryKind>> s =
-          (Option.Some<FileReference<ArchiveDirectoryKind>>) r;
-        final FileReference<ArchiveDirectoryKind> ar = s.value;
-        final ArchiveDirectoryReference ra = (ArchiveDirectoryReference) ar;
-
-        switch (s.value.type) {
-          case TYPE_DIRECTORY:
-          {
-            final String[] fs = ra.actual.list();
-            final TreeSet<String> ts = new TreeSet<String>();
-            for (final String f : fs) {
-              ts.add(f);
-            }
-            return ts;
-          }
-          case TYPE_FILE:
-          {
-            throw FilesystemError.notDirectory(path.toString());
-          }
+    final OptionType<FileReference<ArchiveDirectoryKind>> r =
+      this.lookup(path);
+    return r
+      .acceptPartial(new OptionPartialVisitorType<FileReference<ArchiveDirectoryKind>, SortedSet<String>, FilesystemError>() {
+        @Override public SortedSet<String> none(
+          final None<FileReference<ArchiveDirectoryKind>> n)
+          throws FilesystemError
+        {
+          throw FilesystemError.fileNotFound(path.toString());
         }
-      }
-    }
 
-    throw new UnreachableCodeException();
+        @Override public SortedSet<String> some(
+          final Some<FileReference<ArchiveDirectoryKind>> s)
+          throws FilesystemError
+        {
+          final FileReference<ArchiveDirectoryKind> ar = s.get();
+          final ArchiveDirectoryReference ra = (ArchiveDirectoryReference) ar;
+
+          switch (ra.getType()) {
+            case TYPE_DIRECTORY:
+            {
+              final String[] fs = ra.getActual().list();
+              final SortedSet<String> ts = new TreeSet<String>();
+              for (final String f : fs) {
+                ts.add(f);
+              }
+              return ts;
+            }
+            case TYPE_FILE:
+            {
+              throw FilesystemError.notDirectory(path.toString());
+            }
+          }
+
+          throw new UnreachableCodeException();
+        }
+      });
   }
 
-  @Override protected @CheckForNull
+  @Override protected @Nullable
     FileReference<ArchiveDirectoryKind>
     lookupActual(
-      final @Nonnull PathVirtual path)
-      throws ConstraintError
+      final PathVirtual path)
   {
     final File f = new File(this.base, path.toString());
     if (f.exists()) {
@@ -180,16 +184,15 @@ import com.io7m.jvvfs.FileReference.Type;
     return null;
   }
 
-  @Override protected @Nonnull InputStream openFileActual(
-    final @Nonnull FileReference<ArchiveDirectoryKind> r)
-    throws FilesystemError,
-      ConstraintError
+  @Override protected InputStream openFileActual(
+    final FileReference<ArchiveDirectoryKind> r)
+    throws FilesystemError
   {
     final ArchiveDirectoryReference ra = (ArchiveDirectoryReference) r;
     try {
-      return new FileInputStream(ra.actual);
+      return new FileInputStream(ra.getActual());
     } catch (final FileNotFoundException e) {
-      throw FilesystemError.fileNotFound(ra.path.toString());
+      throw FilesystemError.fileNotFound(ra.getPath().toString());
     }
   }
 

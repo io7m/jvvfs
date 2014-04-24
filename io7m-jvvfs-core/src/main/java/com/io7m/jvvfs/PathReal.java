@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013 <code@io7m.com> http://io7m.com
+ * Copyright © 2014 <code@io7m.com> http://io7m.com
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,44 +18,50 @@ package com.io7m.jvvfs;
 
 import java.io.File;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-
-import com.io7m.jaux.Constraints;
-import com.io7m.jaux.Constraints.ConstraintError;
+import com.io7m.jnull.NullCheck;
+import com.io7m.jnull.Nullable;
 
 /**
- * A path in the operating system's filesystem, in OS-specific syntax.
- */
-
-/**
+ * <p>
  * A real path represents a path in the real (not virtual) filesystem.
- * 
+ * </p>
+ * <p>
  * The concrete syntax of real paths is operating-system specific.
+ * </p>
  */
 
-@Immutable public final class PathReal
+public final class PathReal
 {
-  private final @Nonnull File actual;
+  private final File actual;
+
+  /**
+   * Construct a new path from the given file.
+   * 
+   * @param in_actual
+   *          The file
+   */
 
   public PathReal(
-    final @Nonnull File in_actual)
-    throws ConstraintError
+    final File in_actual)
   {
-    Constraints.constrainNotNull(in_actual, "Path");
-    this.actual = in_actual;
+    this.actual = NullCheck.notNull(in_actual, "Path");
   }
 
+  /**
+   * Construct a new path from the given string.
+   * 
+   * @param in_actual
+   *          The string
+   */
+
   public PathReal(
-    final @Nonnull String in_actual)
-    throws ConstraintError
+    final String in_actual)
   {
-    Constraints.constrainNotNull(in_actual, "Path");
-    this.actual = new File(in_actual);
+    this(new File(NullCheck.notNull(in_actual, "Path")));
   }
 
   @Override public boolean equals(
-    final Object obj)
+    final @Nullable Object obj)
   {
     if (this == obj) {
       return true;
@@ -75,13 +81,17 @@ import com.io7m.jaux.Constraints.ConstraintError;
     return this.actual.hashCode();
   }
 
-  public @Nonnull File toFile()
+  /**
+   * @return The current path as a {@link File}.
+   */
+
+  public File toFile()
   {
     return this.actual;
   }
 
   @Override public String toString()
   {
-    return this.actual.toString();
+    return NullCheck.notNull(this.actual.toString());
   }
 }

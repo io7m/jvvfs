@@ -1,15 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project
   xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.io7m.jvvfs.shell</groupId>
+  <parent>
+    <groupId>com.io7m.jvvfs</groupId>
+    <artifactId>io7m-jvvfs</artifactId>
+    <version>4.0.0</version>
+  </parent>
   <artifactId>io7m-jvvfs-shell</artifactId>
-  <name>io7m-jvvfs-shell</name>
-  <version>3.1.1</version>
-  <description>The jvvfs shell</description>
-  <url>http://mvn.io7m.com/jvvfs-shell/</url>
+
+  <packaging>jar</packaging>
+  <description>Virtual filesystem (Shell)</description>
+  <url>http://mvn.io7m.com/${project.artifactId}/</url>
+  <name>${project.artifactId}</name>
 
   <licenses>
     <license>
@@ -34,7 +40,7 @@
   </developers>
 
   <issueManagement>
-    <url>http://fossil.io7m.com/repo.cgi/io7m-jvvfs-shell</url>
+    <url>http://fossil.io7m.com/repo.cgi/io7m-jvvfs</url>
     <system>Fossil</system>
   </issueManagement>
 
@@ -42,7 +48,7 @@
     <site>
       <id>io7m</id>
       <name>io7m.com</name>
-      <url>http://mvn.io7m.com/jvvfs/</url>
+      <url>${project.url}</url>
     </site>
   </distributionManagement>
 
@@ -56,36 +62,17 @@
     </mailingList>
   </mailingLists>
 
+  <prerequisites>
+    <maven>2.2.1</maven>
+  </prerequisites>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
-  <prerequisites>
-    <maven>2.2.1</maven>
-  </prerequisites>
-
   <dependencies>
-    <dependency>
-      <groupId>com.io7m.jvvfs.core</groupId>
-      <artifactId>io7m-jvvfs-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.io7m.jaux</groupId>
-      <artifactId>io7m-jaux</artifactId>
-      <version>[3.0.0, 4.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>com.io7m.jlog</groupId>
-      <artifactId>io7m-jlog</artifactId>
-      <version>[2.4.0, 3.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>jline</groupId>
-      <artifactId>jline</artifactId>
-      <version>2.11</version>
-    </dependency>
+    <!-- Test suite -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -93,15 +80,26 @@
       <version>4.11</version>
     </dependency>
     <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-      <version>2.0.2</version>
-    </dependency>
-    <dependency>
       <groupId>net.java</groupId>
       <artifactId>quickcheck</artifactId>
       <version>0.6</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.io7m.jvvfs</groupId>
+      <artifactId>io7m-jvvfs-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.jlog</groupId>
+      <artifactId>io7m-jlog-core</artifactId>
+      <version>[3.0.0, 4.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>jline</groupId>
+      <artifactId>jline</artifactId>
+      <version>2.11</version>
     </dependency>
   </dependencies>
 
@@ -119,11 +117,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>3.3</version>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.maven.plugin</groupId>
-        <artifactId>emma-maven-plugin</artifactId>
-        <version>1.2</version>
       </plugin>
     </plugins>
   </reporting>
@@ -163,47 +156,57 @@
         </configuration>
       </plugin>
 
-      <!-- Tell the surefire plugin to fork only once per set of unit tests, -->
-      <!-- and redirect test output -->
+      <!-- Redirect test output -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.15</version>
         <configuration>
-          <forkMode>once</forkMode>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
       </plugin>
 
-      <!-- Produce jar files -->
+      <!-- Produce custom manifest in jar files -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.4</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Specification-Title>${project.name}</Specification-Title>
+              <Specification-Version>${project.version}</Specification-Version>
+              <Specification-Vendor>io7m.com</Specification-Vendor>
+              <Implementation-Title>${project.name}</Implementation-Title>
+              <Implementation-Version>${project.version}</Implementation-Version>
+              <Implementation-Vendor>io7m.com</Implementation-Vendor>
+              <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
+              <Built-By>io7m</Built-By>
+              <Sealed>true</Sealed>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Check style -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.11</version>
         <executions>
-          <!-- Produce custom manifest in jar files -->
           <execution>
-            <id>default-jar</id>
+            <id>validate</id>
+            <phase>validate</phase>
             <configuration>
-              <archive>
-                <manifestEntries>
-                  <Specification-Title>${project.name}</Specification-Title>
-                  <Specification-Version>${project.version}</Specification-Version>
-                  <Specification-Vendor>io7m.com</Specification-Vendor>
-                  <Implementation-Title>${project.name}</Implementation-Title>
-                  <Implementation-Version>${project.version}</Implementation-Version>
-                  <Implementation-Vendor>io7m.com</Implementation-Vendor>
-                  <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
-                  <Built-By>io7m</Built-By>
-                </manifestEntries>
-                <manifestSection>
-                  <name>com/io7m/jvvfs/shell</name>
-                  <manifestEntries>
-                    <Sealed>true</Sealed>
-                  </manifestEntries>
-                </manifestSection>
-              </archive>
+              <configLocation>../checkstyle.xml</configLocation>
+              <encoding>UTF-8</encoding>
+              <consoleOutput>true</consoleOutput>
+              <failsOnError>true</failsOnError>
+              <linkXRef>false</linkXRef>
             </configuration>
+            <goals>
+              <goal>check</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
@@ -217,8 +220,22 @@
           <execution>
             <phase>package</phase>
             <goals>
-               <goal>jar</goal>
+              <goal>jar</goal>
             </goals>
+            <configuration>
+              <archive>
+                <manifestEntries>
+                  <Specification-Title>${project.name}</Specification-Title>
+                  <Specification-Version>${project.version}</Specification-Version>
+                  <Specification-Vendor>io7m.com</Specification-Vendor>
+                  <Implementation-Title>${project.name}</Implementation-Title>
+                  <Implementation-Version>${project.version}</Implementation-Version>
+                  <Implementation-Vendor>io7m.com</Implementation-Vendor>
+                  <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
+                  <Built-By>io7m</Built-By>
+                </manifestEntries>
+              </archive>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -233,9 +250,24 @@
             <id>attach-javadocs</id>
             <phase>package</phase>
             <goals>
-               <goal>jar</goal>
+              <goal>jar</goal>
             </goals>
-         </execution>
+            <configuration>
+              <bottom><![CDATA[Copyright &#169; {currentYear} &lt;code@io7m.com&gt; http://io7m.com]]></bottom>
+              <archive>
+                <manifestEntries>
+                  <Specification-Title>${project.name}</Specification-Title>
+                  <Specification-Version>${project.version}</Specification-Version>
+                  <Specification-Vendor>io7m.com</Specification-Vendor>
+                  <Implementation-Title>${project.name}</Implementation-Title>
+                  <Implementation-Version>${project.version}</Implementation-Version>
+                  <Implementation-Vendor>io7m.com</Implementation-Vendor>
+                  <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
+                  <Built-By>io7m</Built-By>
+                </manifestEntries>
+              </archive>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 
@@ -253,26 +285,6 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- Produce application archive -->
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <descriptors>
-            <descriptor>assembly.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
 
     <!-- Allow deployment over ssh -->
@@ -284,7 +296,7 @@
       </extension>
     </extensions>
 
-    <!-- Mark certain plugins as ignored in Eclipse. Does not affect the build. -->
+    <!-- Mark plugins as ignored in Eclipse, does not affect the build. -->
     <pluginManagement>
       <plugins>
         <plugin>
@@ -301,32 +313,6 @@
                     <versionRange>[1.2,)</versionRange>
                     <goals>
                       <goal>instrument</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>xml-maven-plugin</artifactId>
-                    <versionRange>[1.0,)</versionRange>
-                    <goals>
-                      <goal>transform</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>com.io7m.saxon-plugin</groupId>
-                    <artifactId>io7m-saxon-plugin</artifactId>
-                    <versionRange>[1.0.0,)</versionRange>
-                    <goals>
-                      <goal>transform</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
