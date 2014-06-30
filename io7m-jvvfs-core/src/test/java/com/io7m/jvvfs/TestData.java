@@ -103,6 +103,13 @@ public final class TestData
   }
 
   /**
+   * The current test data directory. Initialized by
+   * {@link #getTestDataDirectory()}.
+   */
+
+  private static @Nullable TemporaryDirectory test_data_directory;
+
+  /**
    * A list of zip files that should be copied to the filesystem.
    */
 
@@ -146,13 +153,6 @@ public final class TestData
     TestData.zip_unpack_map.put("files1-3.zip", "files1-3");
     TestData.zip_unpack_map.put("files4-6.zip", "files4-6");
   }
-
-  /**
-   * The current test data directory. Initialized by
-   * {@link #getTestDataDirectory()}.
-   */
-
-  private static @Nullable TemporaryDirectory test_data_directory;
 
   /**
    * Copy the resource <code>name</code> to the file <code>out</code>.

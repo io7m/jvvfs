@@ -27,11 +27,6 @@ import com.io7m.jvvfs.FilesystemError.Code;
 
 final class ClassURIHandling
 {
-  private ClassURIHandling()
-  {
-    throw new UnreachableCodeException();
-  }
-
   /**
    * For a given URL returned by a classloader <code>url</code>, and the given
    * <code>file</code>, return the filesystem path that contains
@@ -125,5 +120,10 @@ final class ClassURIHandling
         Code.FS_ERROR_CONSTRAINT_ERROR,
         "invalid intermediate URL: " + e.getMessage());
     }
+  }
+
+  private ClassURIHandling()
+  {
+    throw new UnreachableCodeException();
   }
 }

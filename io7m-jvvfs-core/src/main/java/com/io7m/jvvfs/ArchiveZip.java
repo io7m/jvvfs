@@ -65,15 +65,6 @@ final class ArchiveZip extends Archive<ArchiveZipKind>
 
     private final OptionType<ZipEntry> zip_entry_opt;
 
-    /**
-     * @return <code>None</code> iff <code>path.isRoot()</code>.
-     */
-
-    OptionType<ZipEntry> getZipEntryOption()
-    {
-      return this.zip_entry_opt;
-    }
-
     ArchiveZipReference(
       final Archive<ArchiveZipKind> in_archive,
       final PathVirtual in_path,
@@ -94,13 +85,22 @@ final class ArchiveZip extends Archive<ArchiveZipKind>
         this.zip_entry_opt = Option.some(actual);
       }
     }
+
+    /**
+     * @return <code>None</code> iff <code>path.isRoot()</code>.
+     */
+
+    OptionType<ZipEntry> getZipEntryOption()
+    {
+      return this.zip_entry_opt;
+    }
   }
 
-  private final ZipFile     zip;
-  private final PathVirtual mount;
-  private final PathReal    real;
   private final LogType     log;
   private final LogType     log_lookup;
+  private final PathVirtual mount;
+  private final PathReal    real;
+  private final ZipFile     zip;
 
   ArchiveZip(
     final LogUsableType in_log,

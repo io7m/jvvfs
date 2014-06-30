@@ -70,9 +70,9 @@ final class ArchiveDirectory extends Archive<ArchiveDirectoryKind>
   }
 
   private final File          base;
+  private final LogUsableType log;
   private final PathVirtual   mount;
   private final PathReal      real;
-  private final LogUsableType log;
 
   ArchiveDirectory(
     final LogUsableType in_log,

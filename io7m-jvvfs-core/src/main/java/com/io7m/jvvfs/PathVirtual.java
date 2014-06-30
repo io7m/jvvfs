@@ -201,7 +201,6 @@ public final class PathVirtual implements Comparable<PathVirtual>
   }
 
   private final String       image;
-
   private final List<String> names;
 
   private PathVirtual()

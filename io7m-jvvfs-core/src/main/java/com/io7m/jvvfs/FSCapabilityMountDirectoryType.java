@@ -16,7 +16,6 @@
 
 package com.io7m.jvvfs;
 
-
 /**
  * <p>
  * The interface exposed by filesystem implementations that have the

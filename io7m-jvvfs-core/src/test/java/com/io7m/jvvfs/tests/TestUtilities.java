@@ -16,7 +16,6 @@
 
 package com.io7m.jvvfs.tests;
 
-
 public final class TestUtilities
 {
   public static <A> A actuallyNull()

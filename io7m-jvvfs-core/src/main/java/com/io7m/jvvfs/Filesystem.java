@@ -65,11 +65,6 @@ import com.io7m.jvvfs.FilesystemError.Code;
 @SuppressWarnings("synthetic-access") public final class Filesystem implements
   FilesystemType
 {
-  private static final Boolean TRUE_NOT_NULL  = NullCheck
-                                                .notNull(Boolean.TRUE);
-  private static final Boolean FALSE_NOT_NULL = NullCheck
-                                                .notNull(Boolean.FALSE);
-
   private static abstract class FSReference
   {
     private final FSReferenceType type;
@@ -106,8 +101,8 @@ import com.io7m.jvvfs.FilesystemError.Code;
 
   private static final class FSReferenceVirtualDirectory extends FSReference
   {
-    private final PathVirtual path;
     private final Calendar    mtime;
+    private final PathVirtual path;
 
     FSReferenceVirtualDirectory(
       final PathVirtual in_path,
@@ -121,8 +116,8 @@ import com.io7m.jvvfs.FilesystemError.Code;
 
   private static class UpdateTimeEntry
   {
-    private final Calendar time_when_updated;
     private final Calendar time_value;
+    private final Calendar time_when_updated;
 
     UpdateTimeEntry(
       final Calendar in_time_when_updated,
@@ -132,6 +127,12 @@ import com.io7m.jvvfs.FilesystemError.Code;
       this.time_value = in_time_value;
     }
   }
+
+  private static final Boolean FALSE_NOT_NULL = NullCheck
+                                                .notNull(Boolean.FALSE);
+
+  private static final Boolean TRUE_NOT_NULL  = NullCheck
+                                                .notNull(Boolean.TRUE);
 
   private static Calendar getUTCTimeNow()
   {
@@ -191,14 +192,14 @@ import com.io7m.jvvfs.FilesystemError.Code;
     return new Filesystem(log, null);
   }
 
+  private final Deque<Archive<?>>                 archive_list;
+  private final OptionType<PathReal>              archives;
+  private final Map<PathVirtual, Calendar>        directories;
+  private final List<ArchiveHandler<?>>           handlers;
   private final LogUsableType                     log;
   private final LogUsableType                     log_directory;
-  private final LogUsableType                     log_mount;
   private final LogUsableType                     log_lookup;
-  private final OptionType<PathReal>              archives;
-  private final List<ArchiveHandler<?>>           handlers;
-  private final Deque<Archive<?>>                 archive_list;
-  private final Map<PathVirtual, Calendar>        directories;
+  private final LogUsableType                     log_mount;
   private final Map<PathVirtual, UpdateTimeEntry> time_updates;
 
   private Filesystem(

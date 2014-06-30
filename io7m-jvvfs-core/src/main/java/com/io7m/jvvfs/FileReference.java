@@ -38,13 +38,23 @@ abstract class FileReference<T extends ArchiveKind>
 {
   static enum Type
   {
-    TYPE_FILE,
-    TYPE_DIRECTORY
+    TYPE_DIRECTORY,
+    TYPE_FILE
   }
 
   private final @Nullable Archive<T> archive;
   private final PathVirtual          path;
   private final FileReference.Type   type;
+
+  FileReference(
+    final @Nullable Archive<T> in_archive,
+    final PathVirtual in_path,
+    final FileReference.Type in_type)
+  {
+    this.archive = in_archive;
+    this.path = NullCheck.notNull(in_path, "Path");
+    this.type = NullCheck.notNull(in_type, "type");
+  }
 
   final @Nullable Archive<T> getArchive()
   {
@@ -59,16 +69,6 @@ abstract class FileReference<T extends ArchiveKind>
   final FileReference.Type getType()
   {
     return this.type;
-  }
-
-  FileReference(
-    final @Nullable Archive<T> in_archive,
-    final PathVirtual in_path,
-    final FileReference.Type in_type)
-  {
-    this.archive = in_archive;
-    this.path = NullCheck.notNull(in_path, "Path");
-    this.type = NullCheck.notNull(in_type, "type");
   }
 
   @Override public final String toString()

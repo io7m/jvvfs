@@ -46,239 +46,6 @@ import com.io7m.jvvfs.tests.ValidNameGenerator;
 
 @SuppressWarnings("static-method") public class FilesystemTest
 {
-  /**
-   * Passing <code>null</code> to {@link Filesystem#exists(PathVirtual)}
-   * fails.
-   */
-
-  @Test(expected = NullCheckException.class) public void testExistsNull()
-    throws IOException,
-      FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-    fs.exists((PathVirtual) TestUtilities.actuallyNull());
-  }
-
-  /**
-   * Passing <code>null</code> to {@link Filesystem#isDirectory(PathVirtual)}
-   * fails.
-   */
-
-  @Test(expected = NullCheckException.class) public
-    void
-    testIsDirectoryNull()
-      throws IOException,
-        FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-    fs.isDirectory((PathVirtual) TestUtilities.actuallyNull());
-  }
-
-  /**
-   * Passing <code>null</code> to {@link Filesystem#isFile(PathVirtual)}
-   * fails.
-   */
-
-  @Test(expected = NullCheckException.class) public void testIsFileNull()
-    throws IOException,
-      FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-    fs.isFile((PathVirtual) TestUtilities.actuallyNull());
-  }
-
-  /**
-   * Listing null fails.
-   */
-
-  @Test(expected = NullCheckException.class) public void testListNull()
-    throws IOException,
-      FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-    fs.listDirectory((PathVirtual) TestUtilities.actuallyNull());
-  }
-
-  /**
-   * Passing <code>null</code> as an archive directory fails.
-   */
-
-  @Test(expected = NullCheckException.class) public
-    void
-    testMakeWithArchivesNullDirectory()
-      throws IOException
-  {
-    Filesystem.makeWithArchiveDirectory(
-      TestData.getLog(),
-      (PathReal) TestUtilities.actuallyNull());
-  }
-
-  /**
-   * Passing <code>null</code> as a log interface fails.
-   */
-
-  @Test(expected = NullCheckException.class) public
-    void
-    testMakeWithArchivesNullLog()
-  {
-    Filesystem.makeWithArchiveDirectory(
-      (LogUsableType) TestUtilities.actuallyNull(),
-      new PathReal("nonexistent"));
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
-   */
-
-  @Test(expected = NullCheckException.class) public
-    void
-    testMountArchiveClasspathNullArchive()
-      throws IOException,
-        FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-
-    fs.mountClasspathArchive(
-      (Class<?>) TestUtilities.actuallyNull(),
-      PathVirtual.ROOT);
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
-   */
-
-  @Test(expected = NullCheckException.class) public
-    void
-    testMountArchiveClasspathNullMount()
-      throws IOException,
-        FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-
-    fs.mountClasspathArchive(
-      FilesystemTest.class,
-      (PathVirtual) TestUtilities.actuallyNull());
-  }
-
-  /**
-   * Passing an invalid archive name fails.
-   */
-
-  @Test(expected = FilesystemError.class) public
-    void
-    testMountArchiveInvalidArchiveName()
-      throws IOException,
-        FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-
-    fs.mountArchive("..", PathVirtual.ROOT);
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountArchive(String, PathVirtual)} fails.
-   */
-
-  @Test(expected = NullCheckException.class) public
-    void
-    testMountArchiveNullArchive()
-      throws IOException,
-        FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-    fs.mountArchive((String) TestUtilities.actuallyNull(), PathVirtual.ROOT);
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountArchive(String, PathVirtual)} fails.
-   */
-
-  @Test(expected = NullCheckException.class) public
-    void
-    testMountArchiveNullMount()
-      throws IOException,
-        FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-    fs.mountArchive("xyz", (PathVirtual) TestUtilities.actuallyNull());
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
-   */
-
-  @Test(expected = NullCheckException.class) public
-    void
-    testMountClasspathArchiveNullClass()
-      throws IOException,
-        FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-
-    fs.mountClasspathArchive(
-      (Class<?>) TestUtilities.actuallyNull(),
-      PathVirtual.ROOT);
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
-   */
-
-  @Test(expected = NullCheckException.class) public
-    void
-    testMountClasspathArchiveNullMount()
-      throws IOException,
-        FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-
-    fs.mountClasspathArchive(
-      FilesystemTest.class,
-      (PathVirtual) TestUtilities.actuallyNull());
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
-   */
-
-  @Test(expected = NullCheckException.class) public
-    void
-    testMountFromAnywhereNullArchive()
-      throws IOException,
-        FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-
-    fs.mountArchiveFromAnywhere(
-      (File) TestUtilities.actuallyNull(),
-      PathVirtual.ROOT);
-  }
-
-  /**
-   * Passing <code>null</code> to
-   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
-   */
-
-  @Test(expected = NullCheckException.class) public
-    void
-    testMountFromAnywhereNullPath()
-      throws IOException,
-        FilesystemError
-  {
-    final FSCapabilityAllType fs = FilesystemTest.makeFS();
-
-    fs.mountArchiveFromAnywhere(
-      new File("nonexistent"),
-      (PathVirtual) TestUtilities.actuallyNull());
-  }
-
   public static FSCapabilityAllType makeFS()
     throws FileNotFoundException,
       IOException
@@ -479,6 +246,19 @@ import com.io7m.jvvfs.tests.ValidNameGenerator;
       Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     }
+  }
+
+  /**
+   * Passing <code>null</code> to {@link Filesystem#exists(PathVirtual)}
+   * fails.
+   */
+
+  @Test(expected = NullCheckException.class) public void testExistsNull()
+    throws IOException,
+      FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.exists((PathVirtual) TestUtilities.actuallyNull());
   }
 
   /**
@@ -822,6 +602,21 @@ import com.io7m.jvvfs.tests.ValidNameGenerator;
   }
 
   /**
+   * Passing <code>null</code> to {@link Filesystem#isDirectory(PathVirtual)}
+   * fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testIsDirectoryNull()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.isDirectory((PathVirtual) TestUtilities.actuallyNull());
+  }
+
+  /**
    * Files in archives are files.
    */
 
@@ -889,6 +684,19 @@ import com.io7m.jvvfs.tests.ValidNameGenerator;
     final FSCapabilityAllType fs = FilesystemTest.makeFS();
     fs.mountArchive("single-file-and-subdir.zip", PathVirtual.ROOT);
     Assert.assertFalse(fs.isFile(PathVirtual.ofString("/subdir")));
+  }
+
+  /**
+   * Passing <code>null</code> to {@link Filesystem#isFile(PathVirtual)}
+   * fails.
+   */
+
+  @Test(expected = NullCheckException.class) public void testIsFileNull()
+    throws IOException,
+      FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.isFile((PathVirtual) TestUtilities.actuallyNull());
   }
 
   /**
@@ -968,6 +776,18 @@ import com.io7m.jvvfs.tests.ValidNameGenerator;
       Assert.assertEquals(Code.FS_ERROR_NONEXISTENT, e.getCode());
       throw e;
     }
+  }
+
+  /**
+   * Listing null fails.
+   */
+
+  @Test(expected = NullCheckException.class) public void testListNull()
+    throws IOException,
+      FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.listDirectory((PathVirtual) TestUtilities.actuallyNull());
   }
 
   /**
@@ -1130,6 +950,33 @@ import com.io7m.jvvfs.tests.ValidNameGenerator;
       Assert.assertEquals(1, items.size());
       Assert.assertTrue(items.contains("b"));
     }
+  }
+
+  /**
+   * Passing <code>null</code> as an archive directory fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMakeWithArchivesNullDirectory()
+      throws IOException
+  {
+    Filesystem.makeWithArchiveDirectory(
+      TestData.getLog(),
+      (PathReal) TestUtilities.actuallyNull());
+  }
+
+  /**
+   * Passing <code>null</code> as a log interface fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMakeWithArchivesNullLog()
+  {
+    Filesystem.makeWithArchiveDirectory(
+      (LogUsableType) TestUtilities.actuallyNull(),
+      new PathReal("nonexistent"));
   }
 
   /**
@@ -1352,6 +1199,42 @@ import com.io7m.jvvfs.tests.ValidNameGenerator;
   }
 
   /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountArchiveClasspathNullArchive()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountClasspathArchive(
+      (Class<?>) TestUtilities.actuallyNull(),
+      PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountArchiveClasspathNullMount()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountClasspathArchive(
+      FilesystemTest.class,
+      (PathVirtual) TestUtilities.actuallyNull());
+  }
+
+  /**
    * Mounting an archive that hides an existing directory with a file, makes
    * the hidden directory inaccessible.
    */
@@ -1445,6 +1328,21 @@ import com.io7m.jvvfs.tests.ValidNameGenerator;
   }
 
   /**
+   * Passing an invalid archive name fails.
+   */
+
+  @Test(expected = FilesystemError.class) public
+    void
+    testMountArchiveInvalidArchiveName()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountArchive("..", PathVirtual.ROOT);
+  }
+
+  /**
    * Trying to mount an archive of an unsupported type fails.
    */
 
@@ -1509,6 +1407,36 @@ import com.io7m.jvvfs.tests.ValidNameGenerator;
         }
       }
     });
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchive(String, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountArchiveNullArchive()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.mountArchive((String) TestUtilities.actuallyNull(), PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchive(String, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountArchiveNullMount()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+    fs.mountArchive("xyz", (PathVirtual) TestUtilities.actuallyNull());
   }
 
   /**
@@ -1606,6 +1534,42 @@ import com.io7m.jvvfs.tests.ValidNameGenerator;
   }
 
   /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountClasspathArchiveNullClass()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountClasspathArchive(
+      (Class<?>) TestUtilities.actuallyNull(),
+      PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountClasspathArchive(Class, PathVirtual)} fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountClasspathArchiveNullMount()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountClasspathArchive(
+      FilesystemTest.class,
+      (PathVirtual) TestUtilities.actuallyNull());
+  }
+
+  /**
    * Mounting a nonexistent archive using
    * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
    */
@@ -1619,6 +1583,42 @@ import com.io7m.jvvfs.tests.ValidNameGenerator;
     final FSCapabilityAllType fs = FilesystemTest.makeFS();
 
     fs.mountArchiveFromAnywhere(new File("nonexistent"), PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountFromAnywhereNullArchive()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountArchiveFromAnywhere(
+      (File) TestUtilities.actuallyNull(),
+      PathVirtual.ROOT);
+  }
+
+  /**
+   * Passing <code>null</code> to
+   * {@link Filesystem#mountArchiveFromAnywhere(File, PathVirtual)}, fails.
+   */
+
+  @Test(expected = NullCheckException.class) public
+    void
+    testMountFromAnywhereNullPath()
+      throws IOException,
+        FilesystemError
+  {
+    final FSCapabilityAllType fs = FilesystemTest.makeFS();
+
+    fs.mountArchiveFromAnywhere(
+      new File("nonexistent"),
+      (PathVirtual) TestUtilities.actuallyNull());
   }
 
   /**
