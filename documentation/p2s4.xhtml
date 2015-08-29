@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>io7m-jvvfs 4.0.1 Documentation: 2.4. Migrating from 2.*.*</title><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-layout.css"/><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-colour.css"/><link rel="stylesheet" type="text/css" href="documentation.css"/></head><body><div class="st200_body"><div class="brand">
+  <div class="brand_left">
+    <a href="http://io7m.com/">io7m</a>
+  </div>
+  <div class="brand_right">
+    <a href="http://io7m.github.io/jvvfs/">io7m-jvvfs</a> 4.0.1
+  </div>
+</div><div class="st200_navbar st200_navbar_top"><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_title_cell">2.3. The Jvvfs Shell</td><td class="st200_navbar_up_title_cell">2. User Manual</td><td class="st200_navbar_next_title_cell">3. Semantics</td></tr><tr><td class="st200_navbar_prev_file_cell"><a href="p2s3.xhtml#st200_p2s3">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p2.xhtml#st200_p2">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p3.xhtml#st200_p3">Next</a></td></tr></table><hr class="st200_hr"/></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p2s4" href="#st200_p2s4">2.4</a></div><div class="st200_section_title">Migrating from 2.*.*</div><ul class="st200_contents st200_section_contents_outer st200_section_contents"><li class="st200_contents_item st200_contents_item1 st200_contents_item_subsection"><a href="p2s4.xhtml#st200_p2s4ss1">2.4.1. FilesystemAPI</a></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_subsection"><a href="p2s4.xhtml#st200_p2s4ss2">2.4.2. Filesystem</a></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_subsection"><a href="p2s4.xhtml#st200_p2s4ss3">2.4.3. PathVirtual</a></li></ul><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s4ss1" href="#st200_p2s4ss1">2.4.1</a></div><div class="st200_subsection_title">FilesystemAPI</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s4ss1pg1" href="#st200_p2s4ss1pg1">1</a></div><div class="st200_paragraph">
+        The API exposed by filesystems changed and was broken up into
+        separate filesystem capabilities. See
+        <a class="st200_link" href="p2s1.xhtml#st200_p2s1ss4">Capabilities</a>
+        for the details. The only significantly different function is
+        <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/FSCapabilityRead.html#getModificationTime(com.io7m.jvvfs.PathVirtual)">getModificationTime</a>,
+        which replaced <span class="st200_term function">modificationTime()</span>. This
+        now uses values of type <span class="st200_term type">Calendar</span>, to
+        deal correctly with timezones.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s4ss1pg2" href="#st200_p2s4ss1pg2">2</a></div><div class="st200_paragraph">
+        Most of the function names have changed in order to statically
+        indicate that the semantics may be subtly different.
+      </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s4ss2" href="#st200_p2s4ss2">2.4.2</a></div><div class="st200_subsection_title">Filesystem</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s4ss2pg1" href="#st200_p2s4ss2pg1">1</a></div><div class="st200_paragraph">
+      The <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/Filesystem.html">Filesystem</a>
+      type is still the main filesystem implementation, but now requires
+      that users use the provided static methods to initialize the
+      filesystem, instead of the now-private constructors.
+      </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s4ss3" href="#st200_p2s4ss3">2.4.3</a></div><div class="st200_subsection_title">PathVirtual</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s4ss3pg1" href="#st200_p2s4ss3pg1">1</a></div><div class="st200_paragraph">
+        The constructors of the <span class="st200_term type">PathVirtual</span>
+        type are now private and were replaced by
+        <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/PathVirtual.html#ofString(java.lang.String)">ofString</a>.
+        The <span class="st200_term function">ofString</span> function is much
+        stricter in what it'll accept as a valid path. The
+        <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/PathVirtual.html#ofStringLax(java.lang.String)">ofStringLax</a>
+        function is more permissive in the syntax that it supports and
+        may be required for directly migrating old code.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s4ss3pg2" href="#st200_p2s4ss3pg2">2</a></div><div class="st200_paragraph">
+        The semantics of the <span class="st200_term type">PathVirtual</span> type
+        have also changed with regard to what is considered to be a parent
+        or ancestor of a path. For example, the root directory is now not
+        considered to have a parent. These changes are unlikely to affect
+        any existing code that uses <span class="st200_term package">jvvfs</span>.
+        See <a class="st200_link" href="p3s3.xhtml#st200_p3s3">virtual path semantics</a>
+        for the precise details.
+      </div></div></div></div><div class="st200_navbar st200_navbar_bottom"><hr class="st200_hr"/><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_file_cell"><a href="p2s3.xhtml#st200_p2s3">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p2.xhtml#st200_p2">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p3.xhtml#st200_p3">Next</a></td></tr><tr><td class="st200_navbar_prev_title_cell">2.3. The Jvvfs Shell</td><td class="st200_navbar_up_title_cell">2. User Manual</td><td class="st200_navbar_next_title_cell">3. Semantics</td></tr></table></div></div></body></html>

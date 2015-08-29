@@ -1,0 +1,254 @@
+(*
+ * Copyright © 2013 http://io7m.com
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *)
+
+Section Names.
+Axiom name       : Set.
+Axiom name_valid : name -> Prop.
+End Names.
+
+Section PathVirtual.
+Definition path_virtual :=
+  list {n : name | name_valid n}.
+
+Definition root : path_virtual :=
+  nil.
+End PathVirtual.
+
+Section PathVirtualAncestor.
+Require Coq.Lists.List.
+
+Definition is_prefix (p0 p1 : path_virtual) :=
+  List.firstn (length p0) p1 = p0.
+
+Definition is_ancestor_of (p0 p1 : path_virtual) :=
+  p0 <> p1 /\ is_prefix p0 p1.
+End PathVirtualAncestor.
+Section PathVirtualParent.
+Require Coq.Lists.List.
+
+Definition is_parent_of (p0 p1 : path_virtual) :=
+  is_ancestor_of p0 p1 /\ exists n, app p0 (n :: nil) = p1.
+End PathVirtualParent.
+
+Section PathVirtualSubtract.
+Require Coq.Lists.List.
+
+Definition subtract
+  (p0 p1 : path_virtual)
+  (_     : is_ancestor_of p1 p0 \/ p0 = p1) :=
+  List.skipn (length p1) p0.
+End PathVirtualSubtract.
+
+Section PathVirtualAncestors.
+Require Coq.Lists.List.
+
+Fixpoint ancestors_including_self (p : path_virtual) : list path_virtual :=
+  cons root (match p with
+    | nil       => nil
+    | cons y ys => List.map (cons y) (ancestors_including_self ys)
+    end).
+
+Definition ancestors (p : path_virtual) : list path_virtual :=
+  List.removelast (ancestors_including_self p).
+End PathVirtualAncestors.
+
+Section IO.
+Inductive io (F S : Type) : Type :=
+  | Success : S -> io F S
+  | Failure : F -> io F S.
+End IO.
+
+Section ErrorCode.
+Inductive error_code :=
+  | FSErrorNotADirectory
+  | FSErrorIO.
+End ErrorCode.
+
+Section Archive.
+Axiom archive : Set.
+End Archive.
+
+Section ArchiveFileReference.
+Inductive file_reference :=
+  | FSReferenceFile
+  | FSReferenceDirectory.
+End ArchiveFileReference.
+
+Section ArchiveMount.
+Axiom archive_mount : archive -> path_virtual.
+End ArchiveMount.
+
+Section ArchiveLookup.
+Axiom archive_lookup : archive -> path_virtual -> io error_code (option file_reference).
+End ArchiveLookup.
+
+Section ArchiveLookupFileAncestorFailure.
+Axiom archive_lookup_file_ancestor : forall
+  (a   : archive)
+  (p q : path_virtual),
+  is_ancestor_of p q ->
+    archive_lookup a p = Success _ _ (Some FSReferenceFile) ->
+      archive_lookup a q = Failure _ _ FSErrorNotADirectory.
+End ArchiveLookupFileAncestorFailure.
+
+Section ArchiveLookupAncestor.
+Axiom archive_lookup_ancestor : forall
+  (a   : archive)
+  (p q : path_virtual),
+  is_ancestor_of p q ->
+    (exists r, archive_lookup a q = Success _ _ (Some r)) ->
+      archive_lookup a p = Success _ _ (Some FSReferenceDirectory).
+End ArchiveLookupAncestor.
+
+Section ArchiveDirectoryList.
+Axiom archive_directory_list : archive -> path_virtual -> io error_code (list name).
+End ArchiveDirectoryList.
+
+Section ArchiveDirectoryListFile.
+Axiom archive_directory_list_file : forall
+  (a : archive)
+  (p : path_virtual),
+  archive_lookup a p = Success _ _ (Some FSReferenceFile) ->
+    archive_directory_list a p = Failure _ _ FSErrorNotADirectory.
+End ArchiveDirectoryListFile.
+
+Section FilesystemLookupUnion.
+Require Coq.Arith.Peano_dec.
+
+Axiom ancestor_or_equal : forall (p q : path_virtual),
+  {is_ancestor_of p q \/ q = p}+{~is_ancestor_of p q \/ q = p}.
+
+Fixpoint filesystem_lookup_union'
+  (archives : list archive)
+  (p        : path_virtual)
+  (checks   : nat)
+: io error_code (option file_reference) :=
+  match archives with
+  | nil         => Success _ _ None
+  | cons a rest =>
+    let m := archive_mount a in
+      match ancestor_or_equal m p with
+      | right _ => filesystem_lookup_union' rest p checks
+      | left  H =>
+        match archive_lookup a (subtract p m H) with
+        | Success None                 => filesystem_lookup_union' rest p (S checks)
+        | Success (Some r)             => Success _ _ (Some r)
+        | Failure FSErrorNotADirectory =>
+          if Peano_dec.eq_nat_dec checks 0
+          then Failure _ _ FSErrorNotADirectory
+          else Success _ _ None
+        | Failure e => Failure _ _ e
+        end
+      end
+  end.
+
+Definition filesystem_lookup_union
+  (archives : list archive)
+  (p        : path_virtual)
+:= filesystem_lookup_union' archives p 0.
+
+Fixpoint filesystem_lookup_ancestors
+  (archives : list archive)
+  (p_a      : list path_virtual)
+: io error_code (option file_reference) :=
+  match p_a with
+  | nil       => Success _ _ (Some (FSReferenceDirectory))
+  | cons q qs =>
+    match filesystem_lookup_union archives q with
+    | Success None                        => Failure _ _ FSErrorNotADirectory
+    | Success (Some FSReferenceFile)      => Failure _ _ FSErrorNotADirectory
+    | Success (Some FSReferenceDirectory) => filesystem_lookup_ancestors archives qs
+    | Failure e                           => Failure _ _ e
+    end
+  end.
+
+Definition filesystem_lookup
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (option file_reference) :=
+  match filesystem_lookup_ancestors archives (ancestors p) with
+  | Success _ => filesystem_lookup_union archives p
+  | Failure e => Failure _ _ e
+  end.
+End FilesystemLookupUnion.
+
+Section FilesystemLookupTypical.
+Require Coq.Arith.Peano_dec.
+
+Fixpoint filesystem_lookup_typical
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (option file_reference) :=
+  match archives with
+  | nil         => Success _ _ None
+  | cons a rest =>
+    let m := archive_mount a in
+      match ancestor_or_equal m p with
+      | right _ => filesystem_lookup_typical rest p
+      | left  H => archive_lookup a (subtract p m H)
+      end    
+  end.
+End FilesystemLookupTypical.
+
+Section FilesystemListUnion.
+Require Coq.Arith.Peano_dec.
+Require Coq.Lists.ListSet.
+
+Axiom name_eq_dec : forall (n m : name),
+  {n = m}+{n <> m}.
+
+Fixpoint filesystem_directory_list_union'
+  (archives : list archive)
+  (p        : path_virtual)
+  (checks   : nat)
+  (current  : ListSet.set name)
+: io error_code (list name) :=
+  match archives with
+  | nil         => Success _ _ current
+  | cons a rest =>
+    let m := archive_mount a in
+      match ancestor_or_equal m p with
+      | right _ => filesystem_directory_list_union' rest p checks current
+      | left  H =>
+        match archive_directory_list a (subtract p m H) with
+        | Success names                => filesystem_directory_list_union' rest p (S checks) (ListSet.set_union name_eq_dec current names)
+        | Failure FSErrorNotADirectory =>
+          if Peano_dec.eq_nat_dec checks 0
+          then Failure _ _ FSErrorNotADirectory
+          else Success _ _ current
+        | Failure e => Failure _ _ e
+        end
+      end
+  end.
+
+Definition filesystem_directory_list_union
+  (archives : list archive)
+  (p        : path_virtual)
+:= filesystem_directory_list_union' archives p 0 nil.
+
+Definition filesystem_directory_list
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (list name) :=
+  match filesystem_lookup archives p with
+  | Success None                        => Failure _ _ FSErrorNotADirectory
+  | Success (Some FSReferenceFile)      => Failure _ _ FSErrorNotADirectory
+  | Success (Some FSReferenceDirectory) => filesystem_directory_list_union archives p
+  | Failure e                           => Failure _ _ e
+  end.
+End FilesystemListUnion.
+
+Open Scope list_scope.

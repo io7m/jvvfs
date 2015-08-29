@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>io7m-jvvfs 4.0.1 Documentation: 3.1. Overview</title><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-layout.css"/><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-colour.css"/><link rel="stylesheet" type="text/css" href="documentation.css"/></head><body><div class="st200_body"><div class="brand">
+  <div class="brand_left">
+    <a href="http://io7m.com/">io7m</a>
+  </div>
+  <div class="brand_right">
+    <a href="http://io7m.github.io/jvvfs/">io7m-jvvfs</a> 4.0.1
+  </div>
+</div><div class="st200_navbar st200_navbar_top"><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_title_cell">3. Semantics</td><td class="st200_navbar_up_title_cell">3. Semantics</td><td class="st200_navbar_next_title_cell">3.2. Names</td></tr><tr><td class="st200_navbar_prev_file_cell"><a href="p3.xhtml#st200_p3">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p3.xhtml#st200_p3">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p3s2.xhtml#st200_p3s2">Next</a></td></tr></table><hr class="st200_hr"/></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p3s1" href="#st200_p3s1">3.1</a></div><div class="st200_section_title">Overview</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s1ss1" href="#st200_p3s1ss1">3.1.1</a></div><div class="st200_subsection_title">Specification</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s1ss1pg1" href="#st200_p3s1ss1pg1">1</a></div><div class="st200_paragraph">
+          This section attempts to document the semantics of the
+          <span class="st200_term package">jvvfs</span> package. The semantics are
+          given as fragments of code written in the Gallina language of
+          Coq <span class="st200_footnote_reference"><a id="st200_fn_4_ref" href="#st200_fn_4">[4]</a></span>.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s1ss1pg2" href="#st200_p3s1ss1pg2">2</a></div><div class="st200_paragraph">
+          The <a class="st200_link_external" href="Model.v">source</a> to
+          the development is available for type-checking and writing exploratory
+          proofs about the model. Note that the source is not intended to be
+          particularly readable by itself, and is formatted for ease of insertion
+          into this documentation (as opposed to being formatted for easy reading).
+        </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s1ss2" href="#st200_p3s1ss2">3.1.2</a></div><div class="st200_subsection_title">Effects</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s1ss2pg1" href="#st200_p3s1ss2pg1">1</a></div><div class="st200_paragraph">
+          Many of the operations described in this specification are
+          <span class="st200_term term">effectful</span>. That is, they are
+          computations that will perform some side effect and are therefore not
+          directly expressible in Coq's logic. Effectful operations are expressed here as
+          values of type <span class="st200_term type">io</span>. The <span class="st200_term type">io F S</span>
+          type is understood to represent a computation that, when executed, will
+          perform some side effect and return a value of type <span class="st200_term type">S</span>
+          on success or a value of type <span class="st200_term type">F</span> on failure.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s1ss2fo1" href="#st200_p3s1ss2fo1">3.1.2.1. IO</a></div><pre class="st200_verbatim">Inductive io (F S : Type) : Type :=
+  | Success : S -&gt; io F S
+  | Failure : F -&gt; io F S.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s1ss2pg2" href="#st200_p3s1ss2pg2">2</a></div><div class="st200_paragraph">
+          The issue of side effects makes it somewhat awkward to describe
+          the consequences of actions, so the reader is (unfortunately)
+          required to use good judgement when reading statements regarding
+          effectful computations. As an example of this problem: "If looking
+          up an object at path <span class="st200_term variable">p</span> in the filesystem
+          succeeds and produces a reference to a file, then looking up the
+          parent of <span class="st200_term variable">p</span> must succeed and
+          yield a reference to a directory". This is obviously true given
+          normal operating system filesystem semantics. However, looking up
+          objects in the filesystem is an effectful operation and therefore, the
+          filesystem could theoretically burst into flames and never yield
+          the second reference! The reader is more or less expected to
+          implicitly insert the phrase "assuming that no catastrophic operating
+          system errors occur" before reading any statement regarding
+          effectful computations.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s1ss2pg3" href="#st200_p3s1ss2pg3">3</a></div><div class="st200_paragraph">
+          The problem could be solved to some extent by specifying an
+          even more abstract model of the filesystem and then stating that
+          the effectful computations adhere to properties stated about this
+          model, but this is certainly not trivial and would probably be
+          of little practical utility.
+        </div></div></div></div><div class="st200_footnotes"><hr/><div class="st200_footnote_container"><div class="st200_footnote_number">[<a id="st200_fn_4" href="#st200_fn_4_ref">4</a>]</div><div class="st200_footnote_body">
+            <a class="st200_link_external" href="http://coq.inria.fr">http://coq.inria.fr</a>
+          </div></div></div><div class="st200_navbar st200_navbar_bottom"><hr class="st200_hr"/><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_file_cell"><a href="p3.xhtml#st200_p3">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p3.xhtml#st200_p3">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p3s2.xhtml#st200_p3s2">Next</a></td></tr><tr><td class="st200_navbar_prev_title_cell">3. Semantics</td><td class="st200_navbar_up_title_cell">3. Semantics</td><td class="st200_navbar_next_title_cell">3.2. Names</td></tr></table></div></div></body></html>

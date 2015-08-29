@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>io7m-jvvfs 4.0.1 Documentation: 3.5. Filesystem</title><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-layout.css"/><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-colour.css"/><link rel="stylesheet" type="text/css" href="documentation.css"/></head><body><div class="st200_body"><div class="brand">
+  <div class="brand_left">
+    <a href="http://io7m.com/">io7m</a>
+  </div>
+  <div class="brand_right">
+    <a href="http://io7m.github.io/jvvfs/">io7m-jvvfs</a> 4.0.1
+  </div>
+</div><div class="st200_navbar st200_navbar_top"><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_title_cell">3.4. Archives</td><td class="st200_navbar_up_title_cell">3. Semantics</td><td class="st200_navbar_next_title_cell">4. Rationale</td></tr><tr><td class="st200_navbar_prev_file_cell"><a href="p3s4.xhtml#st200_p3s4">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p3.xhtml#st200_p3">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p4.xhtml#st200_p4">Next</a></td></tr></table><hr class="st200_hr"/></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p3s5" href="#st200_p3s5">3.5</a></div><div class="st200_section_title">Filesystem</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s5ss1" href="#st200_p3s5ss1">3.5.1</a></div><div class="st200_subsection_title">Overview</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss1pg1" href="#st200_p3s5ss1pg1">1</a></div><div class="st200_paragraph">
+        The filesystem maintains a list of
+        <a class="st200_link" href="p3s4.xhtml#st200_p3s4">archives</a>,
+        and presents an interface that allows archives to be "mounted" and
+        "unmounted" at directories within the filesystem.
+        </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s5ss2" href="#st200_p3s5ss2">3.5.2</a></div><div class="st200_subsection_title">Lookup</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg1" href="#st200_p3s5ss2pg1">1</a></div><div class="st200_paragraph">
+        Unlike most operating-system filesystems, the <span class="st200_term package">jvvfs</span>
+        filesystem has so-called "union" semantics. The filesystem maintains
+        a list of mounted archives, sorted in order of most-recently mounted -
+        the first archive in the list is the archive that was most recently mounted.
+        In order to look up an object in the filesystem at a given path
+        <span class="st200_term variable">p</span>, it's first necessary to look up all
+        of the ancestors of <span class="st200_term variable">p</span> to ensure that
+        they exist and are directories. Looking up an object at
+        <span class="st200_term variable">p</span> <span class="st200_term term">directly</span>
+        means to look up <span class="st200_term variable">p</span> without looking up
+        any of the ancestors of <span class="st200_term variable">p</span>.
+          When attempting to look up an object <span class="st200_term term">directly</span>
+          in the filesystem at a given path <span class="st200_term variable">p</span>,
+        each archive <span class="st200_term variable">a</span> in the list of archives
+        is considered in turn, starting with the most recently mounted first. The
+        lookup procedure takes the following steps:
+     </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss2fo1" href="#st200_p3s5ss2fo1">3.5.2.1. Filesystem union search</a></div><ol class="st200_list_ordered"><li class="st200_list_item">
+           If <span class="st200_term variable">a</span> is mounted at a path
+           <span class="st200_term variable">m</span> such that
+           <span class="st200_term expression">is_ancestor_of m p</span> or
+           <span class="st200_term expression">m = p</span>,
+           then the object at
+           <span class="st200_term expression">subtract p m</span> is
+           <a class="st200_link" href="p3s4.xhtml#st200_p3s4ss2">looked up</a> in
+           <span class="st200_term variable">a</span>, and
+           <span class="st200_term variable">a</span> is said to have been
+           <span class="st200_term term">checked</span>.
+           Otherwise, the next archive in the list is considered.
+         </li><li class="st200_list_item">
+           If <span class="st200_term variable">a</span> returns a reference
+           to an object, then that object is returned immediately
+           and no further archives are considered. If, in
+           <span class="st200_term variable">a</span>, an ancestor
+           <span class="st200_term variable">q</span> of
+           <span class="st200_term expression">subtract p m</span> is a
+           file, then the file at
+           <span class="st200_term variable">q</span> is said to be
+           <span class="st200_term term">shadowing</span> the contents
+           of the rest of the archives. If
+           shadowing is occuring, and
+           <span class="st200_term variable">a</span> is not the first
+           archive in the list that has been
+           <span class="st200_term term">checked</span> so far, then
+           nothing is returned and no further archives are considered.
+           Otherwise, an error is returned (indicating
+           that <span class="st200_term variable">q</span>
+           is not a directory).  
+         </li></ol></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg2" href="#st200_p3s5ss2pg2">2</a></div><div class="st200_paragraph">
+       If no archives return an object, then no object exists at
+       <span class="st200_term variable">p</span> in the filesystem.
+       </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg3" href="#st200_p3s5ss2pg3">3</a></div><div class="st200_paragraph">
+         As mentioned, it's necessary to look up all of the ancestors
+         of <span class="st200_term variable">p</span> to ensure the correct
+         semantics, so the above procedure is simply applied to all
+         ancestors of <span class="st200_term variable">p</span> before being
+         applied to <span class="st200_term variable">p</span> itself. If any
+         ancestor of <span class="st200_term variable">p</span> turns out not
+         to exist, or not to be a directory, or if an error occurs,
+         the function returns an error.
+       </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss2fo2" href="#st200_p3s5ss2fo2">3.5.2.2. Filesystem union search (Coq)</a></div><pre class="st200_verbatim">Require Coq.Arith.Peano_dec.
+
+Axiom ancestor_or_equal : forall (p q : path_virtual),
+  {is_ancestor_of p q \/ q = p}+{~is_ancestor_of p q \/ q = p}.
+
+Fixpoint filesystem_lookup_union'
+  (archives : list archive)
+  (p        : path_virtual)
+  (checks   : nat)
+: io error_code (option file_reference) :=
+  match archives with
+  | nil         =&gt; Success _ _ None
+  | cons a rest =&gt;
+    let m := archive_mount a in
+      match ancestor_or_equal m p with
+      | right _ =&gt; filesystem_lookup_union' rest p checks
+      | left  H =&gt;
+        match archive_lookup a (subtract p m H) with
+        | Success None                 =&gt; filesystem_lookup_union' rest p (S checks)
+        | Success (Some r)             =&gt; Success _ _ (Some r)
+        | Failure FSErrorNotADirectory =&gt;
+          if Peano_dec.eq_nat_dec checks 0
+          then Failure _ _ FSErrorNotADirectory
+          else Success _ _ None
+        | Failure e =&gt; Failure _ _ e
+        end
+      end
+  end.
+
+Definition filesystem_lookup_union
+  (archives : list archive)
+  (p        : path_virtual)
+:= filesystem_lookup_union' archives p 0.
+
+Fixpoint filesystem_lookup_ancestors
+  (archives : list archive)
+  (p_a      : list path_virtual)
+: io error_code (option file_reference) :=
+  match p_a with
+  | nil       =&gt; Success _ _ (Some (FSReferenceDirectory))
+  | cons q qs =&gt;
+    match filesystem_lookup_union archives q with
+    | Success None                        =&gt; Failure _ _ FSErrorNotADirectory
+    | Success (Some FSReferenceFile)      =&gt; Failure _ _ FSErrorNotADirectory
+    | Success (Some FSReferenceDirectory) =&gt; filesystem_lookup_ancestors archives qs
+    | Failure e                           =&gt; Failure _ _ e
+    end
+  end.
+
+Definition filesystem_lookup
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (option file_reference) :=
+  match filesystem_lookup_ancestors archives (ancestors p) with
+  | Success _ =&gt; filesystem_lookup_union archives p
+  | Failure e =&gt; Failure _ _ e
+  end.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg4" href="#st200_p3s5ss2pg4">4</a></div><div class="st200_paragraph">
+         The above steps are in contrast to how operating-system
+         filesystems usually behave. Typically, operating systems
+         will take steps analogous to the following (where archives
+         are replaced by disks or disk partitions):
+       </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss2fo3" href="#st200_p3s5ss2fo3">3.5.2.3. Typical OS filesystem search</a></div><ol class="st200_list_ordered"><li class="st200_list_item">
+           If <span class="st200_term variable">a</span> is mounted at a path
+           <span class="st200_term variable">m</span> such that
+           <span class="st200_term expression">is_ancestor_of m p</span> or
+           <span class="st200_term expression">m = p</span>,
+           then the object at
+           <span class="st200_term expression">subtract p m</span> is
+           <a class="st200_link" href="p3s4.xhtml#st200_p3s4ss2">looked up</a> in
+           <span class="st200_term variable">a</span>.
+           Otherwise, the next archive in the list is considered.
+         </li><li class="st200_list_item">
+             If, in
+           <span class="st200_term variable">a</span>, an ancestor
+           <span class="st200_term variable">q</span> of
+           <span class="st200_term expression">subtract p m</span> is not a
+           file, an error is returned (indicating
+           that <span class="st200_term variable">q</span>
+           is not a directory).
+           If <span class="st200_term variable">a</span> returns a reference
+           to an object, then that object is returned immediately
+           and no further archives are considered. Otherwise, nothing
+           is returned and no further archives are considered.
+         </li></ol></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss2fo4" href="#st200_p3s5ss2fo4">3.5.2.4. Typical OS filesystem search (Coq)</a></div><pre class="st200_verbatim">Require Coq.Arith.Peano_dec.
+
+Fixpoint filesystem_lookup_typical
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (option file_reference) :=
+  match archives with
+  | nil         =&gt; Success _ _ None
+  | cons a rest =&gt;
+    let m := archive_mount a in
+      match ancestor_or_equal m p with
+      | right _ =&gt; filesystem_lookup_typical rest p
+      | left  H =&gt; archive_lookup a (subtract p m H)
+      end    
+  end.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg5" href="#st200_p3s5ss2pg5">5</a></div><div class="st200_paragraph">
+       In other words, at most one archive is checked for
+       objects. 
+     </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg6" href="#st200_p3s5ss2pg6">6</a></div><div class="st200_paragraph">
+       The procedure that <span class="st200_term package">jvvfs</span>
+       uses to locate filesystem objects is the source of the
+       term "union": With multiple directories overlapping in
+       different archives, the set of visible files is the
+       union of those in the mounted archives. Directories
+       and files can be hidden by files in more recently mounted
+       archives, but a directories can never hide other directories.
+       </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s5ss3" href="#st200_p3s5ss3">3.5.3</a></div><div class="st200_subsection_title">Directory Listing</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss3pg1" href="#st200_p3s5ss3pg1">1</a></div><div class="st200_paragraph">
+          Listing directories proceeds in a similar manner to
+          <a class="st200_link" href="p3s5.xhtml#st200_p3s5ss2">file lookups</a>.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss3pg2" href="#st200_p3s5ss3pg2">2</a></div><div class="st200_paragraph">
+          When attempting to list a directory in the filesystem at a given path
+          <span class="st200_term variable">p</span>, <span class="st200_term variable">p</span>
+          is first <a class="st200_link" href="p3s5.xhtml#st200_p3s5ss2">looked up</a>
+          to ensure that it is a directory as are all of its ancestors.
+          If this is not the case, an error is returned.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss3pg3" href="#st200_p3s5ss3pg3">3</a></div><div class="st200_paragraph">
+          Then, each archive <span class="st200_term variable">a</span> in the list of archives
+        is considered in turn, starting with the most recently mounted first. The
+        listing procedure begins with an empty set of names
+        <span class="st200_term variable">S</span> and takes the following steps:
+     </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss3fo1" href="#st200_p3s5ss3fo1">3.5.3.1. Filesystem directory list union</a></div><ol class="st200_list_ordered"><li class="st200_list_item">
+           If <span class="st200_term variable">a</span> is mounted at a path
+           <span class="st200_term variable">m</span> such that
+           <span class="st200_term expression">is_ancestor_of m p</span> or
+           <span class="st200_term expression">m = p</span>,
+           then the object at
+           <span class="st200_term expression">subtract p m</span> is
+           <a class="st200_link" href="p3s4.xhtml#st200_p3s4ss2">looked up</a> in
+           <span class="st200_term variable">a</span>, and
+           <span class="st200_term variable">a</span> is said to have been
+           <span class="st200_term term">checked</span>.
+           Otherwise, the next archive in the list is considered.
+         </li><li class="st200_list_item">
+           If <span class="st200_term variable">a</span> returns a reference
+           to a directory, then the names in the directory at
+           <span class="st200_term expression">subtract p m</span> are added
+           to <span class="st200_term variable">S</span> and the next archive is considered.
+         </li><li class="st200_list_item">
+           If, in <span class="st200_term variable">a</span>, either 
+           <span class="st200_term expression">subtract p m</span> or
+           an ancestor <span class="st200_term variable">q</span> of
+           <span class="st200_term expression">subtract p m</span> is a
+           file, then the contents of
+           <span class="st200_term expression">subtract p m</span> are said
+           to be
+           <span class="st200_term term">shadowed</span>. If
+           shadowing is occuring, and
+           <span class="st200_term variable">a</span> is not the first
+           archive in the list that has been
+           <span class="st200_term term">checked</span> so far, then
+           <span class="st200_term variable">S</span> is returned and
+           no further archives are considered.
+           Otherwise, an error is returned (indicating
+           that <span class="st200_term variable">q</span>
+           is not a directory).  
+         </li></ol></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss3fo2" href="#st200_p3s5ss3fo2">3.5.3.2. Filesystem directory list union (Coq)</a></div><pre class="st200_verbatim">Require Coq.Arith.Peano_dec.
+Require Coq.Lists.ListSet.
+
+Axiom name_eq_dec : forall (n m : name),
+  {n = m}+{n &lt;&gt; m}.
+
+Fixpoint filesystem_directory_list_union'
+  (archives : list archive)
+  (p        : path_virtual)
+  (checks   : nat)
+  (current  : ListSet.set name)
+: io error_code (list name) :=
+  match archives with
+  | nil         =&gt; Success _ _ current
+  | cons a rest =&gt;
+    let m := archive_mount a in
+      match ancestor_or_equal m p with
+      | right _ =&gt; filesystem_directory_list_union' rest p checks current
+      | left  H =&gt;
+        match archive_directory_list a (subtract p m H) with
+        | Success names                =&gt; filesystem_directory_list_union' rest p (S checks) (ListSet.set_union name_eq_dec current names)
+        | Failure FSErrorNotADirectory =&gt;
+          if Peano_dec.eq_nat_dec checks 0
+          then Failure _ _ FSErrorNotADirectory
+          else Success _ _ current
+        | Failure e =&gt; Failure _ _ e
+        end
+      end
+  end.
+
+Definition filesystem_directory_list_union
+  (archives : list archive)
+  (p        : path_virtual)
+:= filesystem_directory_list_union' archives p 0 nil.
+
+Definition filesystem_directory_list
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (list name) :=
+  match filesystem_lookup archives p with
+  | Success None                        =&gt; Failure _ _ FSErrorNotADirectory
+  | Success (Some FSReferenceFile)      =&gt; Failure _ _ FSErrorNotADirectory
+  | Success (Some FSReferenceDirectory) =&gt; filesystem_directory_list_union archives p
+  | Failure e                           =&gt; Failure _ _ e
+  end.
+</pre></div></div></div><div class="st200_navbar st200_navbar_bottom"><hr class="st200_hr"/><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_file_cell"><a href="p3s4.xhtml#st200_p3s4">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p3.xhtml#st200_p3">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p4.xhtml#st200_p4">Next</a></td></tr><tr><td class="st200_navbar_prev_title_cell">3.4. Archives</td><td class="st200_navbar_up_title_cell">3. Semantics</td><td class="st200_navbar_next_title_cell">4. Rationale</td></tr></table></div></div></body></html>

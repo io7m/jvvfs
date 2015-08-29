@@ -1,0 +1,865 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>io7m-jvvfs 4.0.1 Documentation</title><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-layout.css"/><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-colour.css"/><link rel="stylesheet" type="text/css" href="documentation.css"/></head><body><div class="st200_body"><div class="brand">
+  <div class="brand_left">
+    <a href="http://io7m.com/">io7m</a>
+  </div>
+  <div class="brand_right">
+    <a href="http://io7m.github.io/jvvfs/">io7m-jvvfs</a> 4.0.1
+  </div>
+</div><div class="st200_document_title">io7m-jvvfs 4.0.1 Documentation</div><ul class="st200_contents st200_document_contents"><li class="st200_contents_item st200_contents_item1 st200_contents_item_part"><a href="#st200_p1">1. Package Information</a><ul class="st200_contents st200_part_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p1s1">1.1. Orientation</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p1s2">1.2. Installation</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p1s3">1.3. Platform Specific Issues</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p1s4">1.4. License</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_part"><a href="#st200_p2">2. User Manual</a><ul class="st200_contents st200_part_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p2s1">2.1. Overview</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p2s2">2.2. Tutorial</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p2s3">2.3. The Jvvfs Shell</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p2s4">2.4. Migrating from 2.*.*</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_part"><a href="#st200_p3">3. Semantics</a><ul class="st200_contents st200_part_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p3s1">3.1. Overview</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p3s2">3.2. Names</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p3s3">3.3. Virtual paths</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p3s4">3.4. Archives</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p3s5">3.5. Filesystem</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_part"><a href="#st200_p4">4. Rationale</a><ul class="st200_contents st200_part_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p4s1">4.1. Why not Java resources?</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_part"><a href="#st200_p5">5. API Reference</a><ul class="st200_contents st200_part_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p5s1">5.1. Javadoc</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_part"><a href="#st200_p6">6. Listings</a><ul class="st200_contents st200_part_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p6s1">6.1. Specifications</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_section"><a href="#st200_p6s2">6.2. Examples</a></li></ul></li></ul><div class="st200_part_container"><div class="st200_part_title_number"><a id="st200_p1" href="#st200_p1">1</a></div><div class="st200_part_title">Package Information</div><ul class="st200_contents st200_part_contents_outer st200_part_contents"><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p1s1">1.1. Orientation</a><ul class="st200_contents st200_section_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p1s1ss1">1.1.1. Overview</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p1s1ss2">1.1.2. Portability</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p1s2">1.2. Installation</a><ul class="st200_contents st200_section_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p1s2ss1">1.2.1. Source compilation</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p1s2ss2">1.2.2. Maven</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p1s3">1.3. Platform Specific Issues</a></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p1s4">1.4. License</a></li></ul><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p1s1" href="#st200_p1s1">1.1</a></div><div class="st200_section_title">Orientation</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p1s1ss1" href="#st200_p1s1ss1">1.1.1</a></div><div class="st200_subsection_title">Overview</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p1s1ss1pg1" href="#st200_p1s1ss1pg1">1</a></div><div class="st200_paragraph">
+          The <span class="st200_term package">jvvfs</span>
+          package implements a pseudo virtual filesystem abstraction. The
+          package essentially constructs a unified namespace from sets of
+          mounted archives (such as directories, zip files, etc). It is
+          inspired by
+          <a class="st200_link_external" href="http://icculus.org/physfs">PhysicsFS</a>
+          but does not contain support for old proprietary/obscure archive
+          formats.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p1s1ss1pg2" href="#st200_p1s1ss1pg2">2</a></div><div class="st200_paragraph">
+          When using a filesystem abstraction such as
+          <span class="st200_term package">jvvfs</span>, it becomes very easy
+          for application developers to distribute updates. The developer
+          initially distributes the program resources (images, audio, etc)
+          as one or more zip archives. Updates to the program data then consist
+          of zip archives containing only files that have been changed: these
+          new archives are simply mounted over the top of the old ones
+          in the virtual filesystem.
+        </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p1s1ss2" href="#st200_p1s1ss2">1.1.2</a></div><div class="st200_subsection_title">Portability</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p1s1ss2pg1" href="#st200_p1s1ss2pg1">1</a></div><div class="st200_paragraph">
+          The package is written in pure Java and is expected to work
+          in any environment supporting Java 6.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p1s1ss2pg2" href="#st200_p1s1ss2pg2">2</a></div><div class="st200_paragraph">
+          The filesystem abstraction allows developers to access program
+          resources using platform-independent notation. The package is
+          carefully written to ensure that applications access resources
+          consistently across all platforms (including consistency under
+          erroneous conditions).
+        </div></div></div></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p1s2" href="#st200_p1s2">1.2</a></div><div class="st200_section_title">Installation</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p1s2ss1" href="#st200_p1s2ss1">1.2.1</a></div><div class="st200_subsection_title">Source compilation</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p1s2ss1pg1" href="#st200_p1s2ss1pg1">1</a></div><div class="st200_paragraph">
+          The project can be compiled and installed with
+          <a class="st200_link_external" href="http://maven.apache.org">Maven</a>:
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p1s2ss1pg2" href="#st200_p1s2ss1pg2">2</a></div><div class="st200_paragraph">
+          <pre class="st200_verbatim example">$ mvn -C clean install</pre>
+        </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p1s2ss2" href="#st200_p1s2ss2">1.2.2</a></div><div class="st200_subsection_title">Maven</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p1s2ss2pg1" href="#st200_p1s2ss2pg1">1</a></div><div class="st200_paragraph">
+          Regular releases are made to the
+          <a class="st200_link_external" href="http://search.maven.org/#search%7Cga%7C1%7Cio7m-jvvfs">Central Repository</a>,
+          so it's possible to use the <span class="st200_term package">io7m-jvvfs</span>
+          package in your projects with the following Maven dependency:
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p1s2ss2pg2" href="#st200_p1s2ss2pg2">2</a></div><div class="st200_paragraph">
+          <pre class="st200_verbatim example">&lt;dependency&gt;
+  &lt;groupId&gt;com.io7m.jvvfs&lt;/groupId&gt;
+  &lt;artifactId&gt;io7m-jvvfs-core&lt;/artifactId&gt;
+  &lt;version&gt;4.0.1&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p1s2ss2pg3" href="#st200_p1s2ss2pg3">3</a></div><div class="st200_paragraph">
+          All <a class="st200_link_external" href="http://io7m.com">io7m.com</a>
+          packages use Semantic Versioning
+          <span class="st200_footnote_reference"><a id="st200_fn_0_ref" href="#st200_fn_0">[0]</a></span>, which implies that it is always safe to use version ranges
+          with an exclusive upper bound equal to the next major version - the API of
+          the package will not change in a backwards-incompatible manner before the
+          next major version.
+        </div></div></div></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p1s3" href="#st200_p1s3">1.3</a></div><div class="st200_section_title">Platform Specific Issues</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p1s3pg1" href="#st200_p1s3pg1">1</a></div><div class="st200_paragraph">
+        There are currently no known platform-specific issues.
+      </div></div></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p1s4" href="#st200_p1s4">1.4</a></div><div class="st200_section_title">License</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p1s4pg1" href="#st200_p1s4pg1">1</a></div><div class="st200_paragraph">
+        All files distributed with the <span class="st200_term package">io7m-jvvfs</span>
+        package are placed under the following license:
+        <pre class="st200_verbatim license">Copyright © 2014 &lt;code@io7m.com&gt; http://io7m.com
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+        </pre>
+      </div></div></div></div><div class="st200_part_container"><div class="st200_part_title_number"><a id="st200_p2" href="#st200_p2">2</a></div><div class="st200_part_title">User Manual</div><ul class="st200_contents st200_part_contents_outer st200_part_contents"><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p2s1">2.1. Overview</a><ul class="st200_contents st200_section_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p2s1ss1">2.1.1. Filesystem</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p2s1ss2">2.1.2. Archives</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p2s1ss3">2.1.3. Mounting</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p2s1ss4">2.1.4. Capabilities</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p2s2">2.2. Tutorial</a></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p2s3">2.3. The Jvvfs Shell</a><ul class="st200_contents st200_section_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p2s3ss1">2.3.1. Overview</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p2s3ss2">2.3.2. shell.conf</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p2s3ss3">2.3.3. Commands</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p2s4">2.4. Migrating from 2.*.*</a><ul class="st200_contents st200_section_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p2s4ss1">2.4.1. FilesystemAPI</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p2s4ss2">2.4.2. Filesystem</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p2s4ss3">2.4.3. PathVirtual</a></li></ul></li></ul><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p2s1" href="#st200_p2s1">2.1</a></div><div class="st200_section_title">Overview</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s1ss1" href="#st200_p2s1ss1">2.1.1</a></div><div class="st200_subsection_title">Filesystem</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s1ss1pg1" href="#st200_p2s1ss1pg1">1</a></div><div class="st200_paragraph">
+          The <span class="st200_term package">jvvfs</span> package presents
+          a virtual <span class="st200_term">filesystem</span> in which
+          <a class="st200_link" href="#st200_p2s1ss2">archives</a> are
+          <a class="st200_link" href="#st200_p2s1ss3">mounted</a> to
+          form a unified namespace. This filesystem is conceptually
+          and practically distinct from the filesystem
+          presented by the operating system. The
+          <span class="st200_term package">jvvfs</span> package never writes to
+          or otherwise modifies the operating system filesystem in any
+          way.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s1ss1pg2" href="#st200_p2s1ss1pg2">2</a></div><div class="st200_paragraph">
+          The <span class="st200_term package">jvvfs</span> virtual <span class="st200_term">filesystem</span>
+          presents a hierarchical directory system very similar to the typical
+          UNIX filesystem, supporting a subset of the normal UNIX filesystem operations
+          such as retrieving the modification time of a file, retrieving the
+          size of a file in bytes, listing the contents of a directory,
+          and opening a file as a stream of bytes.
+        </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s1ss2" href="#st200_p2s1ss2">2.1.2</a></div><div class="st200_subsection_title">Archives</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s1ss2pg1" href="#st200_p2s1ss2pg1">1</a></div><div class="st200_paragraph">
+        An <span class="st200_term">archive</span> is a file or directory in the
+        operating system that can be
+        <a class="st200_link" href="#st200_p2s1ss3">mounted</a>.
+        The <span class="st200_term package">jvvfs</span> package currently
+        supports mounting operating system
+        <span class="st200_term">directories</span> and
+        <span class="st200_term">zip</span>
+        <span class="st200_footnote_reference"><a id="st200_fn_1_ref" href="#st200_fn_1">[1]</a></span>
+        files.
+        </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s1ss3" href="#st200_p2s1ss3">2.1.3</a></div><div class="st200_subsection_title">Mounting</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s1ss3pg1" href="#st200_p2s1ss3pg1">1</a></div><div class="st200_paragraph">
+          Mounting an <a class="st200_link" href="#st200_p2s1ss2">archive</a>
+          makes the contents of that archive accessible in the filesystem.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s1ss3pg2" href="#st200_p2s1ss3pg2">2</a></div><div class="st200_paragraph">
+          If an <a class="st200_link" href="#st200_p2s1ss2">archive</a>
+          is <span class="st200_term">mounted</span> at a directory
+          <span class="st200_term variable">/M</span>, and the archive
+          contains a file or directory named <span class="st200_term variable">F</span>,
+          then that file or directory is accessible in the
+          virtual
+          <a class="st200_link" href="#st200_p2s1ss1">filesystem</a>
+          at <span class="st200_term variable">/M/F</span>. As mentioned, directories
+          can be arbitrarily nested, and archives can be mounted at any
+          directory in the filesystem.
+        </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s1ss4" href="#st200_p2s1ss4">2.1.4</a></div><div class="st200_subsection_title">Capabilities</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s1ss4pg1" href="#st200_p2s1ss4pg1">1</a></div><div class="st200_paragraph">
+        The set of operations that can be performed on the virtual
+        <a class="st200_link" href="#st200_p2s1ss1">filesystem</a>
+        is divided into <span class="st200_term">capabilities</span>. The purpose of this
+        is to allow code to be separated according to the principle of
+        least privilege. That is, if a given function only needs to read
+        from the filesystem and does not need to be able to mount or unmount
+        archives, then it can be declared as taking a value of type
+        <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/FSCapabilityRead.html">FSCapabilityRead</a>
+        as opposed to, for example, a value of type
+        <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/FilesystemType.html">FilesystemType</a>.
+        This allows the type system to give much stronger guarantees about
+        what a particular function can do to the filesystem.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s1ss4pg2" href="#st200_p2s1ss4pg2">2</a></div><div class="st200_paragraph">
+          See the JavaDoc documentation for
+          <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/FSCapabilityAll.html">FSCapabilityAll</a>
+          for the definitions of the capabilities.
+        </div></div></div></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p2s2" href="#st200_p2s2">2.2</a></div><div class="st200_section_title">Tutorial</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg1" href="#st200_p2s2pg1">1</a></div><div class="st200_paragraph">
+        First, the filesystem is created by specifying an
+        <span class="st200_term term">archive directory</span> containing archives
+        (zip files, directories, etc):
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s2fo1" href="#st200_p2s2fo1">2.2.1. Filesystem creation</a></div><pre class="st200_verbatim">
+final PathReal path = new PathReal("/path/to/application/resources");
+final FilesystemType fs = Filesystem.makeWithArchiveDirectory(log, path);
+        </pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg2" href="#st200_p2s2pg2">2</a></div><div class="st200_paragraph">
+        Then, individual archives can be mounted into the filesystem
+        in much the same way as disks are mounted in the UNIX filesystem.
+        All archives are treated in a read-only manner. The
+        <span class="st200_term package">jvvfs</span> package never writes to the
+        filesystem or any archives.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg3" href="#st200_p2s2pg3">3</a></div><div class="st200_paragraph">
+        Values of type <span class="st200_term type">PathReal</span> denote
+        platform-specific paths (and should therefore be given in
+        platform-specific notation). Use of
+        <span class="st200_term constant">File.separatorChar</span> in the Java
+        standard library is recommended.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg4" href="#st200_p2s2pg4">4</a></div><div class="st200_paragraph">
+        Assuming <span class="st200_term file">archive.zip</span> exists in the
+        specified archive directory, the archive can be mounted in the
+        root directory of the virtual filesystem:
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s2fo2" href="#st200_p2s2fo2">2.2.2. Mounting archives</a></div><pre class="st200_verbatim">
+final PathVirtual mount = PathVirtual.ofString("/");
+fs.mountArchive("archive.zip", mount);
+        </pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg5" href="#st200_p2s2pg5">5</a></div><div class="st200_paragraph">
+        Values of type <span class="st200_term type">PathVirtual</span> denote
+        paths in the virtual filesystem and are given in platform-independent
+        notation. Virtual path components are separated by
+        <span class="st200_term constant">/</span> and must always begin with
+        a leading <span class="st200_term constant">/</span> (the paths must always
+        be absolute). The filesystem currently has no concept of a "current
+        working directory", so relative paths have no meaning.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg6" href="#st200_p2s2pg6">6</a></div><div class="st200_paragraph">
+        Assuming <span class="st200_term file">archive.zip</span> contains the
+        file <span class="st200_term file">/a/b/c/file.txt</span>, the file can
+        be opened, unsurprisingly, by the path
+        <span class="st200_term file">/a/b/c/file.txt</span>:
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s2fo3" href="#st200_p2s2fo3">2.2.3. Opening a file</a></div><pre class="st200_verbatim">
+final PathVirtual path   = PathVirtual.ofString("/a/b/c/file.txt");
+final InputStream stream = fs.openFile(path);
+        </pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg7" href="#st200_p2s2pg7">7</a></div><div class="st200_paragraph">
+        It is possible to mount archives at directories other than the
+        root. It is possible to create directories in the virtual filesystem
+        with the
+        <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/FSCapabilityCreateDirectory#createDirectory(com.io7m.jvvfs.PathVirtual)">createDirectory</a>
+        function, if no currently mounted archive provides the desired
+        mount point. Manually created directories are purely virtual constructs;
+        creating a directory via the <span class="st200_term package">jvvfs</span>
+        API does not modify the real OS filesystem or any archives.
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s2fo4" href="#st200_p2s2fo4">2.2.4. Creating a directory</a></div><pre class="st200_verbatim">
+// If "archive1.zip" contains "/a/b/file.txt", then "archive2.zip" could, for
+// example, be mounted at "/a" or "/a/b".
+fs.mount("archive1.zip", PathVirtual.ROOT);
+assert fs.isDirectory(PathVirtual.ofString("/a"));
+assert fs.isDirectory(PathVirtual.ofString("/a/b"));
+fs.mount("archive2.zip", PathVirtual.ofString("/a"));
+
+// Explicitly creating "/c" and mounting "archive2.zip" there is also a possibility.
+fs.createDirectory(PathVirtual.ofString("/c"));
+assert fs.isDirectory(PathVirtual.ofString("/c"));
+fs.mount("archive2.zip", PathVirtual.ofString("/c"));
+
+// Assuming "/xyz/file.txt" exists in "archive2.zip", both of the following will work:
+final InputStream s0 = fs.openFile("/a/xyz/file.txt");
+final InputStream s1 = fs.openFile("/c/xyz/file.txt");
+        </pre></div></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p2s3" href="#st200_p2s3">2.3</a></div><div class="st200_section_title">The Jvvfs Shell</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s3ss1" href="#st200_p2s3ss1">2.3.1</a></div><div class="st200_subsection_title">Overview</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss1pg1" href="#st200_p2s3ss1pg1">1</a></div><div class="st200_paragraph">
+          The <span class="st200_term package">jvvfs</span> package includes a simple
+          command-line shell program for manipulating and exploring
+          <span class="st200_term package">jvvfs</span> filesystems.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss1pg2" href="#st200_p2s3ss1pg2">2</a></div><div class="st200_paragraph">
+          The program is distributed as part of the
+          <span class="st200_term package">io7m-jvvfs-shell</span> package, with the
+          <span class="st200_term function">main</span> program provided in the
+          <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/shell/ShellMain.html">ShellMain</a>
+          class.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss1pg3" href="#st200_p2s3ss1pg3">3</a></div><div class="st200_paragraph">
+        The program takes a pair of arguments: The name of a configuration
+        file, and the name of a directory containing archive files.
+      </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s3ss2" href="#st200_p2s3ss2">2.3.2</a></div><div class="st200_subsection_title">shell.conf</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss2pg1" href="#st200_p2s3ss2pg1">1</a></div><div class="st200_paragraph">
+        The sole purpose of the configuration file, at present, is to
+        control logging. The <span class="st200_term package">jvvfs</span> package
+        uses <span class="st200_term package">jlog</span>
+        <span class="st200_footnote_reference"><a id="st200_fn_2_ref" href="#st200_fn_2">[2]</a></span>
+        internally for extremely fine-grained control of logging. All logging
+        controls for <span class="st200_term package">jvvfs</span> are given the prefix
+        <span class="st200_term constant">com.io7m.jvvfs</span>. A trivial configuration
+        file that only logs errors is sufficient for almost all users:
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s3ss2fo1" href="#st200_p2s3ss2fo1">2.3.2.1. Example shell.conf</a></div><pre class="st200_verbatim">
+com.io7m.jvvfs.logs.shell = true
+com.io7m.jvvfs.level      = LOG_ERROR
+        </pre></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s3ss3" href="#st200_p2s3ss3">2.3.3</a></div><div class="st200_subsection_title">Commands</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss3pg1" href="#st200_p2s3ss3pg1">1</a></div><div class="st200_paragraph">
+      Usage information on shell commands can be obtained from the
+      <span class="st200_term function">help</span> command. The shell supports
+      tab-completion
+      <span class="st200_footnote_reference"><a id="st200_fn_3_ref" href="#st200_fn_3">[3]</a></span> for commands.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss3pg2" href="#st200_p2s3ss3pg2">2</a></div><div class="st200_paragraph">
+        A transcript of an example session showing some of the features
+        of the shell is as follows:
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s3ss3fo1" href="#st200_p2s3ss3fo1">2.3.3.1. Example shell session</a></div><pre class="st200_verbatim">
+jvvfs&gt; 
+archives         close            file-list        file-list-long   file-read        file-size        file-time        
+help             list-mounts      mkdir            mount            unmount  
+        
+jvvfs&gt; archives 
+complex.zip
+encrypted.zip
+files1-3.zip
+files4-6.zip
+io7m-jvvfs.properties
+single-file-and-subdir-implicit.zip
+single-file-and-subdir.zip
+single-file-in-subdir-subdir.zip
+single-file.jar
+single-file.zip
+subdir-shadow.zip
+subdir-subdir-shadow.zip
+unknown.unknown
+
+jvvfs&gt; mkdir /z
+jvvfs&gt; file-list-long /
+z/                2013-06-29 14:19:51 +0000 
+jvvfs&gt; file-list-long /z
+
+jvvfs&gt; mount files1-3.zip /z
+jvvfs&gt; file-list-long /z
+file1.txt         2013-05-08 11:35:16 +0000 7
+file2.txt         2013-05-08 11:35:20 +0000 7
+file3.txt         2013-05-08 11:35:24 +0000 7
+jvvfs&gt; file-read /z/file1.txt
+File 1
+
+jvvfs&gt; list-mounts 
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs&gt; mount complex.zip /
+jvvfs&gt; list-mounts 
+/   /tmp/jvvfs/complex.zip
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs&gt; file-list-long /
+a/                2012-03-15 21:13:12 +0000
+b/                2012-03-15 21:13:12 +0000
+z/                2013-06-28 22:13:47 +0000
+
+jvvfs&gt; file-list-long /a
+a/                2012-03-15 21:13:12 +0000
+a1.txt            2012-03-15 21:13:12 +0000 9
+a2.txt            2012-03-15 21:13:12 +0000 9
+a3.txt            2012-03-15 21:13:12 +0000 9
+b/                2012-03-15 21:13:12 +0000
+c/                2012-03-15 21:13:12 +0000
+
+jvvfs&gt; mount files4-6.zip /a
+
+jvvfs&gt; file-list-long /a
+a/                2012-03-15 21:13:12 +0000 
+a1.txt            2012-03-15 21:13:12 +0000 9
+a2.txt            2012-03-15 21:13:12 +0000 9
+a3.txt            2012-03-15 21:13:12 +0000 9
+b/                2012-03-15 21:13:12 +0000 
+c/                2012-03-15 21:13:12 +0000 
+file4.txt         2013-05-08 11:36:02 +0000 7
+file5.txt         2013-05-08 11:36:06 +0000 7
+file6.txt         2013-05-08 11:36:10 +0000 7
+
+jvvfs&gt; list-mounts 
+/a  /tmp/jvvfs/files4-6.zip
+/   /tmp/jvvfs/complex.zip
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs&gt; close
+jvvfs&gt; list-mounts
+jvvfs&gt; file-list-long /
+
+jvvfs&gt; mount encrypted.zip /
+shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt - invalid CEN header (encrypted entry)
+
+        </pre></div></div></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p2s4" href="#st200_p2s4">2.4</a></div><div class="st200_section_title">Migrating from 2.*.*</div><ul class="st200_contents st200_section_contents_outer st200_section_contents"><li class="st200_contents_item st200_contents_item1 st200_contents_item_subsection"><a href="#st200_p2s4ss1">2.4.1. FilesystemAPI</a></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_subsection"><a href="#st200_p2s4ss2">2.4.2. Filesystem</a></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_subsection"><a href="#st200_p2s4ss3">2.4.3. PathVirtual</a></li></ul><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s4ss1" href="#st200_p2s4ss1">2.4.1</a></div><div class="st200_subsection_title">FilesystemAPI</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s4ss1pg1" href="#st200_p2s4ss1pg1">1</a></div><div class="st200_paragraph">
+        The API exposed by filesystems changed and was broken up into
+        separate filesystem capabilities. See
+        <a class="st200_link" href="#st200_p2s1ss4">Capabilities</a>
+        for the details. The only significantly different function is
+        <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/FSCapabilityRead.html#getModificationTime(com.io7m.jvvfs.PathVirtual)">getModificationTime</a>,
+        which replaced <span class="st200_term function">modificationTime()</span>. This
+        now uses values of type <span class="st200_term type">Calendar</span>, to
+        deal correctly with timezones.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s4ss1pg2" href="#st200_p2s4ss1pg2">2</a></div><div class="st200_paragraph">
+        Most of the function names have changed in order to statically
+        indicate that the semantics may be subtly different.
+      </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s4ss2" href="#st200_p2s4ss2">2.4.2</a></div><div class="st200_subsection_title">Filesystem</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s4ss2pg1" href="#st200_p2s4ss2pg1">1</a></div><div class="st200_paragraph">
+      The <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/Filesystem.html">Filesystem</a>
+      type is still the main filesystem implementation, but now requires
+      that users use the provided static methods to initialize the
+      filesystem, instead of the now-private constructors.
+      </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s4ss3" href="#st200_p2s4ss3">2.4.3</a></div><div class="st200_subsection_title">PathVirtual</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s4ss3pg1" href="#st200_p2s4ss3pg1">1</a></div><div class="st200_paragraph">
+        The constructors of the <span class="st200_term type">PathVirtual</span>
+        type are now private and were replaced by
+        <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/PathVirtual.html#ofString(java.lang.String)">ofString</a>.
+        The <span class="st200_term function">ofString</span> function is much
+        stricter in what it'll accept as a valid path. The
+        <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/PathVirtual.html#ofStringLax(java.lang.String)">ofStringLax</a>
+        function is more permissive in the syntax that it supports and
+        may be required for directly migrating old code.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s4ss3pg2" href="#st200_p2s4ss3pg2">2</a></div><div class="st200_paragraph">
+        The semantics of the <span class="st200_term type">PathVirtual</span> type
+        have also changed with regard to what is considered to be a parent
+        or ancestor of a path. For example, the root directory is now not
+        considered to have a parent. These changes are unlikely to affect
+        any existing code that uses <span class="st200_term package">jvvfs</span>.
+        See <a class="st200_link" href="#st200_p3s3">virtual path semantics</a>
+        for the precise details.
+      </div></div></div></div></div><div class="st200_part_container"><div class="st200_part_title_number"><a id="st200_p3" href="#st200_p3">3</a></div><div class="st200_part_title">Semantics</div><ul class="st200_contents st200_part_contents_outer st200_part_contents"><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p3s1">3.1. Overview</a><ul class="st200_contents st200_section_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s1ss1">3.1.1. Specification</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s1ss2">3.1.2. Effects</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p3s2">3.2. Names</a><ul class="st200_contents st200_section_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s2ss1">3.2.1. Semantics</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s2ss2">3.2.2. Syntax</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p3s3">3.3. Virtual paths</a><ul class="st200_contents st200_section_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s3ss1">3.3.1. Semantics</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s3ss2">3.3.2. Syntax</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p3s4">3.4. Archives</a><ul class="st200_contents st200_section_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s4ss1">3.4.1. Overview</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s4ss2">3.4.2. Lookup</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s4ss3">3.4.3. Directory Listing</a></li></ul></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p3s5">3.5. Filesystem</a><ul class="st200_contents st200_section_contents"><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s5ss1">3.5.1. Overview</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s5ss2">3.5.2. Lookup</a></li><li class="st200_contents_item st200_contents_item2 st200_contents_item_subsection"><a href="#st200_p3s5ss3">3.5.3. Directory Listing</a></li></ul></li></ul><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p3s1" href="#st200_p3s1">3.1</a></div><div class="st200_section_title">Overview</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s1ss1" href="#st200_p3s1ss1">3.1.1</a></div><div class="st200_subsection_title">Specification</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s1ss1pg1" href="#st200_p3s1ss1pg1">1</a></div><div class="st200_paragraph">
+          This section attempts to document the semantics of the
+          <span class="st200_term package">jvvfs</span> package. The semantics are
+          given as fragments of code written in the Gallina language of
+          Coq <span class="st200_footnote_reference"><a id="st200_fn_4_ref" href="#st200_fn_4">[4]</a></span>.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s1ss1pg2" href="#st200_p3s1ss1pg2">2</a></div><div class="st200_paragraph">
+          The <a class="st200_link_external" href="Model.v">source</a> to
+          the development is available for type-checking and writing exploratory
+          proofs about the model. Note that the source is not intended to be
+          particularly readable by itself, and is formatted for ease of insertion
+          into this documentation (as opposed to being formatted for easy reading).
+        </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s1ss2" href="#st200_p3s1ss2">3.1.2</a></div><div class="st200_subsection_title">Effects</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s1ss2pg1" href="#st200_p3s1ss2pg1">1</a></div><div class="st200_paragraph">
+          Many of the operations described in this specification are
+          <span class="st200_term term">effectful</span>. That is, they are
+          computations that will perform some side effect and are therefore not
+          directly expressible in Coq's logic. Effectful operations are expressed here as
+          values of type <span class="st200_term type">io</span>. The <span class="st200_term type">io F S</span>
+          type is understood to represent a computation that, when executed, will
+          perform some side effect and return a value of type <span class="st200_term type">S</span>
+          on success or a value of type <span class="st200_term type">F</span> on failure.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s1ss2fo1" href="#st200_p3s1ss2fo1">3.1.2.1. IO</a></div><pre class="st200_verbatim">Inductive io (F S : Type) : Type :=
+  | Success : S -&gt; io F S
+  | Failure : F -&gt; io F S.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s1ss2pg2" href="#st200_p3s1ss2pg2">2</a></div><div class="st200_paragraph">
+          The issue of side effects makes it somewhat awkward to describe
+          the consequences of actions, so the reader is (unfortunately)
+          required to use good judgement when reading statements regarding
+          effectful computations. As an example of this problem: "If looking
+          up an object at path <span class="st200_term variable">p</span> in the filesystem
+          succeeds and produces a reference to a file, then looking up the
+          parent of <span class="st200_term variable">p</span> must succeed and
+          yield a reference to a directory". This is obviously true given
+          normal operating system filesystem semantics. However, looking up
+          objects in the filesystem is an effectful operation and therefore, the
+          filesystem could theoretically burst into flames and never yield
+          the second reference! The reader is more or less expected to
+          implicitly insert the phrase "assuming that no catastrophic operating
+          system errors occur" before reading any statement regarding
+          effectful computations.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s1ss2pg3" href="#st200_p3s1ss2pg3">3</a></div><div class="st200_paragraph">
+          The problem could be solved to some extent by specifying an
+          even more abstract model of the filesystem and then stating that
+          the effectful computations adhere to properties stated about this
+          model, but this is certainly not trivial and would probably be
+          of little practical utility.
+        </div></div></div></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p3s2" href="#st200_p3s2">3.2</a></div><div class="st200_section_title">Names</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s2ss1" href="#st200_p3s2ss1">3.2.1</a></div><div class="st200_subsection_title">Semantics</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s2ss1pg1" href="#st200_p3s2ss1pg1">1</a></div><div class="st200_paragraph">
+      Each object in the <span class="st200_term package">jvvfs</span> filesystem
+      has exactly one name.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s2ss1fo1" href="#st200_p3s2ss1fo1">3.2.1.1. Name type</a></div><pre class="st200_verbatim">Axiom name       : Set.
+Axiom name_valid : name -&gt; Prop.
+</pre></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s2ss2" href="#st200_p3s2ss2">3.2.2</a></div><div class="st200_subsection_title">Syntax</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s2ss2pg1" href="#st200_p3s2ss2pg1">1</a></div><div class="st200_paragraph">
+          <span class="st200_term type">Names</span> of filesystem objects in
+          <span class="st200_term package">jvvfs</span> are specifically not allowed
+          to contain:
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s2ss2fo1" href="#st200_p3s2ss2fo1">3.2.2.1. Name restrictions</a></div><ul class="st200_list_unordered"><li class="st200_list_item">Forward slashes <span class="st200_term constant">(['/'], ASCII [0x2f])</span>, as this is used as a path separator on UNIX and in <span class="st200_term package">jvvfs</span> virtual paths.</li><li class="st200_list_item">Backslashes <span class="st200_term constant">(['\'], ASCII [0x5c])</span>, as this is used as a path separator on Microsoft Windows.</li><li class="st200_list_item">A series of two or more dots <span class="st200_term constant">(['.'], ASCII [0x2e])</span>, as this is a reserved name on UNIX-like platforms.</li><li class="st200_list_item">Colons <span class="st200_term constant">([':'], ASCII [0x3a])</span>, as these are used to identify "drives" on some operating systems.</li><li class="st200_list_item">Null <span class="st200_term constant">(ASCII [0x0])</span>, as almost no operating systems permit these in file names.</li></ul></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s2ss2pg2" href="#st200_p3s2ss2pg2">2</a></div><div class="st200_paragraph">
+          Empty strings are also not considered to be valid names.
+        </div></div></div></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p3s3" href="#st200_p3s3">3.3</a></div><div class="st200_section_title">Virtual paths</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s3ss1" href="#st200_p3s3ss1">3.3.1</a></div><div class="st200_subsection_title">Semantics</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s3ss1pg1" href="#st200_p3s3ss1pg1">1</a></div><div class="st200_paragraph">
+      Virtual paths in <span class="st200_term package">jvvfs</span> are conceptually
+      a list of <a class="st200_link" href="#st200_p3s2">names</a>,
+      with the empty list representing the root.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s3ss1fo1" href="#st200_p3s3ss1fo1">3.3.1.1. Virtual path type</a></div><pre class="st200_verbatim">Definition path_virtual :=
+  list {n : name | name_valid n}.
+
+Definition root : path_virtual :=
+  nil.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s3ss1pg2" href="#st200_p3s3ss1pg2">2</a></div><div class="st200_paragraph">
+          A path <span class="st200_term variable">p0</span> is an ancestor of
+          <span class="st200_term variable">p1</span> iff
+          <span class="st200_term variable">p0</span> is a prefix of
+          <span class="st200_term variable">p1</span> (that is, the first <span class="st200_term expression">length p0</span>
+          elements of <span class="st200_term variable">p1</span> are equal to
+          <span class="st200_term variable">p0</span>), but
+          <span class="st200_term expression">p0 ≠ p1</span>.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s3ss1fo2" href="#st200_p3s3ss1fo2">3.3.1.2. Virtual path ancestor</a></div><pre class="st200_verbatim">Require Coq.Lists.List.
+
+Definition is_prefix (p0 p1 : path_virtual) :=
+  List.firstn (length p0) p1 = p0.
+
+Definition is_ancestor_of (p0 p1 : path_virtual) :=
+  p0 &lt;&gt; p1 /\ is_prefix p0 p1.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s3ss1pg3" href="#st200_p3s3ss1pg3">3</a></div><div class="st200_paragraph">
+          Consequently, a path <span class="st200_term variable">p0</span> is the parent of
+          <span class="st200_term variable">p1</span> iff
+          <span class="st200_term variable">p0</span> is an ancestor of
+          <span class="st200_term variable">p1</span> and <span class="st200_term expression">∃n. app p0 n = p1</span>
+          (where <span class="st200_term function">app</span> is the standard list append function).
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s3ss1fo3" href="#st200_p3s3ss1fo3">3.3.1.3. Virtual path parent</a></div><pre class="st200_verbatim">Require Coq.Lists.List.
+
+Definition is_parent_of (p0 p1 : path_virtual) :=
+  is_ancestor_of p0 p1 /\ exists n, app p0 (n :: nil) = p1.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s3ss1pg4" href="#st200_p3s3ss1pg4">4</a></div><div class="st200_paragraph">
+          Iff <span class="st200_term variable">p1</span> is an ancestor of
+          <span class="st200_term variable">p0</span>, or <span class="st200_term expression">p0 = p1</span>,
+          the <span class="st200_term function">subtraction</span> of
+          <span class="st200_term variable">p1</span> from
+          <span class="st200_term variable">p0</span> is defined as the removal of the
+          first <span class="st200_term expression">length p1</span> elements of
+          <span class="st200_term variable">p0</span>.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s3ss1fo4" href="#st200_p3s3ss1fo4">3.3.1.4. Virtual path subtraction</a></div><pre class="st200_verbatim">Require Coq.Lists.List.
+
+Definition subtract
+  (p0 p1 : path_virtual)
+  (_     : is_ancestor_of p1 p0 \/ p0 = p1) :=
+  List.skipn (length p1) p0.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s3ss1pg5" href="#st200_p3s3ss1pg5">5</a></div><div class="st200_paragraph">
+          It naturally follows that it is possible to obtain a list
+          of all ancestors of a path <span class="st200_term variable">p</span>
+          by successively concatenating the elements of
+          <span class="st200_term variable">p</span> to the root, minus the last element.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s3ss1fo5" href="#st200_p3s3ss1fo5">3.3.1.5. Virtual path ancestors</a></div><pre class="st200_verbatim">Require Coq.Lists.List.
+
+Fixpoint ancestors_including_self (p : path_virtual) : list path_virtual :=
+  cons root (match p with
+    | nil       =&gt; nil
+    | cons y ys =&gt; List.map (cons y) (ancestors_including_self ys)
+    end).
+
+Definition ancestors (p : path_virtual) : list path_virtual :=
+  List.removelast (ancestors_including_self p).
+</pre></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s3ss2" href="#st200_p3s3ss2">3.3.2</a></div><div class="st200_subsection_title">Syntax</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s3ss2pg1" href="#st200_p3s3ss2pg1">1</a></div><div class="st200_paragraph">
+          The concrete syntax of virtual paths is given by the following
+          EBNF <span class="st200_footnote_reference"><a id="st200_fn_5_ref" href="#st200_fn_5">[5]</a></span> grammar:
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s3ss2fo1" href="#st200_p3s3ss2fo1">3.3.2.1. Virtual path EBNF</a></div><pre class="st200_verbatim">path = "/" , [ name , ("/" , name)* ] ;</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s3ss2pg2" href="#st200_p3s3ss2pg2">2</a></div><div class="st200_paragraph">
+          Where <span class="st200_term variable">name</span> represents a valid
+          <a class="st200_link" href="#st200_p3s2">name</a>.
+        </div></div></div></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p3s4" href="#st200_p3s4">3.4</a></div><div class="st200_section_title">Archives</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s4ss1" href="#st200_p3s4ss1">3.4.1</a></div><div class="st200_subsection_title">Overview</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss1pg1" href="#st200_p3s4ss1pg1">1</a></div><div class="st200_paragraph">
+          Archives represent on-disk files and directories. They support
+          basic operations such as file lookups and directory listing.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss1pg2" href="#st200_p3s4ss1pg2">2</a></div><div class="st200_paragraph">
+      From the perspective of the <span class="st200_term package">jvvfs</span>
+      filesystem, an archive is an opaque value that returns responses
+      to queries made relative to the directory at which the archive is
+      mounted.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss1fo1" href="#st200_p3s4ss1fo1">3.4.1.1. Archive type</a></div><pre class="st200_verbatim">Axiom archive : Set.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss1pg3" href="#st200_p3s4ss1pg3">3</a></div><div class="st200_paragraph">
+          The directory at which a given archive is mounted is stored along
+          with the archive and is accessible.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss1fo2" href="#st200_p3s4ss1fo2">3.4.1.2. Archive mount</a></div><pre class="st200_verbatim">Axiom archive_mount : archive -&gt; path_virtual.
+</pre></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s4ss2" href="#st200_p3s4ss2">3.4.2</a></div><div class="st200_subsection_title">Lookup</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss2pg1" href="#st200_p3s4ss2pg1">1</a></div><div class="st200_paragraph">
+          Archives contain files and directories, each of which have
+          unique paths. One of the primitive operations supported by
+          archives is returning a reference to one these filesystem objects
+          when given a path.
+    </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss2pg2" href="#st200_p3s4ss2pg2">2</a></div><div class="st200_paragraph">
+          Archives expose their contents as
+          opaque file references. The <span class="st200_term package">jvvfs</span>
+          filesystem does not expose these references to the user, but they
+          are used here to express further properties of archives. As stated,
+          a referenced object must either be a file or a directory.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss2fo1" href="#st200_p3s4ss2fo1">3.4.2.1. Archive file references</a></div><pre class="st200_verbatim">Inductive file_reference :=
+  | FSReferenceFile
+  | FSReferenceDirectory.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss2pg3" href="#st200_p3s4ss2pg3">3</a></div><div class="st200_paragraph">
+          Looking up an object in an archive is an effectful computation that will
+          return an optional file reference on success.
+          The function returns <span class="st200_term expression">None</span> for
+          a path <span class="st200_term variable">p</span> iff all ancestors
+          of <span class="st200_term variable">p</span> exist and are directories, but
+          no object exists at <span class="st200_term variable">p</span>. The function
+          returns <span class="st200_term expression">Some r</span> iff all ancestors
+          of <span class="st200_term variable">p</span> exist and are directories and
+          an object exists at <span class="st200_term variable">p</span>, where
+          <span class="st200_term variable">r</span> is a reference to the object at
+          <span class="st200_term variable">p</span>. Otherwise, the function returns an
+          error. Some specific error cases are described below.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss2fo2" href="#st200_p3s4ss2fo2">3.4.2.2. Archive lookup</a></div><pre class="st200_verbatim">Axiom archive_lookup : archive -&gt; path_virtual -&gt; io error_code (option file_reference).
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss2pg4" href="#st200_p3s4ss2pg4">4</a></div><div class="st200_paragraph">
+          If the path <span class="st200_term variable">p</span> refers to a file in
+          the archive <span class="st200_term variable">a</span>, then attempting to
+          call <span class="st200_term function">archive_lookup</span> on any
+          <span class="st200_term variable">q</span> where
+          <span class="st200_term expression">is_ancestor_of p q</span> must clearly
+          fail (because only directories can have children).
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss2fo3" href="#st200_p3s4ss2fo3">3.4.2.3. Archive lookup file parent failure</a></div><pre class="st200_verbatim">Axiom archive_lookup_file_ancestor : forall
+  (a   : archive)
+  (p q : path_virtual),
+  is_ancestor_of p q -&gt;
+    archive_lookup a p = Success _ _ (Some FSReferenceFile) -&gt;
+      archive_lookup a q = Failure _ _ FSErrorNotADirectory.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss2pg5" href="#st200_p3s4ss2pg5">5</a></div><div class="st200_paragraph">
+        Additionally, if <span class="st200_term function">archive_lookup</span> yields
+        a reference to anything for some <span class="st200_term variable">q</span>,
+        then it must yield a reference to a directory for all
+        <span class="st200_term variable">p</span> where
+        <span class="st200_term expression">is_ancestor_of p q</span>.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss2fo4" href="#st200_p3s4ss2fo4">3.4.2.4. Archive lookup directory ancestor</a></div><pre class="st200_verbatim">Axiom archive_lookup_ancestor : forall
+  (a   : archive)
+  (p q : path_virtual),
+  is_ancestor_of p q -&gt;
+    (exists r, archive_lookup a q = Success _ _ (Some r)) -&gt;
+      archive_lookup a p = Success _ _ (Some FSReferenceDirectory).
+</pre></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s4ss3" href="#st200_p3s4ss3">3.4.3</a></div><div class="st200_subsection_title">Directory Listing</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss3pg1" href="#st200_p3s4ss3pg1">1</a></div><div class="st200_paragraph">
+          The contents of directories within archives may be listed. The
+          <span class="st200_term function">archive_directory_list</span> function
+          returns a list of <a class="st200_link" href="#st200_p3s2">names</a>
+          of direct children of the directory at <span class="st200_term variable">p</span>,
+          iff <span class="st200_term variable">p</span> refers to a directory and
+          all ancestors of <span class="st200_term variable">p</span> are directories.
+          Otherwise, the function returns an error.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss3fo1" href="#st200_p3s4ss3fo1">3.4.3.1. Archive directory listing</a></div><pre class="st200_verbatim">Axiom archive_directory_list : archive -&gt; path_virtual -&gt; io error_code (list name).
+</pre></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss3fo2" href="#st200_p3s4ss3fo2">3.4.3.2. Archive directory listing file failure</a></div><pre class="st200_verbatim">Axiom archive_directory_list_file : forall
+  (a : archive)
+  (p : path_virtual),
+  archive_lookup a p = Success _ _ (Some FSReferenceFile) -&gt;
+    archive_directory_list a p = Failure _ _ FSErrorNotADirectory.
+</pre></div></div></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p3s5" href="#st200_p3s5">3.5</a></div><div class="st200_section_title">Filesystem</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s5ss1" href="#st200_p3s5ss1">3.5.1</a></div><div class="st200_subsection_title">Overview</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss1pg1" href="#st200_p3s5ss1pg1">1</a></div><div class="st200_paragraph">
+        The filesystem maintains a list of
+        <a class="st200_link" href="#st200_p3s4">archives</a>,
+        and presents an interface that allows archives to be "mounted" and
+        "unmounted" at directories within the filesystem.
+        </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s5ss2" href="#st200_p3s5ss2">3.5.2</a></div><div class="st200_subsection_title">Lookup</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg1" href="#st200_p3s5ss2pg1">1</a></div><div class="st200_paragraph">
+        Unlike most operating-system filesystems, the <span class="st200_term package">jvvfs</span>
+        filesystem has so-called "union" semantics. The filesystem maintains
+        a list of mounted archives, sorted in order of most-recently mounted -
+        the first archive in the list is the archive that was most recently mounted.
+        In order to look up an object in the filesystem at a given path
+        <span class="st200_term variable">p</span>, it's first necessary to look up all
+        of the ancestors of <span class="st200_term variable">p</span> to ensure that
+        they exist and are directories. Looking up an object at
+        <span class="st200_term variable">p</span> <span class="st200_term term">directly</span>
+        means to look up <span class="st200_term variable">p</span> without looking up
+        any of the ancestors of <span class="st200_term variable">p</span>.
+          When attempting to look up an object <span class="st200_term term">directly</span>
+          in the filesystem at a given path <span class="st200_term variable">p</span>,
+        each archive <span class="st200_term variable">a</span> in the list of archives
+        is considered in turn, starting with the most recently mounted first. The
+        lookup procedure takes the following steps:
+     </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss2fo1" href="#st200_p3s5ss2fo1">3.5.2.1. Filesystem union search</a></div><ol class="st200_list_ordered"><li class="st200_list_item">
+           If <span class="st200_term variable">a</span> is mounted at a path
+           <span class="st200_term variable">m</span> such that
+           <span class="st200_term expression">is_ancestor_of m p</span> or
+           <span class="st200_term expression">m = p</span>,
+           then the object at
+           <span class="st200_term expression">subtract p m</span> is
+           <a class="st200_link" href="#st200_p3s4ss2">looked up</a> in
+           <span class="st200_term variable">a</span>, and
+           <span class="st200_term variable">a</span> is said to have been
+           <span class="st200_term term">checked</span>.
+           Otherwise, the next archive in the list is considered.
+         </li><li class="st200_list_item">
+           If <span class="st200_term variable">a</span> returns a reference
+           to an object, then that object is returned immediately
+           and no further archives are considered. If, in
+           <span class="st200_term variable">a</span>, an ancestor
+           <span class="st200_term variable">q</span> of
+           <span class="st200_term expression">subtract p m</span> is a
+           file, then the file at
+           <span class="st200_term variable">q</span> is said to be
+           <span class="st200_term term">shadowing</span> the contents
+           of the rest of the archives. If
+           shadowing is occuring, and
+           <span class="st200_term variable">a</span> is not the first
+           archive in the list that has been
+           <span class="st200_term term">checked</span> so far, then
+           nothing is returned and no further archives are considered.
+           Otherwise, an error is returned (indicating
+           that <span class="st200_term variable">q</span>
+           is not a directory).  
+         </li></ol></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg2" href="#st200_p3s5ss2pg2">2</a></div><div class="st200_paragraph">
+       If no archives return an object, then no object exists at
+       <span class="st200_term variable">p</span> in the filesystem.
+       </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg3" href="#st200_p3s5ss2pg3">3</a></div><div class="st200_paragraph">
+         As mentioned, it's necessary to look up all of the ancestors
+         of <span class="st200_term variable">p</span> to ensure the correct
+         semantics, so the above procedure is simply applied to all
+         ancestors of <span class="st200_term variable">p</span> before being
+         applied to <span class="st200_term variable">p</span> itself. If any
+         ancestor of <span class="st200_term variable">p</span> turns out not
+         to exist, or not to be a directory, or if an error occurs,
+         the function returns an error.
+       </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss2fo2" href="#st200_p3s5ss2fo2">3.5.2.2. Filesystem union search (Coq)</a></div><pre class="st200_verbatim">Require Coq.Arith.Peano_dec.
+
+Axiom ancestor_or_equal : forall (p q : path_virtual),
+  {is_ancestor_of p q \/ q = p}+{~is_ancestor_of p q \/ q = p}.
+
+Fixpoint filesystem_lookup_union'
+  (archives : list archive)
+  (p        : path_virtual)
+  (checks   : nat)
+: io error_code (option file_reference) :=
+  match archives with
+  | nil         =&gt; Success _ _ None
+  | cons a rest =&gt;
+    let m := archive_mount a in
+      match ancestor_or_equal m p with
+      | right _ =&gt; filesystem_lookup_union' rest p checks
+      | left  H =&gt;
+        match archive_lookup a (subtract p m H) with
+        | Success None                 =&gt; filesystem_lookup_union' rest p (S checks)
+        | Success (Some r)             =&gt; Success _ _ (Some r)
+        | Failure FSErrorNotADirectory =&gt;
+          if Peano_dec.eq_nat_dec checks 0
+          then Failure _ _ FSErrorNotADirectory
+          else Success _ _ None
+        | Failure e =&gt; Failure _ _ e
+        end
+      end
+  end.
+
+Definition filesystem_lookup_union
+  (archives : list archive)
+  (p        : path_virtual)
+:= filesystem_lookup_union' archives p 0.
+
+Fixpoint filesystem_lookup_ancestors
+  (archives : list archive)
+  (p_a      : list path_virtual)
+: io error_code (option file_reference) :=
+  match p_a with
+  | nil       =&gt; Success _ _ (Some (FSReferenceDirectory))
+  | cons q qs =&gt;
+    match filesystem_lookup_union archives q with
+    | Success None                        =&gt; Failure _ _ FSErrorNotADirectory
+    | Success (Some FSReferenceFile)      =&gt; Failure _ _ FSErrorNotADirectory
+    | Success (Some FSReferenceDirectory) =&gt; filesystem_lookup_ancestors archives qs
+    | Failure e                           =&gt; Failure _ _ e
+    end
+  end.
+
+Definition filesystem_lookup
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (option file_reference) :=
+  match filesystem_lookup_ancestors archives (ancestors p) with
+  | Success _ =&gt; filesystem_lookup_union archives p
+  | Failure e =&gt; Failure _ _ e
+  end.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg4" href="#st200_p3s5ss2pg4">4</a></div><div class="st200_paragraph">
+         The above steps are in contrast to how operating-system
+         filesystems usually behave. Typically, operating systems
+         will take steps analogous to the following (where archives
+         are replaced by disks or disk partitions):
+       </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss2fo3" href="#st200_p3s5ss2fo3">3.5.2.3. Typical OS filesystem search</a></div><ol class="st200_list_ordered"><li class="st200_list_item">
+           If <span class="st200_term variable">a</span> is mounted at a path
+           <span class="st200_term variable">m</span> such that
+           <span class="st200_term expression">is_ancestor_of m p</span> or
+           <span class="st200_term expression">m = p</span>,
+           then the object at
+           <span class="st200_term expression">subtract p m</span> is
+           <a class="st200_link" href="#st200_p3s4ss2">looked up</a> in
+           <span class="st200_term variable">a</span>.
+           Otherwise, the next archive in the list is considered.
+         </li><li class="st200_list_item">
+             If, in
+           <span class="st200_term variable">a</span>, an ancestor
+           <span class="st200_term variable">q</span> of
+           <span class="st200_term expression">subtract p m</span> is not a
+           file, an error is returned (indicating
+           that <span class="st200_term variable">q</span>
+           is not a directory).
+           If <span class="st200_term variable">a</span> returns a reference
+           to an object, then that object is returned immediately
+           and no further archives are considered. Otherwise, nothing
+           is returned and no further archives are considered.
+         </li></ol></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss2fo4" href="#st200_p3s5ss2fo4">3.5.2.4. Typical OS filesystem search (Coq)</a></div><pre class="st200_verbatim">Require Coq.Arith.Peano_dec.
+
+Fixpoint filesystem_lookup_typical
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (option file_reference) :=
+  match archives with
+  | nil         =&gt; Success _ _ None
+  | cons a rest =&gt;
+    let m := archive_mount a in
+      match ancestor_or_equal m p with
+      | right _ =&gt; filesystem_lookup_typical rest p
+      | left  H =&gt; archive_lookup a (subtract p m H)
+      end    
+  end.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg5" href="#st200_p3s5ss2pg5">5</a></div><div class="st200_paragraph">
+       In other words, at most one archive is checked for
+       objects. 
+     </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss2pg6" href="#st200_p3s5ss2pg6">6</a></div><div class="st200_paragraph">
+       The procedure that <span class="st200_term package">jvvfs</span>
+       uses to locate filesystem objects is the source of the
+       term "union": With multiple directories overlapping in
+       different archives, the set of visible files is the
+       union of those in the mounted archives. Directories
+       and files can be hidden by files in more recently mounted
+       archives, but a directories can never hide other directories.
+       </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s5ss3" href="#st200_p3s5ss3">3.5.3</a></div><div class="st200_subsection_title">Directory Listing</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss3pg1" href="#st200_p3s5ss3pg1">1</a></div><div class="st200_paragraph">
+          Listing directories proceeds in a similar manner to
+          <a class="st200_link" href="#st200_p3s5ss2">file lookups</a>.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss3pg2" href="#st200_p3s5ss3pg2">2</a></div><div class="st200_paragraph">
+          When attempting to list a directory in the filesystem at a given path
+          <span class="st200_term variable">p</span>, <span class="st200_term variable">p</span>
+          is first <a class="st200_link" href="#st200_p3s5ss2">looked up</a>
+          to ensure that it is a directory as are all of its ancestors.
+          If this is not the case, an error is returned.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s5ss3pg3" href="#st200_p3s5ss3pg3">3</a></div><div class="st200_paragraph">
+          Then, each archive <span class="st200_term variable">a</span> in the list of archives
+        is considered in turn, starting with the most recently mounted first. The
+        listing procedure begins with an empty set of names
+        <span class="st200_term variable">S</span> and takes the following steps:
+     </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss3fo1" href="#st200_p3s5ss3fo1">3.5.3.1. Filesystem directory list union</a></div><ol class="st200_list_ordered"><li class="st200_list_item">
+           If <span class="st200_term variable">a</span> is mounted at a path
+           <span class="st200_term variable">m</span> such that
+           <span class="st200_term expression">is_ancestor_of m p</span> or
+           <span class="st200_term expression">m = p</span>,
+           then the object at
+           <span class="st200_term expression">subtract p m</span> is
+           <a class="st200_link" href="#st200_p3s4ss2">looked up</a> in
+           <span class="st200_term variable">a</span>, and
+           <span class="st200_term variable">a</span> is said to have been
+           <span class="st200_term term">checked</span>.
+           Otherwise, the next archive in the list is considered.
+         </li><li class="st200_list_item">
+           If <span class="st200_term variable">a</span> returns a reference
+           to a directory, then the names in the directory at
+           <span class="st200_term expression">subtract p m</span> are added
+           to <span class="st200_term variable">S</span> and the next archive is considered.
+         </li><li class="st200_list_item">
+           If, in <span class="st200_term variable">a</span>, either 
+           <span class="st200_term expression">subtract p m</span> or
+           an ancestor <span class="st200_term variable">q</span> of
+           <span class="st200_term expression">subtract p m</span> is a
+           file, then the contents of
+           <span class="st200_term expression">subtract p m</span> are said
+           to be
+           <span class="st200_term term">shadowed</span>. If
+           shadowing is occuring, and
+           <span class="st200_term variable">a</span> is not the first
+           archive in the list that has been
+           <span class="st200_term term">checked</span> so far, then
+           <span class="st200_term variable">S</span> is returned and
+           no further archives are considered.
+           Otherwise, an error is returned (indicating
+           that <span class="st200_term variable">q</span>
+           is not a directory).  
+         </li></ol></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s5ss3fo2" href="#st200_p3s5ss3fo2">3.5.3.2. Filesystem directory list union (Coq)</a></div><pre class="st200_verbatim">Require Coq.Arith.Peano_dec.
+Require Coq.Lists.ListSet.
+
+Axiom name_eq_dec : forall (n m : name),
+  {n = m}+{n &lt;&gt; m}.
+
+Fixpoint filesystem_directory_list_union'
+  (archives : list archive)
+  (p        : path_virtual)
+  (checks   : nat)
+  (current  : ListSet.set name)
+: io error_code (list name) :=
+  match archives with
+  | nil         =&gt; Success _ _ current
+  | cons a rest =&gt;
+    let m := archive_mount a in
+      match ancestor_or_equal m p with
+      | right _ =&gt; filesystem_directory_list_union' rest p checks current
+      | left  H =&gt;
+        match archive_directory_list a (subtract p m H) with
+        | Success names                =&gt; filesystem_directory_list_union' rest p (S checks) (ListSet.set_union name_eq_dec current names)
+        | Failure FSErrorNotADirectory =&gt;
+          if Peano_dec.eq_nat_dec checks 0
+          then Failure _ _ FSErrorNotADirectory
+          else Success _ _ current
+        | Failure e =&gt; Failure _ _ e
+        end
+      end
+  end.
+
+Definition filesystem_directory_list_union
+  (archives : list archive)
+  (p        : path_virtual)
+:= filesystem_directory_list_union' archives p 0 nil.
+
+Definition filesystem_directory_list
+  (archives : list archive)
+  (p        : path_virtual)
+: io error_code (list name) :=
+  match filesystem_lookup archives p with
+  | Success None                        =&gt; Failure _ _ FSErrorNotADirectory
+  | Success (Some FSReferenceFile)      =&gt; Failure _ _ FSErrorNotADirectory
+  | Success (Some FSReferenceDirectory) =&gt; filesystem_directory_list_union archives p
+  | Failure e                           =&gt; Failure _ _ e
+  end.
+</pre></div></div></div></div><div class="st200_part_container"><div class="st200_part_title_number"><a id="st200_p4" href="#st200_p4">4</a></div><div class="st200_part_title">Rationale</div><ul class="st200_contents st200_part_contents_outer st200_part_contents"><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p4s1">4.1. Why not Java resources?</a></li></ul><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p4s1" href="#st200_p4s1">4.1</a></div><div class="st200_section_title">Why not Java resources?</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p4s1pg1" href="#st200_p4s1pg1">1</a></div><div class="st200_paragraph">
+        Java resources allow developers to access program resources and
+        data files without explicit access to a filesystem. This is usually
+        sufficient if all the resources in question are conceptually part of
+        the program. The main problem that <span class="st200_term package">jvvfs</span>
+        attempts to solve is the problem of the set of required resources not
+        being known or available on program startup.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p4s1pg2" href="#st200_p4s1pg2">2</a></div><div class="st200_paragraph">
+        Consider a game or simulation that allows the loading of third-party
+        levels or other assets. The <a class="st200_link_external" href="http://openttd.org">OpenTTD</a>
+        engine is a good example of this, as it comes with a built-in installer
+        for third party content:
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p4s1fo1" href="#st200_p4s1fo1">4.1.1. OpenTTD content installer</a></div><img class="st200_image" alt="OpenTTD content installer" src="openttd_content.png"/></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p4s1pg3" href="#st200_p4s1pg3">3</a></div><div class="st200_paragraph">
+        Implementing the above with Java resources turns out to be rather
+        complicated. Overriding resources (to allow for content "upgrades")
+        is equally difficult.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p4s1pg4" href="#st200_p4s1pg4">4</a></div><div class="st200_paragraph">
+        The <span class="st200_term package">jvvfs</span> package provides a uniform
+        namespace for all resources, and new resources can be added at any time
+        by simply adding new archives and/or directories to the
+        <span class="st200_term term">archive directory</span> and then mounting them
+        as explained elsewhere in this documentation. The actual downloading of
+        external resource archives is considered to be outside of the scope of
+        <span class="st200_term package">jvvfs</span> and can be easily provided by
+        classes in the Java standard library.
+      </div></div></div></div><div class="st200_part_container"><div class="st200_part_title_number"><a id="st200_p5" href="#st200_p5">5</a></div><div class="st200_part_title">API Reference</div><ul class="st200_contents st200_part_contents_outer st200_part_contents"><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p5s1">5.1. Javadoc</a></li></ul><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p5s1" href="#st200_p5s1">5.1</a></div><div class="st200_section_title">Javadoc</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p5s1pg1" href="#st200_p5s1pg1">1</a></div><div class="st200_paragraph">
+        API documentation for the package is provided via the
+        included <a class="st200_link_external" href="apidocs">Javadoc</a>.
+      </div></div></div></div><div class="st200_part_container"><div class="st200_part_title_number"><a id="st200_p6" href="#st200_p6">6</a></div><div class="st200_part_title">Listings</div><ul class="st200_contents st200_part_contents_outer st200_part_contents"><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p6s1">6.1. Specifications</a></li><li class="st200_contents_item st200_contents_item1 st200_contents_item_section"><a href="#st200_p6s2">6.2. Examples</a></li></ul><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p6s1" href="#st200_p6s1">6.1</a></div><div class="st200_section_title">Specifications</div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p6s1fo1" href="#st200_p6s1fo1">6.1.1. Specification listings</a></div><div class="st200_formal_item_list"><ul><li class="st200_formal_item_list_item"><a href="#st200_p3s1ss2fo1">3.1.2.1. IO</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s2ss1fo1">3.2.1.1. Name type</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s2ss2fo1">3.2.2.1. Name restrictions</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s3ss1fo1">3.3.1.1. Virtual path type</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s3ss1fo2">3.3.1.2. Virtual path ancestor</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s3ss1fo3">3.3.1.3. Virtual path parent</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s3ss1fo4">3.3.1.4. Virtual path subtraction</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s3ss1fo5">3.3.1.5. Virtual path ancestors</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s3ss2fo1">3.3.2.1. Virtual path EBNF</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s4ss1fo1">3.4.1.1. Archive type</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s4ss1fo2">3.4.1.2. Archive mount</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s4ss2fo1">3.4.2.1. Archive file references</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s4ss2fo2">3.4.2.2. Archive lookup</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s4ss2fo3">3.4.2.3. Archive lookup file parent failure</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s4ss2fo4">3.4.2.4. Archive lookup directory ancestor</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s4ss3fo1">3.4.3.1. Archive directory listing</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s4ss3fo2">3.4.3.2. Archive directory listing file failure</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s5ss2fo1">3.5.2.1. Filesystem union search</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s5ss2fo2">3.5.2.2. Filesystem union search (Coq)</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s5ss2fo3">3.5.2.3. Typical OS filesystem search</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s5ss2fo4">3.5.2.4. Typical OS filesystem search (Coq)</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s5ss3fo1">3.5.3.1. Filesystem directory list union</a></li><li class="st200_formal_item_list_item"><a href="#st200_p3s5ss3fo2">3.5.3.2. Filesystem directory list union (Coq)</a></li></ul></div></div></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p6s2" href="#st200_p6s2">6.2</a></div><div class="st200_section_title">Examples</div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p6s2fo1" href="#st200_p6s2fo1">6.2.1. Example listings</a></div><div class="st200_formal_item_list"><ul><li class="st200_formal_item_list_item"><a href="#st200_p2s2fo1">2.2.1. Filesystem creation</a></li><li class="st200_formal_item_list_item"><a href="#st200_p2s2fo2">2.2.2. Mounting archives</a></li><li class="st200_formal_item_list_item"><a href="#st200_p2s2fo3">2.2.3. Opening a file</a></li><li class="st200_formal_item_list_item"><a href="#st200_p2s2fo4">2.2.4. Creating a directory</a></li><li class="st200_formal_item_list_item"><a href="#st200_p2s3ss2fo1">2.3.2.1. Example shell.conf</a></li><li class="st200_formal_item_list_item"><a href="#st200_p2s3ss3fo1">2.3.3.1. Example shell session</a></li></ul></div></div></div></div><div class="st200_footnotes"><hr/><div class="st200_footnote_container"><div class="st200_footnote_number">[<a id="st200_fn_0" href="#st200_fn_0_ref">0</a>]</div><div class="st200_footnote_body">
+            <a class="st200_link_external" href="http://semver.org">http://semver.org</a>
+          </div></div><div class="st200_footnote_container"><div class="st200_footnote_number">[<a id="st200_fn_1" href="#st200_fn_1_ref">1</a>]</div><div class="st200_footnote_body">
+          <a class="st200_link_external" href="http://en.wikipedia.org/wiki/Zip_(file_format)">http://en.wikipedia.org/wiki/Zip_(file_format)</a>
+        </div></div><div class="st200_footnote_container"><div class="st200_footnote_number">[<a id="st200_fn_2" href="#st200_fn_2_ref">2</a>]</div><div class="st200_footnote_body">
+        <a class="st200_link_external" href="http://io7m.com/software/jlog">http://io7m.com/software/jlog</a>
+        </div></div><div class="st200_footnote_container"><div class="st200_footnote_number">[<a id="st200_fn_3" href="#st200_fn_3_ref">3</a>]</div><div class="st200_footnote_body">
+        <a class="st200_link_external" href="http://en.wikipedia.org/wiki/Command_line_completion">http://en.wikipedia.org/wiki/Command_line_completion</a>
+      </div></div><div class="st200_footnote_container"><div class="st200_footnote_number">[<a id="st200_fn_4" href="#st200_fn_4_ref">4</a>]</div><div class="st200_footnote_body">
+            <a class="st200_link_external" href="http://coq.inria.fr">http://coq.inria.fr</a>
+          </div></div><div class="st200_footnote_container"><div class="st200_footnote_number">[<a id="st200_fn_5" href="#st200_fn_5_ref">5</a>]</div><div class="st200_footnote_body">
+            <a class="st200_link_external" href="http://en.wikipedia.org/wiki/EBNF">http://en.wikipedia.org/wiki/EBNF</a>
+          </div></div></div></div></body></html>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>io7m-jvvfs 4.0.1 Documentation: 3.4. Archives</title><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-layout.css"/><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-colour.css"/><link rel="stylesheet" type="text/css" href="documentation.css"/></head><body><div class="st200_body"><div class="brand">
+  <div class="brand_left">
+    <a href="http://io7m.com/">io7m</a>
+  </div>
+  <div class="brand_right">
+    <a href="http://io7m.github.io/jvvfs/">io7m-jvvfs</a> 4.0.1
+  </div>
+</div><div class="st200_navbar st200_navbar_top"><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_title_cell">3.3. Virtual paths</td><td class="st200_navbar_up_title_cell">3. Semantics</td><td class="st200_navbar_next_title_cell">3.5. Filesystem</td></tr><tr><td class="st200_navbar_prev_file_cell"><a href="p3s3.xhtml#st200_p3s3">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p3.xhtml#st200_p3">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p3s5.xhtml#st200_p3s5">Next</a></td></tr></table><hr class="st200_hr"/></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p3s4" href="#st200_p3s4">3.4</a></div><div class="st200_section_title">Archives</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s4ss1" href="#st200_p3s4ss1">3.4.1</a></div><div class="st200_subsection_title">Overview</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss1pg1" href="#st200_p3s4ss1pg1">1</a></div><div class="st200_paragraph">
+          Archives represent on-disk files and directories. They support
+          basic operations such as file lookups and directory listing.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss1pg2" href="#st200_p3s4ss1pg2">2</a></div><div class="st200_paragraph">
+      From the perspective of the <span class="st200_term package">jvvfs</span>
+      filesystem, an archive is an opaque value that returns responses
+      to queries made relative to the directory at which the archive is
+      mounted.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss1fo1" href="#st200_p3s4ss1fo1">3.4.1.1. Archive type</a></div><pre class="st200_verbatim">Axiom archive : Set.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss1pg3" href="#st200_p3s4ss1pg3">3</a></div><div class="st200_paragraph">
+          The directory at which a given archive is mounted is stored along
+          with the archive and is accessible.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss1fo2" href="#st200_p3s4ss1fo2">3.4.1.2. Archive mount</a></div><pre class="st200_verbatim">Axiom archive_mount : archive -&gt; path_virtual.
+</pre></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s4ss2" href="#st200_p3s4ss2">3.4.2</a></div><div class="st200_subsection_title">Lookup</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss2pg1" href="#st200_p3s4ss2pg1">1</a></div><div class="st200_paragraph">
+          Archives contain files and directories, each of which have
+          unique paths. One of the primitive operations supported by
+          archives is returning a reference to one these filesystem objects
+          when given a path.
+    </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss2pg2" href="#st200_p3s4ss2pg2">2</a></div><div class="st200_paragraph">
+          Archives expose their contents as
+          opaque file references. The <span class="st200_term package">jvvfs</span>
+          filesystem does not expose these references to the user, but they
+          are used here to express further properties of archives. As stated,
+          a referenced object must either be a file or a directory.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss2fo1" href="#st200_p3s4ss2fo1">3.4.2.1. Archive file references</a></div><pre class="st200_verbatim">Inductive file_reference :=
+  | FSReferenceFile
+  | FSReferenceDirectory.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss2pg3" href="#st200_p3s4ss2pg3">3</a></div><div class="st200_paragraph">
+          Looking up an object in an archive is an effectful computation that will
+          return an optional file reference on success.
+          The function returns <span class="st200_term expression">None</span> for
+          a path <span class="st200_term variable">p</span> iff all ancestors
+          of <span class="st200_term variable">p</span> exist and are directories, but
+          no object exists at <span class="st200_term variable">p</span>. The function
+          returns <span class="st200_term expression">Some r</span> iff all ancestors
+          of <span class="st200_term variable">p</span> exist and are directories and
+          an object exists at <span class="st200_term variable">p</span>, where
+          <span class="st200_term variable">r</span> is a reference to the object at
+          <span class="st200_term variable">p</span>. Otherwise, the function returns an
+          error. Some specific error cases are described below.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss2fo2" href="#st200_p3s4ss2fo2">3.4.2.2. Archive lookup</a></div><pre class="st200_verbatim">Axiom archive_lookup : archive -&gt; path_virtual -&gt; io error_code (option file_reference).
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss2pg4" href="#st200_p3s4ss2pg4">4</a></div><div class="st200_paragraph">
+          If the path <span class="st200_term variable">p</span> refers to a file in
+          the archive <span class="st200_term variable">a</span>, then attempting to
+          call <span class="st200_term function">archive_lookup</span> on any
+          <span class="st200_term variable">q</span> where
+          <span class="st200_term expression">is_ancestor_of p q</span> must clearly
+          fail (because only directories can have children).
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss2fo3" href="#st200_p3s4ss2fo3">3.4.2.3. Archive lookup file parent failure</a></div><pre class="st200_verbatim">Axiom archive_lookup_file_ancestor : forall
+  (a   : archive)
+  (p q : path_virtual),
+  is_ancestor_of p q -&gt;
+    archive_lookup a p = Success _ _ (Some FSReferenceFile) -&gt;
+      archive_lookup a q = Failure _ _ FSErrorNotADirectory.
+</pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss2pg5" href="#st200_p3s4ss2pg5">5</a></div><div class="st200_paragraph">
+        Additionally, if <span class="st200_term function">archive_lookup</span> yields
+        a reference to anything for some <span class="st200_term variable">q</span>,
+        then it must yield a reference to a directory for all
+        <span class="st200_term variable">p</span> where
+        <span class="st200_term expression">is_ancestor_of p q</span>.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss2fo4" href="#st200_p3s4ss2fo4">3.4.2.4. Archive lookup directory ancestor</a></div><pre class="st200_verbatim">Axiom archive_lookup_ancestor : forall
+  (a   : archive)
+  (p q : path_virtual),
+  is_ancestor_of p q -&gt;
+    (exists r, archive_lookup a q = Success _ _ (Some r)) -&gt;
+      archive_lookup a p = Success _ _ (Some FSReferenceDirectory).
+</pre></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p3s4ss3" href="#st200_p3s4ss3">3.4.3</a></div><div class="st200_subsection_title">Directory Listing</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p3s4ss3pg1" href="#st200_p3s4ss3pg1">1</a></div><div class="st200_paragraph">
+          The contents of directories within archives may be listed. The
+          <span class="st200_term function">archive_directory_list</span> function
+          returns a list of <a class="st200_link" href="p3s2.xhtml#st200_p3s2">names</a>
+          of direct children of the directory at <span class="st200_term variable">p</span>,
+          iff <span class="st200_term variable">p</span> refers to a directory and
+          all ancestors of <span class="st200_term variable">p</span> are directories.
+          Otherwise, the function returns an error.
+        </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss3fo1" href="#st200_p3s4ss3fo1">3.4.3.1. Archive directory listing</a></div><pre class="st200_verbatim">Axiom archive_directory_list : archive -&gt; path_virtual -&gt; io error_code (list name).
+</pre></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p3s4ss3fo2" href="#st200_p3s4ss3fo2">3.4.3.2. Archive directory listing file failure</a></div><pre class="st200_verbatim">Axiom archive_directory_list_file : forall
+  (a : archive)
+  (p : path_virtual),
+  archive_lookup a p = Success _ _ (Some FSReferenceFile) -&gt;
+    archive_directory_list a p = Failure _ _ FSErrorNotADirectory.
+</pre></div></div></div><div class="st200_navbar st200_navbar_bottom"><hr class="st200_hr"/><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_file_cell"><a href="p3s3.xhtml#st200_p3s3">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p3.xhtml#st200_p3">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p3s5.xhtml#st200_p3s5">Next</a></td></tr><tr><td class="st200_navbar_prev_title_cell">3.3. Virtual paths</td><td class="st200_navbar_up_title_cell">3. Semantics</td><td class="st200_navbar_next_title_cell">3.5. Filesystem</td></tr></table></div></div></body></html>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<a:feed xmlns:a="http://www.w3.org/2005/Atom">
+  <a:author>
+    <a:name>io7m release robot</a:name>
+    <a:email>contact@io7m.com</a:email>
+  </a:author>
+  <a:id>http://io7m.github.io/jvvfs//releases.atom</a:id>
+  <a:title>io7m-jvvfs Releases</a:title>
+  <a:updated>2015-08-29T00:00:00Z</a:updated>
+  <a:entry>
+    <a:id>0</a:id>
+    <a:updated>2015-08-29T00:00:00Z</a:updated>
+    <a:published>2015-08-29T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 4.0.1 released</a:title>
+    <a:content type="text"> io7m-jvvfs 4.0.1 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>1</a:id>
+    <a:updated>2014-04-23T00:00:00Z</a:updated>
+    <a:published>2014-04-23T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 4.0.0 released</a:title>
+    <a:content type="text"> io7m-jvvfs 4.0.0 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>2</a:id>
+    <a:updated>2014-01-04T00:00:00Z</a:updated>
+    <a:published>2014-01-04T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 3.1.1 released</a:title>
+    <a:content type="text"> io7m-jvvfs 3.1.1 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>3</a:id>
+    <a:updated>2013-07-13T00:00:00Z</a:updated>
+    <a:published>2013-07-13T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 3.1.0 released</a:title>
+    <a:content type="text"> io7m-jvvfs 3.1.0 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>4</a:id>
+    <a:updated>2013-06-30T00:00:00Z</a:updated>
+    <a:published>2013-06-30T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 3.0.0 released</a:title>
+    <a:content type="text"> io7m-jvvfs 3.0.0 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>5</a:id>
+    <a:updated>2013-04-06T00:00:00Z</a:updated>
+    <a:published>2013-04-06T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 2.4.0 released</a:title>
+    <a:content type="text"> io7m-jvvfs 2.4.0 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>6</a:id>
+    <a:updated>2012-11-22T00:00:00Z</a:updated>
+    <a:published>2012-11-22T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 2.3.0 released</a:title>
+    <a:content type="text"> io7m-jvvfs 2.3.0 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>7</a:id>
+    <a:updated>2012-07-25T00:00:00Z</a:updated>
+    <a:published>2012-07-25T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 2.2.0 released</a:title>
+    <a:content type="text"> io7m-jvvfs 2.2.0 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>8</a:id>
+    <a:updated>2012-07-14T00:00:00Z</a:updated>
+    <a:published>2012-07-14T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 2.1.0 released</a:title>
+    <a:content type="text"> io7m-jvvfs 2.1.0 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>9</a:id>
+    <a:updated>2012-06-28T00:00:00Z</a:updated>
+    <a:published>2012-06-28T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 2.0.0 released</a:title>
+    <a:content type="text"> io7m-jvvfs 2.0.0 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>10</a:id>
+    <a:updated>2012-04-20T00:00:00Z</a:updated>
+    <a:published>2012-04-20T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 1.1.0 released</a:title>
+    <a:content type="text"> io7m-jvvfs 1.1.0 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>11</a:id>
+    <a:updated>2012-03-21T00:00:00Z</a:updated>
+    <a:published>2012-03-21T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 1.0.1 released</a:title>
+    <a:content type="text"> io7m-jvvfs 1.0.1 released </a:content>
+  </a:entry>
+  <a:entry>
+    <a:id>12</a:id>
+    <a:updated>2012-03-15T00:00:00Z</a:updated>
+    <a:published>2012-03-15T00:00:00Z</a:published>
+    <a:title>io7m-jvvfs 1.0.0 released</a:title>
+    <a:content type="text"> io7m-jvvfs 1.0.0 released </a:content>
+  </a:entry>
+</a:feed>

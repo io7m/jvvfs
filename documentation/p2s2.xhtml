@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>io7m-jvvfs 4.0.1 Documentation: 2.2. Tutorial</title><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-layout.css"/><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-colour.css"/><link rel="stylesheet" type="text/css" href="documentation.css"/></head><body><div class="st200_body"><div class="brand">
+  <div class="brand_left">
+    <a href="http://io7m.com/">io7m</a>
+  </div>
+  <div class="brand_right">
+    <a href="http://io7m.github.io/jvvfs/">io7m-jvvfs</a> 4.0.1
+  </div>
+</div><div class="st200_navbar st200_navbar_top"><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_title_cell">2.1. Overview</td><td class="st200_navbar_up_title_cell">2. User Manual</td><td class="st200_navbar_next_title_cell">2.3. The Jvvfs Shell</td></tr><tr><td class="st200_navbar_prev_file_cell"><a href="p2s1.xhtml#st200_p2s1">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p2.xhtml#st200_p2">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p2s3.xhtml#st200_p2s3">Next</a></td></tr></table><hr class="st200_hr"/></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p2s2" href="#st200_p2s2">2.2</a></div><div class="st200_section_title">Tutorial</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg1" href="#st200_p2s2pg1">1</a></div><div class="st200_paragraph">
+        First, the filesystem is created by specifying an
+        <span class="st200_term term">archive directory</span> containing archives
+        (zip files, directories, etc):
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s2fo1" href="#st200_p2s2fo1">2.2.1. Filesystem creation</a></div><pre class="st200_verbatim">
+final PathReal path = new PathReal("/path/to/application/resources");
+final FilesystemType fs = Filesystem.makeWithArchiveDirectory(log, path);
+        </pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg2" href="#st200_p2s2pg2">2</a></div><div class="st200_paragraph">
+        Then, individual archives can be mounted into the filesystem
+        in much the same way as disks are mounted in the UNIX filesystem.
+        All archives are treated in a read-only manner. The
+        <span class="st200_term package">jvvfs</span> package never writes to the
+        filesystem or any archives.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg3" href="#st200_p2s2pg3">3</a></div><div class="st200_paragraph">
+        Values of type <span class="st200_term type">PathReal</span> denote
+        platform-specific paths (and should therefore be given in
+        platform-specific notation). Use of
+        <span class="st200_term constant">File.separatorChar</span> in the Java
+        standard library is recommended.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg4" href="#st200_p2s2pg4">4</a></div><div class="st200_paragraph">
+        Assuming <span class="st200_term file">archive.zip</span> exists in the
+        specified archive directory, the archive can be mounted in the
+        root directory of the virtual filesystem:
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s2fo2" href="#st200_p2s2fo2">2.2.2. Mounting archives</a></div><pre class="st200_verbatim">
+final PathVirtual mount = PathVirtual.ofString("/");
+fs.mountArchive("archive.zip", mount);
+        </pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg5" href="#st200_p2s2pg5">5</a></div><div class="st200_paragraph">
+        Values of type <span class="st200_term type">PathVirtual</span> denote
+        paths in the virtual filesystem and are given in platform-independent
+        notation. Virtual path components are separated by
+        <span class="st200_term constant">/</span> and must always begin with
+        a leading <span class="st200_term constant">/</span> (the paths must always
+        be absolute). The filesystem currently has no concept of a "current
+        working directory", so relative paths have no meaning.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg6" href="#st200_p2s2pg6">6</a></div><div class="st200_paragraph">
+        Assuming <span class="st200_term file">archive.zip</span> contains the
+        file <span class="st200_term file">/a/b/c/file.txt</span>, the file can
+        be opened, unsurprisingly, by the path
+        <span class="st200_term file">/a/b/c/file.txt</span>:
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s2fo3" href="#st200_p2s2fo3">2.2.3. Opening a file</a></div><pre class="st200_verbatim">
+final PathVirtual path   = PathVirtual.ofString("/a/b/c/file.txt");
+final InputStream stream = fs.openFile(path);
+        </pre></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s2pg7" href="#st200_p2s2pg7">7</a></div><div class="st200_paragraph">
+        It is possible to mount archives at directories other than the
+        root. It is possible to create directories in the virtual filesystem
+        with the
+        <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/FSCapabilityCreateDirectory#createDirectory(com.io7m.jvvfs.PathVirtual)">createDirectory</a>
+        function, if no currently mounted archive provides the desired
+        mount point. Manually created directories are purely virtual constructs;
+        creating a directory via the <span class="st200_term package">jvvfs</span>
+        API does not modify the real OS filesystem or any archives.
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s2fo4" href="#st200_p2s2fo4">2.2.4. Creating a directory</a></div><pre class="st200_verbatim">
+// If "archive1.zip" contains "/a/b/file.txt", then "archive2.zip" could, for
+// example, be mounted at "/a" or "/a/b".
+fs.mount("archive1.zip", PathVirtual.ROOT);
+assert fs.isDirectory(PathVirtual.ofString("/a"));
+assert fs.isDirectory(PathVirtual.ofString("/a/b"));
+fs.mount("archive2.zip", PathVirtual.ofString("/a"));
+
+// Explicitly creating "/c" and mounting "archive2.zip" there is also a possibility.
+fs.createDirectory(PathVirtual.ofString("/c"));
+assert fs.isDirectory(PathVirtual.ofString("/c"));
+fs.mount("archive2.zip", PathVirtual.ofString("/c"));
+
+// Assuming "/xyz/file.txt" exists in "archive2.zip", both of the following will work:
+final InputStream s0 = fs.openFile("/a/xyz/file.txt");
+final InputStream s1 = fs.openFile("/c/xyz/file.txt");
+        </pre></div></div><div class="st200_navbar st200_navbar_bottom"><hr class="st200_hr"/><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_file_cell"><a href="p2s1.xhtml#st200_p2s1">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p2.xhtml#st200_p2">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p2s3.xhtml#st200_p2s3">Next</a></td></tr><tr><td class="st200_navbar_prev_title_cell">2.1. Overview</td><td class="st200_navbar_up_title_cell">2. User Manual</td><td class="st200_navbar_next_title_cell">2.3. The Jvvfs Shell</td></tr></table></div></div></body></html>

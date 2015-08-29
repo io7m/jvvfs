@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>io7m-jvvfs 4.0.1 Documentation: 2.3. The Jvvfs Shell</title><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-layout.css"/><link rel="stylesheet" type="text/css" href="jstructural-2.0.0-colour.css"/><link rel="stylesheet" type="text/css" href="documentation.css"/></head><body><div class="st200_body"><div class="brand">
+  <div class="brand_left">
+    <a href="http://io7m.com/">io7m</a>
+  </div>
+  <div class="brand_right">
+    <a href="http://io7m.github.io/jvvfs/">io7m-jvvfs</a> 4.0.1
+  </div>
+</div><div class="st200_navbar st200_navbar_top"><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_title_cell">2.2. Tutorial</td><td class="st200_navbar_up_title_cell">2. User Manual</td><td class="st200_navbar_next_title_cell">2.4. Migrating from 2.*.*</td></tr><tr><td class="st200_navbar_prev_file_cell"><a href="p2s2.xhtml#st200_p2s2">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p2.xhtml#st200_p2">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p2s4.xhtml#st200_p2s4">Next</a></td></tr></table><hr class="st200_hr"/></div><div class="st200_section_container"><div class="st200_section_title_number"><a id="st200_p2s3" href="#st200_p2s3">2.3</a></div><div class="st200_section_title">The Jvvfs Shell</div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s3ss1" href="#st200_p2s3ss1">2.3.1</a></div><div class="st200_subsection_title">Overview</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss1pg1" href="#st200_p2s3ss1pg1">1</a></div><div class="st200_paragraph">
+          The <span class="st200_term package">jvvfs</span> package includes a simple
+          command-line shell program for manipulating and exploring
+          <span class="st200_term package">jvvfs</span> filesystems.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss1pg2" href="#st200_p2s3ss1pg2">2</a></div><div class="st200_paragraph">
+          The program is distributed as part of the
+          <span class="st200_term package">io7m-jvvfs-shell</span> package, with the
+          <span class="st200_term function">main</span> program provided in the
+          <a class="st200_link_external" href="apidocs/com/io7m/jvvfs/shell/ShellMain.html">ShellMain</a>
+          class.
+        </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss1pg3" href="#st200_p2s3ss1pg3">3</a></div><div class="st200_paragraph">
+        The program takes a pair of arguments: The name of a configuration
+        file, and the name of a directory containing archive files.
+      </div></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s3ss2" href="#st200_p2s3ss2">2.3.2</a></div><div class="st200_subsection_title">shell.conf</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss2pg1" href="#st200_p2s3ss2pg1">1</a></div><div class="st200_paragraph">
+        The sole purpose of the configuration file, at present, is to
+        control logging. The <span class="st200_term package">jvvfs</span> package
+        uses <span class="st200_term package">jlog</span>
+        <span class="st200_footnote_reference"><a id="st200_fn_2_ref" href="#st200_fn_2">[2]</a></span>
+        internally for extremely fine-grained control of logging. All logging
+        controls for <span class="st200_term package">jvvfs</span> are given the prefix
+        <span class="st200_term constant">com.io7m.jvvfs</span>. A trivial configuration
+        file that only logs errors is sufficient for almost all users:
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s3ss2fo1" href="#st200_p2s3ss2fo1">2.3.2.1. Example shell.conf</a></div><pre class="st200_verbatim">
+com.io7m.jvvfs.logs.shell = true
+com.io7m.jvvfs.level      = LOG_ERROR
+        </pre></div></div><div class="st200_subsection_container"><div class="st200_subsection_title_number"><a id="st200_p2s3ss3" href="#st200_p2s3ss3">2.3.3</a></div><div class="st200_subsection_title">Commands</div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss3pg1" href="#st200_p2s3ss3pg1">1</a></div><div class="st200_paragraph">
+      Usage information on shell commands can be obtained from the
+      <span class="st200_term function">help</span> command. The shell supports
+      tab-completion
+      <span class="st200_footnote_reference"><a id="st200_fn_3_ref" href="#st200_fn_3">[3]</a></span> for commands.
+      </div></div><div class="st200_paragraph_container"><div class="st200_paragraph_number"><a id="st200_p2s3ss3pg2" href="#st200_p2s3ss3pg2">2</a></div><div class="st200_paragraph">
+        A transcript of an example session showing some of the features
+        of the shell is as follows:
+      </div></div><div class="st200_formal_item"><div class="st200_formal_item_title"><a id="st200_p2s3ss3fo1" href="#st200_p2s3ss3fo1">2.3.3.1. Example shell session</a></div><pre class="st200_verbatim">
+jvvfs&gt; 
+archives         close            file-list        file-list-long   file-read        file-size        file-time        
+help             list-mounts      mkdir            mount            unmount  
+        
+jvvfs&gt; archives 
+complex.zip
+encrypted.zip
+files1-3.zip
+files4-6.zip
+io7m-jvvfs.properties
+single-file-and-subdir-implicit.zip
+single-file-and-subdir.zip
+single-file-in-subdir-subdir.zip
+single-file.jar
+single-file.zip
+subdir-shadow.zip
+subdir-subdir-shadow.zip
+unknown.unknown
+
+jvvfs&gt; mkdir /z
+jvvfs&gt; file-list-long /
+z/                2013-06-29 14:19:51 +0000 
+jvvfs&gt; file-list-long /z
+
+jvvfs&gt; mount files1-3.zip /z
+jvvfs&gt; file-list-long /z
+file1.txt         2013-05-08 11:35:16 +0000 7
+file2.txt         2013-05-08 11:35:20 +0000 7
+file3.txt         2013-05-08 11:35:24 +0000 7
+jvvfs&gt; file-read /z/file1.txt
+File 1
+
+jvvfs&gt; list-mounts 
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs&gt; mount complex.zip /
+jvvfs&gt; list-mounts 
+/   /tmp/jvvfs/complex.zip
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs&gt; file-list-long /
+a/                2012-03-15 21:13:12 +0000
+b/                2012-03-15 21:13:12 +0000
+z/                2013-06-28 22:13:47 +0000
+
+jvvfs&gt; file-list-long /a
+a/                2012-03-15 21:13:12 +0000
+a1.txt            2012-03-15 21:13:12 +0000 9
+a2.txt            2012-03-15 21:13:12 +0000 9
+a3.txt            2012-03-15 21:13:12 +0000 9
+b/                2012-03-15 21:13:12 +0000
+c/                2012-03-15 21:13:12 +0000
+
+jvvfs&gt; mount files4-6.zip /a
+
+jvvfs&gt; file-list-long /a
+a/                2012-03-15 21:13:12 +0000 
+a1.txt            2012-03-15 21:13:12 +0000 9
+a2.txt            2012-03-15 21:13:12 +0000 9
+a3.txt            2012-03-15 21:13:12 +0000 9
+b/                2012-03-15 21:13:12 +0000 
+c/                2012-03-15 21:13:12 +0000 
+file4.txt         2013-05-08 11:36:02 +0000 7
+file5.txt         2013-05-08 11:36:06 +0000 7
+file6.txt         2013-05-08 11:36:10 +0000 7
+
+jvvfs&gt; list-mounts 
+/a  /tmp/jvvfs/files4-6.zip
+/   /tmp/jvvfs/complex.zip
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs&gt; close
+jvvfs&gt; list-mounts
+jvvfs&gt; file-list-long /
+
+jvvfs&gt; mount encrypted.zip /
+shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt - invalid CEN header (encrypted entry)
+
+        </pre></div></div></div><div class="st200_footnotes"><hr/><div class="st200_footnote_container"><div class="st200_footnote_number">[<a id="st200_fn_2" href="#st200_fn_2_ref">2</a>]</div><div class="st200_footnote_body">
+        <a class="st200_link_external" href="http://io7m.com/software/jlog">http://io7m.com/software/jlog</a>
+        </div></div><div class="st200_footnote_container"><div class="st200_footnote_number">[<a id="st200_fn_3" href="#st200_fn_3_ref">3</a>]</div><div class="st200_footnote_body">
+        <a class="st200_link_external" href="http://en.wikipedia.org/wiki/Command_line_completion">http://en.wikipedia.org/wiki/Command_line_completion</a>
+      </div></div></div><div class="st200_navbar st200_navbar_bottom"><hr class="st200_hr"/><table class="st200_navbar_table" summary="Navigation bar"><tr><td class="st200_navbar_prev_file_cell"><a href="p2s2.xhtml#st200_p2s2">Previous</a></td><td class="st200_navbar_up_file_cell"><a href="p2.xhtml#st200_p2">Up</a></td><td class="st200_navbar_next_file_cell"><a href="p2s4.xhtml#st200_p2s4">Next</a></td></tr><tr><td class="st200_navbar_prev_title_cell">2.2. Tutorial</td><td class="st200_navbar_up_title_cell">2. User Manual</td><td class="st200_navbar_next_title_cell">2.4. Migrating from 2.*.*</td></tr></table></div></div></body></html>
