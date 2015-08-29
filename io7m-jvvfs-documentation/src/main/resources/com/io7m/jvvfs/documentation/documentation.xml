@@ -1,0 +1,1096 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright © 2014 <code@io7m.com> http://io7m.com
+
+  Permission to use, copy, modify, and/or distribute this software for any
+  purpose with or without fee is hereby granted, provided that the above
+  copyright notice and this permission notice appear in all copies.
+
+  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+  -->
+
+<s:document
+  xmlns:s="http://schemas.io7m.com/structural/2.1.0"
+  xmlns:xi="http://www.w3.org/2001/XInclude">
+  <s:document-title>${project.parent.name} ${project.version} Documentation</s:document-title>
+  <s:document-style>documentation.css</s:document-style>
+  <s:document-contents/>
+
+  <s:part>
+    <s:part-title>Package Information</s:part-title>
+    <s:part-contents />
+    <s:section>
+      <s:section-title>Orientation</s:section-title>
+      <s:subsection>
+        <s:subsection-title>Overview</s:subsection-title>
+        <s:paragraph>
+          The <s:term s:type="package">jvvfs</s:term>
+          package implements a pseudo virtual filesystem abstraction. The
+          package essentially constructs a unified namespace from sets of
+          mounted archives (such as directories, zip files, etc). It is
+          inspired by
+          <s:link-external s:target="http://icculus.org/physfs">PhysicsFS</s:link-external>
+          but does not contain support for old proprietary/obscure archive
+          formats.
+        </s:paragraph>
+        <s:paragraph>
+          When using a filesystem abstraction such as
+          <s:term s:type="package">jvvfs</s:term>, it becomes very easy
+          for application developers to distribute updates. The developer
+          initially distributes the program resources (images, audio, etc)
+          as one or more zip archives. Updates to the program data then consist
+          of zip archives containing only files that have been changed: these
+          new archives are simply mounted over the top of the old ones
+          in the virtual filesystem.
+        </s:paragraph>
+      </s:subsection>
+      <s:subsection>
+        <s:subsection-title>Portability</s:subsection-title>
+        <s:paragraph>
+          The package is written in pure Java and is expected to work
+          in any environment supporting Java 6.
+        </s:paragraph>
+        <s:paragraph>
+          The filesystem abstraction allows developers to access program
+          resources using platform-independent notation. The package is
+          carefully written to ensure that applications access resources
+          consistently across all platforms (including consistency under
+          erroneous conditions).
+        </s:paragraph>
+      </s:subsection>
+    </s:section>
+
+    <s:section>
+      <s:section-title>Installation</s:section-title>
+      <s:subsection>
+        <s:subsection-title>Source compilation</s:subsection-title>
+        <s:paragraph>
+          The project can be compiled and installed with
+          <s:link-external s:target="http://maven.apache.org">Maven</s:link-external>:
+        </s:paragraph>
+        <s:paragraph>
+          <s:verbatim s:type="example"><![CDATA[$ mvn -C clean install]]></s:verbatim>
+        </s:paragraph>
+      </s:subsection>
+
+      <s:subsection>
+        <s:subsection-title>Maven</s:subsection-title>
+        <s:paragraph>
+          Regular releases are made to the
+          <s:link-external s:target="http://search.maven.org/#search%7Cga%7C1%7C${project.parent.name}">Central Repository</s:link-external>,
+          so it's possible to use the <s:term s:type="package">${project.parent.name}</s:term>
+          package in your projects with the following Maven dependency:
+        </s:paragraph>
+        <s:paragraph>
+          <s:verbatim s:type="example"><![CDATA[<dependency>
+  <groupId>${project.groupId}</groupId>
+  <artifactId>${project.parent.artifactId}-core</artifactId>
+  <version>${project.version}</version>
+</dependency>]]></s:verbatim>
+        </s:paragraph>
+        <s:paragraph>
+          All <s:link-external s:target="http://io7m.com">io7m.com</s:link-external>
+          packages use Semantic Versioning
+          <s:footnote>
+            <s:link-external s:target="http://semver.org">http://semver.org</s:link-external>
+          </s:footnote>, which implies that it is always safe to use version ranges
+          with an exclusive upper bound equal to the next major version - the API of
+          the package will not change in a backwards-incompatible manner before the
+          next major version.
+        </s:paragraph>
+      </s:subsection>
+    </s:section>
+
+    <s:section>
+      <s:section-title>Platform Specific Issues</s:section-title>
+      <s:paragraph>
+        There are currently no known platform-specific issues.
+      </s:paragraph>
+    </s:section>
+
+    <s:section>
+      <s:section-title>License</s:section-title>
+      <s:paragraph>
+        All files distributed with the <s:term s:type="package">${project.parent.name}</s:term>
+        package are placed under the following license:
+        <s:verbatim s:type="license"><![CDATA[Copyright © 2014 <code@io7m.com> http://io7m.com
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.]]>
+        </s:verbatim>
+      </s:paragraph>
+    </s:section>
+  </s:part>
+
+  <s:part>
+    <s:part-title>User Manual</s:part-title>
+    <s:part-contents/>
+
+    <s:section>
+      <s:section-title>Overview</s:section-title>
+      <s:subsection xml:id="usage.filesystem">
+        <s:subsection-title>Filesystem</s:subsection-title>
+        <s:paragraph>
+          The <s:term s:type="package">jvvfs</s:term> package presents
+          a virtual <s:term>filesystem</s:term> in which
+          <s:link s:target="usage.archives">archives</s:link> are
+          <s:link s:target="usage.mounting">mounted</s:link> to
+          form a unified namespace. This filesystem is conceptually
+          and practically distinct from the filesystem
+          presented by the operating system. The
+          <s:term s:type="package">jvvfs</s:term> package never writes to
+          or otherwise modifies the operating system filesystem in any
+          way.
+        </s:paragraph>
+        <s:paragraph>
+          The <s:term s:type="package">jvvfs</s:term> virtual <s:term>filesystem</s:term>
+          presents a hierarchical directory system very similar to the typical
+          UNIX filesystem, supporting a subset of the normal UNIX filesystem operations
+          such as retrieving the modification time of a file, retrieving the
+          size of a file in bytes, listing the contents of a directory,
+          and opening a file as a stream of bytes.
+        </s:paragraph>
+      </s:subsection>
+      <s:subsection xml:id="usage.archives">
+        <s:subsection-title>Archives</s:subsection-title>
+        <s:paragraph>
+        An <s:term>archive</s:term> is a file or directory in the
+        operating system that can be
+        <s:link s:target="usage.mounting">mounted</s:link>.
+        The <s:term s:type="package">jvvfs</s:term> package currently
+        supports mounting operating system
+        <s:term>directories</s:term> and
+        <s:term>zip</s:term>
+        <s:footnote>
+          <s:link-external s:target="http://en.wikipedia.org/wiki/Zip_(file_format)">http://en.wikipedia.org/wiki/Zip_(file_format)</s:link-external>
+        </s:footnote>
+        files.
+        </s:paragraph>
+      </s:subsection>
+      <s:subsection xml:id="usage.mounting">
+        <s:subsection-title>Mounting</s:subsection-title>
+        <s:paragraph>
+          Mounting an <s:link s:target="usage.archives">archive</s:link>
+          makes the contents of that archive accessible in the filesystem.
+        </s:paragraph>
+        <s:paragraph>
+          If an <s:link s:target="usage.archives">archive</s:link>
+          is <s:term>mounted</s:term> at a directory
+          <s:term s:type="variable">/M</s:term>, and the archive
+          contains a file or directory named <s:term s:type="variable">F</s:term>,
+          then that file or directory is accessible in the
+          virtual
+          <s:link s:target="usage.filesystem">filesystem</s:link>
+          at <s:term s:type="variable">/M/F</s:term>. As mentioned, directories
+          can be arbitrarily nested, and archives can be mounted at any
+          directory in the filesystem.
+        </s:paragraph>
+      </s:subsection>
+      <s:subsection xml:id="usage.capabilities">
+        <s:subsection-title>Capabilities</s:subsection-title>
+        <s:paragraph>
+        The set of operations that can be performed on the virtual
+        <s:link s:target="usage.filesystem">filesystem</s:link>
+        is divided into <s:term>capabilities</s:term>. The purpose of this
+        is to allow code to be separated according to the principle of
+        least privilege. That is, if a given function only needs to read
+        from the filesystem and does not need to be able to mount or unmount
+        archives, then it can be declared as taking a value of type
+        <s:link-external s:target="apidocs/com/io7m/jvvfs/FSCapabilityRead.html">FSCapabilityRead</s:link-external>
+        as opposed to, for example, a value of type
+        <s:link-external s:target="apidocs/com/io7m/jvvfs/FilesystemType.html">FilesystemType</s:link-external>.
+        This allows the type system to give much stronger guarantees about
+        what a particular function can do to the filesystem.
+        </s:paragraph>
+        <s:paragraph>
+          See the JavaDoc documentation for
+          <s:link-external s:target="apidocs/com/io7m/jvvfs/FSCapabilityAll.html">FSCapabilityAll</s:link-external>
+          for the definitions of the capabilities.
+        </s:paragraph>
+      </s:subsection>
+    </s:section>
+
+    <s:section>
+      <s:section-title>Tutorial</s:section-title>
+      <s:paragraph>
+        First, the filesystem is created by specifying an
+        <s:term s:type="term">archive directory</s:term> containing archives
+        (zip files, directories, etc):
+      </s:paragraph>
+      <s:formal-item s:kind="examples">
+        <s:formal-item-title>Filesystem creation</s:formal-item-title>
+        <s:verbatim><![CDATA[
+final PathReal path = new PathReal("/path/to/application/resources");
+final FilesystemType fs = Filesystem.makeWithArchiveDirectory(log, path);]]>
+        </s:verbatim>
+      </s:formal-item>
+      <s:paragraph>
+        Then, individual archives can be mounted into the filesystem
+        in much the same way as disks are mounted in the UNIX filesystem.
+        All archives are treated in a read-only manner. The
+        <s:term s:type="package">jvvfs</s:term> package never writes to the
+        filesystem or any archives.
+      </s:paragraph>
+      <s:paragraph>
+        Values of type <s:term s:type="type">PathReal</s:term> denote
+        platform-specific paths (and should therefore be given in
+        platform-specific notation). Use of
+        <s:term s:type="constant">File.separatorChar</s:term> in the Java
+        standard library is recommended.
+      </s:paragraph>
+      <s:paragraph>
+        Assuming <s:term s:type="file">archive.zip</s:term> exists in the
+        specified archive directory, the archive can be mounted in the
+        root directory of the virtual filesystem:
+      </s:paragraph>
+      <s:formal-item s:kind="examples">
+        <s:formal-item-title>Mounting archives</s:formal-item-title>
+        <s:verbatim><![CDATA[
+final PathVirtual mount = PathVirtual.ofString("/");
+fs.mountArchive("archive.zip", mount);]]>
+        </s:verbatim>
+      </s:formal-item>
+      <s:paragraph>
+        Values of type <s:term s:type="type">PathVirtual</s:term> denote
+        paths in the virtual filesystem and are given in platform-independent
+        notation. Virtual path components are separated by
+        <s:term s:type="constant">/</s:term> and must always begin with
+        a leading <s:term s:type="constant">/</s:term> (the paths must always
+        be absolute). The filesystem currently has no concept of a "current
+        working directory", so relative paths have no meaning.
+      </s:paragraph>
+      <s:paragraph>
+        Assuming <s:term s:type="file">archive.zip</s:term> contains the
+        file <s:term s:type="file">/a/b/c/file.txt</s:term>, the file can
+        be opened, unsurprisingly, by the path
+        <s:term s:type="file">/a/b/c/file.txt</s:term>:
+      </s:paragraph>
+      <s:formal-item s:kind="examples">
+        <s:formal-item-title>Opening a file</s:formal-item-title>
+        <s:verbatim><![CDATA[
+final PathVirtual path   = PathVirtual.ofString("/a/b/c/file.txt");
+final InputStream stream = fs.openFile(path);]]>
+        </s:verbatim>
+      </s:formal-item>
+      <s:paragraph>
+        It is possible to mount archives at directories other than the
+        root. It is possible to create directories in the virtual filesystem
+        with the
+        <s:link-external s:target="apidocs/com/io7m/jvvfs/FSCapabilityCreateDirectory#createDirectory(com.io7m.jvvfs.PathVirtual)">createDirectory</s:link-external>
+        function, if no currently mounted archive provides the desired
+        mount point. Manually created directories are purely virtual constructs;
+        creating a directory via the <s:term s:type="package">jvvfs</s:term>
+        API does not modify the real OS filesystem or any archives.
+      </s:paragraph>
+      <s:formal-item s:kind="examples">
+        <s:formal-item-title>Creating a directory</s:formal-item-title>
+        <s:verbatim><![CDATA[
+// If "archive1.zip" contains "/a/b/file.txt", then "archive2.zip" could, for
+// example, be mounted at "/a" or "/a/b".
+fs.mount("archive1.zip", PathVirtual.ROOT);
+assert fs.isDirectory(PathVirtual.ofString("/a"));
+assert fs.isDirectory(PathVirtual.ofString("/a/b"));
+fs.mount("archive2.zip", PathVirtual.ofString("/a"));
+
+// Explicitly creating "/c" and mounting "archive2.zip" there is also a possibility.
+fs.createDirectory(PathVirtual.ofString("/c"));
+assert fs.isDirectory(PathVirtual.ofString("/c"));
+fs.mount("archive2.zip", PathVirtual.ofString("/c"));
+
+// Assuming "/xyz/file.txt" exists in "archive2.zip", both of the following will work:
+final InputStream s0 = fs.openFile("/a/xyz/file.txt");
+final InputStream s1 = fs.openFile("/c/xyz/file.txt");]]>
+        </s:verbatim>
+      </s:formal-item>
+    </s:section>
+    
+    <s:section>
+      <s:section-title>The Jvvfs Shell</s:section-title>
+    <s:subsection>
+      <s:subsection-title>Overview</s:subsection-title>
+      <s:paragraph>
+          The <s:term s:type="package">jvvfs</s:term> package includes a simple
+          command-line shell program for manipulating and exploring
+          <s:term s:type="package">jvvfs</s:term> filesystems.
+        </s:paragraph>
+        <s:paragraph>
+          The program is distributed as part of the
+          <s:term s:type="package">io7m-jvvfs-shell</s:term> package, with the
+          <s:term s:type="function">main</s:term> program provided in the
+          <s:link-external s:target="apidocs/com/io7m/jvvfs/shell/ShellMain.html">ShellMain</s:link-external>
+          class.
+        </s:paragraph>
+      <s:paragraph>
+        The program takes a pair of arguments: The name of a configuration
+        file, and the name of a directory containing archive files.
+      </s:paragraph>
+    </s:subsection>
+    <s:subsection>
+      <s:subsection-title>shell.conf</s:subsection-title>
+      <s:paragraph>
+        The sole purpose of the configuration file, at present, is to
+        control logging. The <s:term s:type="package">jvvfs</s:term> package
+        uses <s:term s:type="package">jlog</s:term>
+        <s:footnote>
+        <s:link-external s:target="http://io7m.com/software/jlog">http://io7m.com/software/jlog</s:link-external>
+        </s:footnote>
+        internally for extremely fine-grained control of logging. All logging
+        controls for <s:term s:type="package">jvvfs</s:term> are given the prefix
+        <s:term s:type="constant">com.io7m.jvvfs</s:term>. A trivial configuration
+        file that only logs errors is sufficient for almost all users:
+      </s:paragraph>
+      <s:formal-item s:kind="examples">
+        <s:formal-item-title>Example shell.conf</s:formal-item-title>
+        <s:verbatim><![CDATA[
+com.io7m.jvvfs.logs.shell = true
+com.io7m.jvvfs.level      = LOG_ERROR]]>
+        </s:verbatim>
+      </s:formal-item>
+    </s:subsection>
+    <s:subsection>
+      <s:subsection-title>Commands</s:subsection-title>
+      <s:paragraph>
+      Usage information on shell commands can be obtained from the
+      <s:term s:type="function">help</s:term> command. The shell supports
+      tab-completion
+      <s:footnote>
+        <s:link-external s:target="http://en.wikipedia.org/wiki/Command_line_completion">http://en.wikipedia.org/wiki/Command_line_completion</s:link-external>
+      </s:footnote> for commands.
+      </s:paragraph>
+      <s:paragraph>
+        A transcript of an example session showing some of the features
+        of the shell is as follows:
+      </s:paragraph>
+      <s:formal-item s:kind="examples">
+        <s:formal-item-title>Example shell session</s:formal-item-title>
+        <s:verbatim><![CDATA[
+jvvfs> 
+archives         close            file-list        file-list-long   file-read        file-size        file-time        
+help             list-mounts      mkdir            mount            unmount  
+        
+jvvfs> archives 
+complex.zip
+encrypted.zip
+files1-3.zip
+files4-6.zip
+io7m-jvvfs.properties
+single-file-and-subdir-implicit.zip
+single-file-and-subdir.zip
+single-file-in-subdir-subdir.zip
+single-file.jar
+single-file.zip
+subdir-shadow.zip
+subdir-subdir-shadow.zip
+unknown.unknown
+
+jvvfs> mkdir /z
+jvvfs> file-list-long /
+z/                2013-06-29 14:19:51 +0000 
+jvvfs> file-list-long /z
+
+jvvfs> mount files1-3.zip /z
+jvvfs> file-list-long /z
+file1.txt         2013-05-08 11:35:16 +0000 7
+file2.txt         2013-05-08 11:35:20 +0000 7
+file3.txt         2013-05-08 11:35:24 +0000 7
+jvvfs> file-read /z/file1.txt
+File 1
+
+jvvfs> list-mounts 
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs> mount complex.zip /
+jvvfs> list-mounts 
+/   /tmp/jvvfs/complex.zip
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs> file-list-long /
+a/                2012-03-15 21:13:12 +0000
+b/                2012-03-15 21:13:12 +0000
+z/                2013-06-28 22:13:47 +0000
+
+jvvfs> file-list-long /a
+a/                2012-03-15 21:13:12 +0000
+a1.txt            2012-03-15 21:13:12 +0000 9
+a2.txt            2012-03-15 21:13:12 +0000 9
+a3.txt            2012-03-15 21:13:12 +0000 9
+b/                2012-03-15 21:13:12 +0000
+c/                2012-03-15 21:13:12 +0000
+
+jvvfs> mount files4-6.zip /a
+
+jvvfs> file-list-long /a
+a/                2012-03-15 21:13:12 +0000 
+a1.txt            2012-03-15 21:13:12 +0000 9
+a2.txt            2012-03-15 21:13:12 +0000 9
+a3.txt            2012-03-15 21:13:12 +0000 9
+b/                2012-03-15 21:13:12 +0000 
+c/                2012-03-15 21:13:12 +0000 
+file4.txt         2013-05-08 11:36:02 +0000 7
+file5.txt         2013-05-08 11:36:06 +0000 7
+file6.txt         2013-05-08 11:36:10 +0000 7
+
+jvvfs> list-mounts 
+/a  /tmp/jvvfs/files4-6.zip
+/   /tmp/jvvfs/complex.zip
+/z  /tmp/jvvfs/files1-3.zip
+
+jvvfs> close
+jvvfs> list-mounts
+jvvfs> file-list-long /
+
+jvvfs> mount encrypted.zip /
+shell : error : filesystem error: archive 'encrypted.zip' appears to be corrupt - invalid CEN header (encrypted entry)
+]]>
+        </s:verbatim>
+      </s:formal-item>
+    </s:subsection>
+    </s:section>
+
+    <s:section>
+      <s:section-title>Migrating from 2.*.*</s:section-title>
+      <s:section-contents/>
+    <s:subsection>
+      <s:subsection-title>FilesystemAPI</s:subsection-title>
+      <s:paragraph>
+        The API exposed by filesystems changed and was broken up into
+        separate filesystem capabilities. See
+        <s:link s:target="usage.capabilities">Capabilities</s:link>
+        for the details. The only significantly different function is
+        <s:link-external s:target="apidocs/com/io7m/jvvfs/FSCapabilityRead.html#getModificationTime(com.io7m.jvvfs.PathVirtual)">getModificationTime</s:link-external>,
+        which replaced <s:term s:type="function">modificationTime()</s:term>. This
+        now uses values of type <s:term s:type="type">Calendar</s:term>, to
+        deal correctly with timezones.
+      </s:paragraph>
+      <s:paragraph>
+        Most of the function names have changed in order to statically
+        indicate that the semantics may be subtly different.
+      </s:paragraph>
+    </s:subsection>
+    <s:subsection>
+      <s:subsection-title>Filesystem</s:subsection-title>
+      <s:paragraph>
+      The <s:link-external s:target="apidocs/com/io7m/jvvfs/Filesystem.html">Filesystem</s:link-external>
+      type is still the main filesystem implementation, but now requires
+      that users use the provided static methods to initialize the
+      filesystem, instead of the now-private constructors.
+      </s:paragraph>
+    </s:subsection>
+    <s:subsection>
+      <s:subsection-title>PathVirtual</s:subsection-title>
+      <s:paragraph>
+        The constructors of the <s:term s:type="type">PathVirtual</s:term>
+        type are now private and were replaced by
+        <s:link-external s:target="apidocs/com/io7m/jvvfs/PathVirtual.html#ofString(java.lang.String)">ofString</s:link-external>.
+        The <s:term s:type="function">ofString</s:term> function is much
+        stricter in what it'll accept as a valid path. The
+        <s:link-external s:target="apidocs/com/io7m/jvvfs/PathVirtual.html#ofStringLax(java.lang.String)">ofStringLax</s:link-external>
+        function is more permissive in the syntax that it supports and
+        may be required for directly migrating old code.
+      </s:paragraph>
+      <s:paragraph>
+        The semantics of the <s:term s:type="type">PathVirtual</s:term> type
+        have also changed with regard to what is considered to be a parent
+        or ancestor of a path. For example, the root directory is now not
+        considered to have a parent. These changes are unlikely to affect
+        any existing code that uses <s:term s:type="package">jvvfs</s:term>.
+        See <s:link s:target="semantics.virtual-paths">virtual path semantics</s:link>
+        for the precise details.
+      </s:paragraph>
+    </s:subsection>
+    </s:section>
+  </s:part>
+
+  <s:part>
+    <s:part-title>Semantics</s:part-title>
+    <s:part-contents/>
+
+    <s:section xml:id="semantics.overview">
+      <s:section-title>Overview</s:section-title>
+      <s:subsection>
+        <s:subsection-title>Specification</s:subsection-title>
+        <s:paragraph>
+          This section attempts to document the semantics of the
+          <s:term s:type="package">jvvfs</s:term> package. The semantics are
+          given as fragments of code written in the Gallina language of
+          Coq <s:footnote>
+            <s:link-external s:target="http://coq.inria.fr">http://coq.inria.fr</s:link-external>
+          </s:footnote>.
+        </s:paragraph>
+        <s:paragraph>
+          The <s:link-external s:target="Model.v">source</s:link-external> to
+          the development is available for type-checking and writing exploratory
+          proofs about the model. Note that the source is not intended to be
+          particularly readable by itself, and is formatted for ease of insertion
+          into this documentation (as opposed to being formatted for easy reading).
+        </s:paragraph>
+      </s:subsection>
+      <s:subsection>
+        <s:subsection-title>Effects</s:subsection-title>
+        <s:paragraph>
+          Many of the operations described in this specification are
+          <s:term s:type="term">effectful</s:term>. That is, they are
+          computations that will perform some side effect and are therefore not
+          directly expressible in Coq's logic. Effectful operations are expressed here as
+          values of type <s:term s:type="type">io</s:term>. The <s:term s:type="type">io F S</s:term>
+          type is understood to represent a computation that, when executed, will
+          perform some side effect and return a value of type <s:term s:type="type">S</s:term>
+          on success or a value of type <s:term s:type="type">F</s:term> on failure.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>IO</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/IO.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+        <s:paragraph>
+          The issue of side effects makes it somewhat awkward to describe
+          the consequences of actions, so the reader is (unfortunately)
+          required to use good judgement when reading statements regarding
+          effectful computations. As an example of this problem: "If looking
+          up an object at path <s:term s:type="variable">p</s:term> in the filesystem
+          succeeds and produces a reference to a file, then looking up the
+          parent of <s:term s:type="variable">p</s:term> must succeed and
+          yield a reference to a directory". This is obviously true given
+          normal operating system filesystem semantics. However, looking up
+          objects in the filesystem is an effectful operation and therefore, the
+          filesystem could theoretically burst into flames and never yield
+          the second reference! The reader is more or less expected to
+          implicitly insert the phrase "assuming that no catastrophic operating
+          system errors occur" before reading any statement regarding
+          effectful computations.
+        </s:paragraph>
+        <s:paragraph>
+          The problem could be solved to some extent by specifying an
+          even more abstract model of the filesystem and then stating that
+          the effectful computations adhere to properties stated about this
+          model, but this is certainly not trivial and would probably be
+          of little practical utility.
+        </s:paragraph>
+      </s:subsection>
+    </s:section>
+
+    <s:section xml:id="semantics.names">
+      <s:section-title>Names</s:section-title>
+      <s:subsection>
+        <s:subsection-title>Semantics</s:subsection-title>
+        <s:paragraph>
+      Each object in the <s:term s:type="package">jvvfs</s:term> filesystem
+      has exactly one name.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Name type</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/Names.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+      </s:subsection>
+      <s:subsection>
+        <s:subsection-title>Syntax</s:subsection-title>
+        <s:paragraph>
+          <s:term s:type="type">Names</s:term> of filesystem objects in
+          <s:term s:type="package">jvvfs</s:term> are specifically not allowed
+          to contain:
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Name restrictions</s:formal-item-title>
+          <s:list-unordered>
+<s:list-item>Forward slashes <s:term s:type="constant">(['/'], ASCII [0x2f])</s:term>, as this is used as a path separator on UNIX and in <s:term s:type="package">jvvfs</s:term> virtual paths.</s:list-item>
+<s:list-item>Backslashes <s:term s:type="constant">(['\'], ASCII [0x5c])</s:term>, as this is used as a path separator on Microsoft Windows.</s:list-item>
+<s:list-item>A series of two or more dots <s:term s:type="constant">(['.'], ASCII [0x2e])</s:term>, as this is a reserved name on UNIX-like platforms.</s:list-item>
+<s:list-item>Colons <s:term s:type="constant">([':'], ASCII [0x3a])</s:term>, as these are used to identify "drives" on some operating systems.</s:list-item>
+<s:list-item>Null <s:term s:type="constant">(ASCII [0x0])</s:term>, as almost no operating systems permit these in file names.</s:list-item>
+          </s:list-unordered>
+        </s:formal-item>
+        <s:paragraph>
+          Empty strings are also not considered to be valid names.
+        </s:paragraph>
+      </s:subsection>
+    </s:section>
+
+    <s:section xml:id="semantics.virtual-paths">
+      <s:section-title>Virtual paths</s:section-title>
+      <s:subsection>
+        <s:subsection-title>Semantics</s:subsection-title>
+        <s:paragraph>
+      Virtual paths in <s:term s:type="package">jvvfs</s:term> are conceptually
+      a list of <s:link s:target="semantics.names">names</s:link>,
+      with the empty list representing the root.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Virtual path type</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/PathVirtual.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+        <s:paragraph>
+          A path <s:term s:type="variable">p0</s:term> is an ancestor of
+          <s:term s:type="variable">p1</s:term> iff
+          <s:term s:type="variable">p0</s:term> is a prefix of
+          <s:term s:type="variable">p1</s:term> (that is, the first <s:term s:type="expression">length p0</s:term>
+          elements of <s:term s:type="variable">p1</s:term> are equal to
+          <s:term s:type="variable">p0</s:term>), but
+          <s:term s:type="expression">p0 ≠ p1</s:term>.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Virtual path ancestor</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/PathVirtualAncestor.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+        <s:paragraph>
+          Consequently, a path <s:term s:type="variable">p0</s:term> is the parent of
+          <s:term s:type="variable">p1</s:term> iff
+          <s:term s:type="variable">p0</s:term> is an ancestor of
+          <s:term s:type="variable">p1</s:term> and <s:term s:type="expression">∃n. app p0 n = p1</s:term>
+          (where <s:term s:type="function">app</s:term> is the standard list append function).
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Virtual path parent</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/PathVirtualParent.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+        <s:paragraph>
+          Iff <s:term s:type="variable">p1</s:term> is an ancestor of
+          <s:term s:type="variable">p0</s:term>, or <s:term s:type="expression">p0 = p1</s:term>,
+          the <s:term s:type="function">subtraction</s:term> of
+          <s:term s:type="variable">p1</s:term> from
+          <s:term s:type="variable">p0</s:term> is defined as the removal of the
+          first <s:term s:type="expression">length p1</s:term> elements of
+          <s:term s:type="variable">p0</s:term>.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Virtual path subtraction</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/PathVirtualSubtract.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+        <s:paragraph>
+          It naturally follows that it is possible to obtain a list
+          of all ancestors of a path <s:term s:type="variable">p</s:term>
+          by successively concatenating the elements of
+          <s:term s:type="variable">p</s:term> to the root, minus the last element.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Virtual path ancestors</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/PathVirtualAncestors.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+      </s:subsection>
+      <s:subsection>
+        <s:subsection-title>Syntax</s:subsection-title>
+        <s:paragraph>
+          The concrete syntax of virtual paths is given by the following
+          EBNF <s:footnote>
+            <s:link-external s:target="http://en.wikipedia.org/wiki/EBNF">http://en.wikipedia.org/wiki/EBNF</s:link-external>
+          </s:footnote> grammar:
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Virtual path EBNF</s:formal-item-title>
+          <s:verbatim><![CDATA[path = "/" , [ name , ("/" , name)* ] ;]]></s:verbatim>
+        </s:formal-item>
+        <s:paragraph>
+          Where <s:term s:type="variable">name</s:term> represents a valid
+          <s:link s:target="semantics.names">name</s:link>.
+        </s:paragraph>
+      </s:subsection>
+    </s:section>
+
+    <s:section xml:id="semantics.archives">
+      <s:section-title>Archives</s:section-title>
+      <s:subsection>
+        <s:subsection-title>Overview</s:subsection-title>
+        <s:paragraph>
+          Archives represent on-disk files and directories. They support
+          basic operations such as file lookups and directory listing.
+        </s:paragraph>
+        <s:paragraph>
+      From the perspective of the <s:term s:type="package">jvvfs</s:term>
+      filesystem, an archive is an opaque value that returns responses
+      to queries made relative to the directory at which the archive is
+      mounted.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Archive type</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/Archive.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+        <s:paragraph>
+          The directory at which a given archive is mounted is stored along
+          with the archive and is accessible.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Archive mount</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/ArchiveMount.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+      </s:subsection>
+      <s:subsection xml:id="semantics.archives.lookup">
+        <s:subsection-title>Lookup</s:subsection-title>
+    <s:paragraph>
+          Archives contain files and directories, each of which have
+          unique paths. One of the primitive operations supported by
+          archives is returning a reference to one these filesystem objects
+          when given a path.
+    </s:paragraph>
+        <s:paragraph>
+          Archives expose their contents as
+          opaque file references. The <s:term s:type="package">jvvfs</s:term>
+          filesystem does not expose these references to the user, but they
+          are used here to express further properties of archives. As stated,
+          a referenced object must either be a file or a directory.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Archive file references</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/ArchiveFileReference.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+        <s:paragraph>
+          Looking up an object in an archive is an effectful computation that will
+          return an optional file reference on success.
+          The function returns <s:term s:type="expression">None</s:term> for
+          a path <s:term s:type="variable">p</s:term> iff all ancestors
+          of <s:term s:type="variable">p</s:term> exist and are directories, but
+          no object exists at <s:term s:type="variable">p</s:term>. The function
+          returns <s:term s:type="expression">Some r</s:term> iff all ancestors
+          of <s:term s:type="variable">p</s:term> exist and are directories and
+          an object exists at <s:term s:type="variable">p</s:term>, where
+          <s:term s:type="variable">r</s:term> is a reference to the object at
+          <s:term s:type="variable">p</s:term>. Otherwise, the function returns an
+          error. Some specific error cases are described below.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Archive lookup</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/ArchiveLookup.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+        <s:paragraph>
+          If the path <s:term s:type="variable">p</s:term> refers to a file in
+          the archive <s:term s:type="variable">a</s:term>, then attempting to
+          call <s:term s:type="function">archive_lookup</s:term> on any
+          <s:term s:type="variable">q</s:term> where
+          <s:term s:type="expression">is_ancestor_of p q</s:term> must clearly
+          fail (because only directories can have children).
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Archive lookup file parent failure</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/ArchiveLookupFileAncestorFailure.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+        <s:paragraph>
+        Additionally, if <s:term s:type="function">archive_lookup</s:term> yields
+        a reference to anything for some <s:term s:type="variable">q</s:term>,
+        then it must yield a reference to a directory for all
+        <s:term s:type="variable">p</s:term> where
+        <s:term s:type="expression">is_ancestor_of p q</s:term>.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Archive lookup directory ancestor</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/ArchiveLookupAncestor.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+      </s:subsection>
+      <s:subsection>
+        <s:subsection-title>Directory Listing</s:subsection-title>
+        <s:paragraph>
+          The contents of directories within archives may be listed. The
+          <s:term s:type="function">archive_directory_list</s:term> function
+          returns a list of <s:link s:target="semantics.names">names</s:link>
+          of direct children of the directory at <s:term s:type="variable">p</s:term>,
+          iff <s:term s:type="variable">p</s:term> refers to a directory and
+          all ancestors of <s:term s:type="variable">p</s:term> are directories.
+          Otherwise, the function returns an error.
+        </s:paragraph>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Archive directory listing</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/ArchiveDirectoryList.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+        <s:formal-item s:kind="specifications">
+          <s:formal-item-title>Archive directory listing file failure</s:formal-item-title>
+        <s:verbatim><xi:include href="coq/ArchiveDirectoryListFile.v" parse="text"/></s:verbatim>
+        </s:formal-item>
+      </s:subsection>
+    </s:section>
+
+    <s:section xml:id="semantics.filesystem">
+      <s:section-title>Filesystem</s:section-title>
+      <s:subsection>
+        <s:subsection-title>Overview</s:subsection-title>
+        <s:paragraph>
+        The filesystem maintains a list of
+        <s:link s:target="semantics.archives">archives</s:link>,
+        and presents an interface that allows archives to be "mounted" and
+        "unmounted" at directories within the filesystem.
+        </s:paragraph>
+      </s:subsection>
+      <s:subsection xml:id="semantics.filesystem.lookup">
+        <s:subsection-title>Lookup</s:subsection-title>
+        <s:paragraph>
+        Unlike most operating-system filesystems, the <s:term s:type="package">jvvfs</s:term>
+        filesystem has so-called "union" semantics. The filesystem maintains
+        a list of mounted archives, sorted in order of most-recently mounted -
+        the first archive in the list is the archive that was most recently mounted.
+        In order to look up an object in the filesystem at a given path
+        <s:term s:type="variable">p</s:term>, it's first necessary to look up all
+        of the ancestors of <s:term s:type="variable">p</s:term> to ensure that
+        they exist and are directories. Looking up an object at
+        <s:term s:type="variable">p</s:term> <s:term s:type="term">directly</s:term>
+        means to look up <s:term s:type="variable">p</s:term> without looking up
+        any of the ancestors of <s:term s:type="variable">p</s:term>.
+          When attempting to look up an object <s:term s:type="term">directly</s:term>
+          in the filesystem at a given path <s:term s:type="variable">p</s:term>,
+        each archive <s:term s:type="variable">a</s:term> in the list of archives
+        is considered in turn, starting with the most recently mounted first. The
+        lookup procedure takes the following steps:
+     </s:paragraph>
+     <s:formal-item s:kind="specifications">
+       <s:formal-item-title>Filesystem union search</s:formal-item-title>
+       <s:list-ordered>
+         <s:list-item>
+           If <s:term s:type="variable">a</s:term> is mounted at a path
+           <s:term s:type="variable">m</s:term> such that
+           <s:term s:type="expression">is_ancestor_of m p</s:term> or
+           <s:term s:type="expression">m = p</s:term>,
+           then the object at
+           <s:term s:type="expression">subtract p m</s:term> is
+           <s:link s:target="semantics.archives.lookup">looked up</s:link> in
+           <s:term s:type="variable">a</s:term>, and
+           <s:term s:type="variable">a</s:term> is said to have been
+           <s:term s:type="term">checked</s:term>.
+           Otherwise, the next archive in the list is considered.
+         </s:list-item>
+         <s:list-item>
+           If <s:term s:type="variable">a</s:term> returns a reference
+           to an object, then that object is returned immediately
+           and no further archives are considered. If, in
+           <s:term s:type="variable">a</s:term>, an ancestor
+           <s:term s:type="variable">q</s:term> of
+           <s:term s:type="expression">subtract p m</s:term> is a
+           file, then the file at
+           <s:term s:type="variable">q</s:term> is said to be
+           <s:term s:type="term">shadowing</s:term> the contents
+           of the rest of the archives. If
+           shadowing is occuring, and
+           <s:term s:type="variable">a</s:term> is not the first
+           archive in the list that has been
+           <s:term s:type="term">checked</s:term> so far, then
+           nothing is returned and no further archives are considered.
+           Otherwise, an error is returned (indicating
+           that <s:term s:type="variable">q</s:term>
+           is not a directory).  
+         </s:list-item>
+       </s:list-ordered>
+     </s:formal-item>
+     <s:paragraph>
+       If no archives return an object, then no object exists at
+       <s:term s:type="variable">p</s:term> in the filesystem.
+       </s:paragraph>
+       <s:paragraph>
+         As mentioned, it's necessary to look up all of the ancestors
+         of <s:term s:type="variable">p</s:term> to ensure the correct
+         semantics, so the above procedure is simply applied to all
+         ancestors of <s:term s:type="variable">p</s:term> before being
+         applied to <s:term s:type="variable">p</s:term> itself. If any
+         ancestor of <s:term s:type="variable">p</s:term> turns out not
+         to exist, or not to be a directory, or if an error occurs,
+         the function returns an error.
+       </s:paragraph>
+       <s:formal-item s:kind="specifications">
+         <s:formal-item-title>Filesystem union search (Coq)</s:formal-item-title>
+       <s:verbatim><xi:include href="coq/FilesystemLookupUnion.v" parse="text"/></s:verbatim>
+       </s:formal-item>
+       <s:paragraph>
+         The above steps are in contrast to how operating-system
+         filesystems usually behave. Typically, operating systems
+         will take steps analogous to the following (where archives
+         are replaced by disks or disk partitions):
+       </s:paragraph>
+     <s:formal-item s:kind="specifications">
+       <s:formal-item-title>Typical OS filesystem search</s:formal-item-title>
+       <s:list-ordered>
+         <s:list-item>
+           If <s:term s:type="variable">a</s:term> is mounted at a path
+           <s:term s:type="variable">m</s:term> such that
+           <s:term s:type="expression">is_ancestor_of m p</s:term> or
+           <s:term s:type="expression">m = p</s:term>,
+           then the object at
+           <s:term s:type="expression">subtract p m</s:term> is
+           <s:link s:target="semantics.archives.lookup">looked up</s:link> in
+           <s:term s:type="variable">a</s:term>.
+           Otherwise, the next archive in the list is considered.
+         </s:list-item>
+         <s:list-item>
+             If, in
+           <s:term s:type="variable">a</s:term>, an ancestor
+           <s:term s:type="variable">q</s:term> of
+           <s:term s:type="expression">subtract p m</s:term> is not a
+           file, an error is returned (indicating
+           that <s:term s:type="variable">q</s:term>
+           is not a directory).
+           If <s:term s:type="variable">a</s:term> returns a reference
+           to an object, then that object is returned immediately
+           and no further archives are considered. Otherwise, nothing
+           is returned and no further archives are considered.
+         </s:list-item>
+       </s:list-ordered>
+     </s:formal-item>
+       <s:formal-item s:kind="specifications">
+         <s:formal-item-title>Typical OS filesystem search (Coq)</s:formal-item-title>
+       <s:verbatim><xi:include href="coq/FilesystemLookupTypical.v" parse="text"/></s:verbatim>
+       </s:formal-item>
+     <s:paragraph>
+       In other words, at most one archive is checked for
+       objects. 
+     </s:paragraph>
+     <s:paragraph>
+       The procedure that <s:term s:type="package">jvvfs</s:term>
+       uses to locate filesystem objects is the source of the
+       term "union": With multiple directories overlapping in
+       different archives, the set of visible files is the
+       union of those in the mounted archives. Directories
+       and files can be hidden by files in more recently mounted
+       archives, but a directories can never hide other directories.
+       </s:paragraph>
+      </s:subsection>
+      <s:subsection xml:id="semantics.filesystem.listing">
+        <s:subsection-title>Directory Listing</s:subsection-title>
+        <s:paragraph>
+          Listing directories proceeds in a similar manner to
+          <s:link s:target="semantics.filesystem.lookup">file lookups</s:link>.
+        </s:paragraph>
+        <s:paragraph>
+          When attempting to list a directory in the filesystem at a given path
+          <s:term s:type="variable">p</s:term>, <s:term s:type="variable">p</s:term>
+          is first <s:link s:target="semantics.filesystem.lookup">looked up</s:link>
+          to ensure that it is a directory as are all of its ancestors.
+          If this is not the case, an error is returned.
+        </s:paragraph>
+        <s:paragraph>
+          Then, each archive <s:term s:type="variable">a</s:term> in the list of archives
+        is considered in turn, starting with the most recently mounted first. The
+        listing procedure begins with an empty set of names
+        <s:term s:type="variable">S</s:term> and takes the following steps:
+     </s:paragraph>
+     <s:formal-item s:kind="specifications">
+       <s:formal-item-title>Filesystem directory list union</s:formal-item-title>
+       <s:list-ordered>
+         <s:list-item>
+           If <s:term s:type="variable">a</s:term> is mounted at a path
+           <s:term s:type="variable">m</s:term> such that
+           <s:term s:type="expression">is_ancestor_of m p</s:term> or
+           <s:term s:type="expression">m = p</s:term>,
+           then the object at
+           <s:term s:type="expression">subtract p m</s:term> is
+           <s:link s:target="semantics.archives.lookup">looked up</s:link> in
+           <s:term s:type="variable">a</s:term>, and
+           <s:term s:type="variable">a</s:term> is said to have been
+           <s:term s:type="term">checked</s:term>.
+           Otherwise, the next archive in the list is considered.
+         </s:list-item>
+         <s:list-item>
+           If <s:term s:type="variable">a</s:term> returns a reference
+           to a directory, then the names in the directory at
+           <s:term s:type="expression">subtract p m</s:term> are added
+           to <s:term s:type="variable">S</s:term> and the next archive is considered.
+         </s:list-item>
+         <s:list-item>
+           If, in <s:term s:type="variable">a</s:term>, either 
+           <s:term s:type="expression">subtract p m</s:term> or
+           an ancestor <s:term s:type="variable">q</s:term> of
+           <s:term s:type="expression">subtract p m</s:term> is a
+           file, then the contents of
+           <s:term s:type="expression">subtract p m</s:term> are said
+           to be
+           <s:term s:type="term">shadowed</s:term>. If
+           shadowing is occuring, and
+           <s:term s:type="variable">a</s:term> is not the first
+           archive in the list that has been
+           <s:term s:type="term">checked</s:term> so far, then
+           <s:term s:type="variable">S</s:term> is returned and
+           no further archives are considered.
+           Otherwise, an error is returned (indicating
+           that <s:term s:type="variable">q</s:term>
+           is not a directory).  
+         </s:list-item>
+       </s:list-ordered>
+     </s:formal-item>
+       <s:formal-item s:kind="specifications">
+         <s:formal-item-title>Filesystem directory list union (Coq)</s:formal-item-title>
+       <s:verbatim><xi:include href="coq/FilesystemListUnion.v" parse="text"/></s:verbatim>
+       </s:formal-item>
+      </s:subsection>
+    </s:section>
+  </s:part>
+
+  <s:part>
+    <s:part-title>Rationale</s:part-title>
+    <s:part-contents/>
+
+    <s:section>
+      <s:section-title>Why not Java resources?</s:section-title>
+      <s:paragraph>
+        Java resources allow developers to access program resources and
+        data files without explicit access to a filesystem. This is usually
+        sufficient if all the resources in question are conceptually part of
+        the program. The main problem that <s:term s:type="package">jvvfs</s:term>
+        attempts to solve is the problem of the set of required resources not
+        being known or available on program startup.
+      </s:paragraph>
+      <s:paragraph>
+        Consider a game or simulation that allows the loading of third-party
+        levels or other assets. The <s:link-external s:target="http://openttd.org">OpenTTD</s:link-external>
+        engine is a good example of this, as it comes with a built-in installer
+        for third party content:
+      </s:paragraph>
+      <s:formal-item s:kind="illustration">
+        <s:formal-item-title>OpenTTD content installer</s:formal-item-title>
+        <s:image s:source="openttd_content.png">OpenTTD content installer</s:image>
+      </s:formal-item>
+      <s:paragraph>
+        Implementing the above with Java resources turns out to be rather
+        complicated. Overriding resources (to allow for content "upgrades")
+        is equally difficult.
+      </s:paragraph>
+      <s:paragraph>
+        The <s:term s:type="package">jvvfs</s:term> package provides a uniform
+        namespace for all resources, and new resources can be added at any time
+        by simply adding new archives and/or directories to the
+        <s:term s:type="term">archive directory</s:term> and then mounting them
+        as explained elsewhere in this documentation. The actual downloading of
+        external resource archives is considered to be outside of the scope of
+        <s:term s:type="package">jvvfs</s:term> and can be easily provided by
+        classes in the Java standard library.
+      </s:paragraph>
+    </s:section>
+  </s:part>
+
+  <s:part>
+    <s:part-title>API Reference</s:part-title>
+    <s:part-contents/>
+    <s:section>
+      <s:section-title>Javadoc</s:section-title>
+      <s:paragraph>
+        API documentation for the package is provided via the
+        included <s:link-external s:target="apidocs">Javadoc</s:link-external>.
+      </s:paragraph>
+    </s:section>
+  </s:part>
+
+  <s:part>
+    <s:part-title>Listings</s:part-title>
+    <s:part-contents/>
+    <s:section>
+      <s:section-title>Specifications</s:section-title>
+      <s:formal-item s:kind="listing">
+        <s:formal-item-title>Specification listings</s:formal-item-title>
+        <s:formal-item-list s:kind="specifications"/>
+      </s:formal-item>
+    </s:section>
+    <s:section>
+      <s:section-title>Examples</s:section-title>
+      <s:formal-item s:kind="listing">
+        <s:formal-item-title>Example listings</s:formal-item-title>
+        <s:formal-item-list s:kind="examples"/>
+      </s:formal-item>
+    </s:section>
+  </s:part>
+
+</s:document>

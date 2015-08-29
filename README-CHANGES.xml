@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<c:changelog xmlns:c="http://schemas.io7m.com/changelog/2.0.0">
+  <c:project>io7m-jvvfs</c:project>
+
+  <c:release c:ticket-system="com.github.io7m.jvvfs">
+    <c:date>2015-08-29</c:date>
+    <c:version>4.0.1</c:version>
+    <c:item>
+      <c:date>2015-08-29</c:date>
+      <c:type-code-fix/>
+      <c:summary>Migrate to GitHub.</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2014-04-23</c:date>
+    <c:version>4.0.0</c:version>
+
+    <c:item>
+      <c:date>2014-04-23</c:date>
+      <c:type-code-change/>
+      <c:summary>Rename each interface type S to SType, to follow new naming conventions.</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2014-04-23</c:date>
+      <c:type-code-change/>
+      <c:summary>Use io7m-jlog 3.0.0.</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2014-04-23</c:date>
+      <c:type-code-change/>
+      <c:summary>Use io7m-jfunctional, io7m-jnull, etc. Remove ConstraintError from all interfaces.</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2014-04-24</c:date>
+      <c:type-code-change/>
+      <c:summary>All packages now exist under a common groupId (com.io7m.jvvfs).</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2014-04-24</c:date>
+      <c:type-code-change/>
+      <c:summary>Filesystem.make*() now returns FilesystemType.</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2014-04-24</c:date>
+      <c:type-code-new/>
+      <c:summary>Added FilesystemType mainly for aesthetic reasons (more pleasant to read than the capability types it extends).</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2014-01-04</c:date>
+    <c:version>3.1.1</c:version>
+
+    <c:item>
+      <c:date>2014-01-04</c:date>
+      <c:type-code-new/>
+      <c:summary>Use jaux 3.0.0 and jsr305 2.0.2.</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2013-07-13</c:date>
+    <c:version>3.1.0</c:version>
+
+    <c:item>
+      <c:date>2013-10-04</c:date>
+      <c:type-code-new/>
+      <c:summary>Add the ability to mount archives from anywhere, exposed as a capability.</c:summary>
+    </c:item>
+
+    <c:item>
+      <c:date>2013-07-13</c:date>
+      <c:type-code-fix/>
+      <c:summary>Reduce log level of archive operations to 'debug'.</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2013-06-30</c:date>
+    <c:version>3.0.0</c:version>
+
+    <c:item>
+      <c:date>2013-06-30</c:date>
+      <c:type-code-change/>
+      <c:summary>Complete rewrite. Please consult the documentation for details on how to migrate a 2.*.* program to 3.0.0.</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2013-04-06</c:date>
+    <c:version>2.4.0</c:version>
+
+    <c:item>
+      <c:date>2012-12-04</c:date>
+      <c:type-code-fix/>
+      <c:summary>Use version ranges in dependencies</c:summary>
+    </c:item>
+
+    <c:item>
+      <c:date>2012-12-04</c:date>
+      <c:type-code-new/>
+      <c:summary>Add touch() function to FilesystemAPI</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2012-11-22</c:date>
+    <c:version>2.3.0</c:version>
+
+    <c:item>
+      <c:date>2012-11-21</c:date>
+      <c:type-code-new/>
+      <c:summary>Update all plugins to latest versions</c:summary>
+    </c:item>
+
+    <c:item>
+      <c:date>2012-11-10</c:date>
+      <c:type-code-fix/>
+      <c:summary>Use JSR 305 2.0.1</c:summary>
+    </c:item>
+
+    <c:item>
+      <c:date>2012-10-21</c:date>
+      <c:type-code-fix/>
+      <c:summary>Improve javadoc. Use UnreachableCodeException from io7m-jaux 2.3.0</c:summary>
+    </c:item>
+
+    <c:item>
+      <c:date>2012-09-05</c:date>
+      <c:type-code-fix/>
+      <c:summary>Add constructor without archive path in Filesystem, for using classpath-only filesystems</c:summary>
+    </c:item>
+
+    <c:item>
+      <c:date>2012-08-14</c:date>
+      <c:type-code-fix/>
+      <c:summary>Correct mountUnsafeClassPathItem on windows (urls are not interchangeable with file paths!)</c:summary>
+    </c:item>
+
+    <c:item>
+      <c:date>2012-08-14</c:date>
+      <c:type-code-fix/>
+      <c:summary>Weaken zip modification time tests, for portability</c:summary>
+    </c:item>
+
+    <c:item>
+      <c:date>2012-07-27</c:date>
+      <c:type-code-fix/>
+      <c:summary>Update saxon-plugin to 1.1.0 to correct documentation builds on Windows</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2012-07-25</c:date>
+    <c:version>2.2.0</c:version>
+
+    <c:item>
+      <c:date>2012-07-25</c:date>
+      <c:type-code-fix/>
+      <c:summary>Improve installation documentation</c:summary>
+    </c:item>
+
+    <c:item>
+      <c:date>2012-07-25</c:date>
+      <c:type-code-fix/>
+      <c:summary>Update versions of all plugins in POM</c:summary>
+    </c:item>
+
+    <c:item>
+      <c:date>2012-07-15</c:date>
+      <c:type-code-fix/>
+      <c:summary>Add missing documentation CSS</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2012-07-14</c:date>
+    <c:version>2.1.0</c:version>
+
+    <c:item>
+      <c:date>2012-07-14</c:date>
+      <c:type-code-fix/>
+      <c:summary>Produce documentation with Maven</c:summary>
+    </c:item>
+
+    <c:item>
+      <c:date>2012-07-13</c:date>
+      <c:type-code-fix/>
+      <c:summary>Make dependencies more honest: The package only depends on jsr305, not all of findbugs</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2012-06-28</c:date>
+    <c:version>2.0.0</c:version>
+    <c:item>
+      <c:date>2012-06-28</c:date>
+      <c:type-code-new/>
+      <c:summary>Switch to maven for builds</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2012-04-20</c:date>
+    <c:version>1.1.0</c:version>
+    <c:item>
+      <c:date>2012-04-20</c:date>
+      <c:type-code-fix/>
+      <c:summary>Non-root mount points for archives were not working correctly</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2012-04-19</c:date>
+      <c:type-code-fix/>
+      <c:summary>Directories were not being listed when specifying a mount point directly</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2012-04-19</c:date>
+      <c:type-code-new/>
+      <c:summary>Add mountUnsafeClasspathItem for mounting classpath archives</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2012-04-19</c:date>
+      <c:type-code-fix/>
+      <c:summary>Add missing directory entries in file listings</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2012-03-21</c:date>
+    <c:version>1.0.1</c:version>
+    <c:item>
+      <c:date>2012-03-21</c:date>
+      <c:type-code-new/>
+      <c:summary>Add FreeBSD 8.2 as supported</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.io7m.fossil.jvvfs">
+    <c:date>2012-03-15</c:date>
+    <c:version>1.0.0</c:version>
+    <c:item>
+      <c:date>2012-03-06</c:date>
+      <c:type-code-fix/>
+      <c:summary>Depend on jexternals for eclipse users</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2012-02-08</c:date>
+      <c:type-code-new/>
+      <c:summary>Add SunOS supported</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:ticket-system xml:id="com.io7m.fossil.jvvfs">
+    <c:ticket-url>http://fossil.io7m.com/repo.cgi/io7m-jvvfs/tktview?name=</c:ticket-url>
+  </c:ticket-system>
+
+  <c:ticket-system xml:id="com.github.io7m.jvvfs">
+    <c:ticket-url>http://github.com/io7m/jvvfs/issues/</c:ticket-url>
+  </c:ticket-system>
+
+</c:changelog>
