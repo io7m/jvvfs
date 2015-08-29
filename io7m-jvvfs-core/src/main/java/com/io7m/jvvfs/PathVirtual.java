@@ -286,22 +286,19 @@ public final class PathVirtual implements Comparable<PathVirtual>
    * <p>
    * The ordering relation for virtual paths.
    * </p>
-   * <p>
    * <ul>
-   * <li>If <code>p0.size() &lt; p1.size()</code>, then
-   * <code>p0 &lt; p1</code></li>
-   * <li>If <code>p0.size() &gt; p1.size()</code>, then
-   * <code>p0 &gt; p1</code></li>
-   * <li>If <code>p0.size() == p1.size()</code>, then:
-   * <ul>
-   * <li><code>∃i. p0[i] &lt; p1[i] → p0 &lt; p1</code></li>
-   * <li><code>∃i. p0[i] &gt; p1[i] → p0 &gt; p1</code></li>
-   * <li>Otherwise, <code>p0 == p1</code>.</li>
+   *   <li>If <code>p0.size() &lt; p1.size()</code>, then <code>p0 &lt; p1</code></li>
+   *   <li>If <code>p0.size() &gt; p1.size()</code>, then <code>p0 &gt; p1</code></li>
+   *   <li>
+   *     If <code>p0.size() == p1.size()</code>, then:
+   *     <ul>
+   *       <li><code>∃i. p0[i] &lt; p1[i] → p0 &lt; p1</code></li>
+   *       <li><code>∃i. p0[i] &gt; p1[i] → p0 &gt; p1</code></li>
+   *       <li>Otherwise, <code>p0 == p1</code>.</li>
+   *     </ul>
+   *   </li>
    * </ul>
-   * </li>
-   * </ul>
-   * </p>
-   * 
+   *
    * @param o
    *          The other path
    * @return A negative integer, zero, or a positive integer as this path is
